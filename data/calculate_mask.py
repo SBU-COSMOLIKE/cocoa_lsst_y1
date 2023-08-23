@@ -3,7 +3,7 @@ import os
 from astropy.cosmology import FlatLambdaCDM
 
 #VM code adapted from Supranta's Python script
-ggl_efficiency_cut = 0.05
+ggl_efficiency_cut = [0.05]
 
 #VM INPUT BEGINS ---------------------------------------------------------------
 for Year in [1]:
@@ -72,10 +72,10 @@ for Year in [1]:
       ]
 
     γt_mask = [] 
-    if (Year == 1)
+    if (Year == 1):
       for i in range(N_LENS): 
         for j in range(N_SRC):
-          if ggl_efficiency(i,j) > ggl_efficiency_cut[0]:
+          if ggl_efficiency[i][j] > ggl_efficiency_cut[0]:
             γt_mask.append((theta[:-1] > ang_cut(zavg[i])))
           else:
             γt_mask.append(np.zeros(N_ANG_BINS))
@@ -86,9 +86,9 @@ for Year in [1]:
 
     #VM output -----------------------------------------------------------------
     mask = np.hstack([ξp_mask, ξm_mask, γt_mask, w_mask])
-    if (Year == 1)
+    if (Year == 1):
       np.savetxt("LSST_Y" + str(Year) + "_M" + str(mask_choice) +
-        + "GGLOLAP" + str(ggl_efficiency_cut[0]) + ".mask", 
+        "_GGLOLAP" + str(ggl_efficiency_cut[0]) + ".mask", 
         np.column_stack((np.arange(0,len(mask)), mask)),
         fmt='%d %1.1f')
 
