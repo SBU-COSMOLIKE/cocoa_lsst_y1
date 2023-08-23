@@ -184,55 +184,55 @@ params:
   LSST_DZ_S1:
     prior:
       dist: norm
-      loc: 0.0414632
+      loc: 0.1
       scale: 0.002
     ref:
       dist: norm
-      loc: 0.0414632
+      loc: 0.1
       scale: 0.002
     proposal: 0.002
     latex: \Delta z_\mathrm{s,LSST}^1
   LSST_DZ_S2:
     prior:
       dist: norm
-      loc: 0.00147332
+      loc: 0.1
       scale: 0.002
     ref:
       dist: norm
-      loc: 0.00147332
+      loc: 0.1
       scale: 0.002
     proposal: 0.002
     latex: \Delta z_\mathrm{s,LSST}^2
   LSST_DZ_S3:
     prior:
       dist: norm
-      loc: 0.0237035
+      loc: 0.1
       scale: 0.002
     ref:
       dist: norm
-      loc: 0.0237035
+      loc: 0.1
       scale: 0.002
     proposal: 0.002
     latex: \Delta z_\mathrm{s,LSST}^3
   LSST_DZ_S4:
     prior:
       dist: norm
-      loc: -0.0773436
+      loc: 0.1
       scale: 0.002
     ref:
       dist: norm
-      loc: -0.0773436
+      loc: 0.1
       scale: 0.002
     proposal: 0.002
     latex: \Delta z_\mathrm{s,LSST}^4
   LSST_DZ_S5:
     prior:
       dist: norm
-      loc: -8.67127e-05
+      loc: 0.1
       scale: 0.002
     ref:
       dist: norm
-      loc: -8.67127e-05
+      loc: 0.1
       scale: 0.002
     proposal: 0.002
     latex: \Delta z_\mathrm{s,LSST}^5
@@ -277,55 +277,55 @@ params:
   LSST_DZ_L1:
     prior:
       dist: norm
-      loc: 0.00457604
+      loc: 0.1
       scale: 0.005
     ref:
       dist: norm
-      loc: 0.00457604
+      loc: 0.1
       scale: 0.005
     proposal: 0.005
     latex: \Delta z_\mathrm{l,LSST}^1
   LSST_DZ_L2:
     prior:
       dist: norm
-      loc: 0.000309875
+      loc: 0.1
       scale: 0.005
     ref:
       dist: norm
-      loc: 0.000309875
+      loc: 0.1
       scale: 0.005
     proposal: 0.005
     latex: \Delta z_\mathrm{l,LSST}^2
   LSST_DZ_L3:
     prior:
       dist: norm
-      loc: 0.00855907
+      loc: 0.1
       scale: 0.005
     ref:
       dist: norm
-      loc: 0.00855907
+      loc: 0.1
       scale: 0.005
     proposal: 0.005
     latex: \Delta z_\mathrm{l,LSST}^3
   LSST_DZ_L4:
     prior:
       dist: norm
-      loc: -0.00316269
+      loc: 0.1
       scale: 0.005
     ref:
       dist: norm
-      loc: -0.00316269
+      loc: 0.1
       scale: 0.005
     proposal: 0.005
     latex: \Delta z_\mathrm{l,LSST}^4
   LSST_DZ_L5:
     prior:
       dist: norm
-      loc: -0.0146753
+      loc: 0.1
       scale: 0.005
     ref:
       dist: norm
-      loc: -0.0146753
+      loc: 0.1
       scale: 0.005
     proposal: 0.005
     latex: \Delta z_\mathrm{l,LSST}^5
