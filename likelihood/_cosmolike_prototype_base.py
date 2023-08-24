@@ -207,7 +207,7 @@ class _cosmolike_prototype_base(DataSetLikelihood):
       # COLA NN Emulator for LCDM
       self.emulator = nn_emu_lcdm
     else:
-      raise LoggedError(self.log, "non_linear_emul = %d is an invalid option", non_linear_emul)
+      raise LoggedError(self.log, "non_linear_emul = %d is an invalid option", self.non_linear_emul)
 
   # ------------------------------------------------------------------------
   # ------------------------------------------------------------------------
