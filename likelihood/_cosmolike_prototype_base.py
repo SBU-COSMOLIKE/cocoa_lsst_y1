@@ -15,6 +15,9 @@ from getdist import IniFile
 import euclidemu2
 import math
 
+# JVR - Importing COLA Emulators
+from COLA_Emulators.NN import nn_emu_lcdm
+
 import cosmolike_lsst_y1_interface as ci
 
 # default is best fit LCDM - just need to be an ok Cosmology
@@ -195,7 +198,16 @@ class _cosmolike_prototype_base(DataSetLikelihood):
 
     # ------------------------------------------------------------------------
     if self.non_linear_emul == 1:
+      # Euclid Emulator 2
       self.emulator = ee2=euclidemu2.PyEuclidEmulator()
+    elif self.non_linear_emul == 2:
+      # Halofit
+      self.emulator = None
+    elif self.non_linear_emul == 3:
+      # COLA NN Emulator for LCDM
+      self.emulator = nn_emu_lcdm
+    else:
+      raise LoggedError(self.log, "non_linear_emul = %d is an invalid option", non_linear_emul)
 
   # ------------------------------------------------------------------------
   # ------------------------------------------------------------------------
@@ -280,7 +292,7 @@ class _cosmolike_prototype_base(DataSetLikelihood):
     lnPL  += np.log((h**3))
 
     if self.non_linear_emul == 1:
-
+      # EE2
       params = {
         'Omm'  : self.provider.get_param("omegam"),
         'As'   : self.provider.get_param("As"),
@@ -310,13 +322,27 @@ class _cosmolike_prototype_base(DataSetLikelihood):
         lnPNL[i::self.len_z_interp_2D]  = lnPL[i::self.len_z_interp_2D] + lnbt
       
     elif self.non_linear_emul == 2:
-
+      # Halofit
       for i in range(self.len_z_interp_2D):
         lnPNL[i::self.len_z_interp_2D]  = t1[i*self.len_k_interp_2D:(i+1)*self.len_k_interp_2D]  
-      lnPNL += np.log((h**3))      
+      lnPNL += np.log((h**3))   
 
-    else:
-      raise LoggedError(self.log, "non_linear_emul = %d is an invalid option", non_linear_emul)
+    elif self.non_linear_emul == 3:
+      # COLA NN
+      params = {
+        'Omm'  : self.provider.get_param("omegam"),
+        'As'   : self.provider.get_param("As"),
+        'Omb'  : self.provider.get_param("omegab"),
+        'ns'   : self.provider.get_param("ns"),
+        'h'    : h
+      }
+      cola_ks = self.emulator.cola_ks_default
+      cola_zs = self.emulator.cola_redshifts
+      boost_at_cola_ks_and_zs = self.emulator.get_boost(params)
+
+      assert False, "Implementation of COLA NN not finished"
+
+    
 
     # Compute chi(z) - convert to Mpc/h
     chi = self.provider.get_comoving_radial_distance(self.z_interp_1D) * h
