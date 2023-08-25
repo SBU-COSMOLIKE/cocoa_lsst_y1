@@ -44,19 +44,19 @@ likelihood:
 #    w0pwa: -0.9 (wa = 0)
 #    w: -0.9
 #  LSST_BMAG_1:
-#    value: -0.898
+#    value: 0.0
 #    latex: b_\mathrm{BMAG-LSST}^1
 #  LSST_BMAG_2:
-#    value: -0.659
+#    value: 0.0
 #    latex: b_\mathrm{BMAG-LSST}^2
 #  LSST_BMAG_3:
-#    value: -0.403
+#    value: 0.0
 #    latex: b_\mathrm{BMAG-LSST}^3
 #  LSST_BMAG_4:
-#    value: -0.0704
+#    value: 0.0
 #    latex: b_\mathrm{BMAG-LSST}^4
 #  LSST_BMAG_5:
-#    value: 0.416
+#    value: 0.0
 #    latex: b_\mathrm{BMAG-LSST}^5
 
 params:
@@ -471,9 +471,9 @@ sampler:
     # Maximum number of posterior evaluations
     max_samples: .inf
     # Gelman-Rubin R-1 on means
-    Rminus1_stop: 0.02
+    Rminus1_stop: 0.005
     # Gelman-Rubin R-1 on std deviations
-    Rminus1_cl_stop: 0.2
+    Rminus1_cl_stop: 0.15
     Rminus1_cl_level: 0.95
     # --------------------------------------
     # --------------------------------------
@@ -482,6 +482,9 @@ sampler:
     # --------------------------------------
     measure_speeds: False
     drag: False
+    # Cosmolike Cosmic Shear without Cosmo change is ~0.45seconds (8 cores) @OCelote
+    # Euclid Emulator runs in ~0.15seconds @Ocelote
+    # Euclid Emulator destroys the speed-up (~0.02s) when only varying LSST_MX
     blocking:
       - [1,
           [
@@ -495,12 +498,12 @@ sampler:
             LSST_DZ_L5, LSST_B1_1, LSST_B1_2, LSST_B1_3, LSST_B1_4, LSST_B1_5
           ]
         ]
-      - [25,
+      - [5,
           [
             LSST_M1, LSST_M2, LSST_M3, LSST_M4, LSST_M5, 
           ]
         ]
-    oversample_power: 0.3
+    oversample_power: 0.2
     oversample_thin: True
     # --------------------------------------
     # --------------------------------------

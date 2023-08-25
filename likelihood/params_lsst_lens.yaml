@@ -130,19 +130,19 @@
   # ------------------------------------------------------------------------
   # ------------------------------------------------------------------------
   LSST_BMAG_1:
-    value: -0.898
+    value: 0.0
     latex: b_\mathrm{BMAG-LSST}^1
   LSST_BMAG_2:
-    value: -0.659
+    value: 0.0
     latex: b_\mathrm{BMAG-LSST}^2
   LSST_BMAG_3:
-    value: -0.403
+    value: 0.0
     latex: b_\mathrm{BMAG-LSST}^3
   LSST_BMAG_4:
-    value: -0.0704
+    value: 0.0
     latex: b_\mathrm{BMAG-LSST}^4
   LSST_BMAG_5:
-    value: 0.416
+    value: 0.0
     latex: b_\mathrm{BMAG-LSST}^5
   # ------------------------------------------------------------------------
   # ------------------------------------------------------------------------

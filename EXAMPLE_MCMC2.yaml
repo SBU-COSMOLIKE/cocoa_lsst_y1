@@ -44,19 +44,19 @@ likelihood:
 #    w0pwa: -0.9 (wa = 0)
 #    w: -0.9
 #  LSST_BMAG_1:
-#    value: -0.898
+#    value: 0.0
 #    latex: b_\mathrm{BMAG-LSST}^1
 #  LSST_BMAG_2:
-#    value: -0.659
+#    value: 0.0
 #    latex: b_\mathrm{BMAG-LSST}^2
 #  LSST_BMAG_3:
-#    value: -0.403
+#    value: 0.0
 #    latex: b_\mathrm{BMAG-LSST}^3
 #  LSST_BMAG_4:
-#    value: -0.0704
+#    value: 0.0
 #    latex: b_\mathrm{BMAG-LSST}^4
 #  LSST_BMAG_5:
-#    value: 0.416
+#    value: 0.0
 #    latex: b_\mathrm{BMAG-LSST}^5
 
 params:
@@ -470,9 +470,9 @@ sampler:
     # Maximum number of posterior evaluations
     max_samples: .inf
     # Gelman-Rubin R-1 on means
-    Rminus1_stop: 0.02
+    Rminus1_stop: 0.005
     # Gelman-Rubin R-1 on std deviations
-    Rminus1_cl_stop: 0.2
+    Rminus1_cl_stop: 0.15
     Rminus1_cl_level: 0.95
     # --------------------------------------
     # --------------------------------------
@@ -481,6 +481,7 @@ sampler:
     # --------------------------------------
     measure_speeds: False
     drag: False
+    # Cosmolike Cosmic Shear without Cosmo change is ~0.43seconds (8 cores) @OCelote
     blocking:
       - [1,
           [

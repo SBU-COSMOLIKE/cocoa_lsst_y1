@@ -1,6 +1,11 @@
-timing: True
+timing: False
 debug: False
 stop_at_error: False
+
+# THIS EXAMPLE POST PROCESS EXAMPLE_MCMC1 CHANGING HALOFIT W/ EE2 EMULATOR
+# THIS EXAMPLE CHECKS IF IMPORTANCE SAMPLING IS EQUIVALENT TO RUNNING MCMC3
+# THE YAML ASSUMES 0.35% BURN IN (COBAYA WILL SKIP THEM); 
+# THE YAML THINS THE CHAIN BY A FACTOR 3
 
 likelihood:
   lsst_y1.lsst_cosmic_shear:
@@ -8,54 +13,8 @@ likelihood:
     accuracyboost: 1.0
     integration_accuracy: 0
     kmax_boltzmann: 5.0
-
-# IN THIS EXAMPLE, WE ASSUMED THE DATA VECTOR WERE CREATED W/ THE FOLLOWING 
-# PARAMETERS
-#    As_1e9: 2.1
-#    ns: 0.96605
-#    H0: 67.32
-#    omegab: 0.04
-#    omegam: 0.3
-#    mnu: 0.06
-#    LSST_DZ_S1: 0.0414632
-#    LSST_DZ_S2: 0.00147332
-#    LSST_DZ_S3: 0.0237035
-#    LSST_DZ_S4: -0.0773436
-#    LSST_DZ_S5: -8.67127e-05
-#    LSST_M1: 0.0191832
-#    LSST_M2: -0.0431752
-#    LSST_M3: -0.034961
-#    LSST_M4: -0.0158096
-#    LSST_M5: -0.0158096
-#    LSST_A1_1: 0.606102
-#    LSST_A1_2: -1.51541
-#    LSST_DZ_L1: 0.00457604
-#    LSST_DZ_L2: 0.000309875
-#    LSST_DZ_L3: 0.00855907
-#    LSST_DZ_L4: -0.00316269
-#    LSST_DZ_L5: -0.0146753
-#    LSST_B1_1: 1.72716
-#    LSST_B1_2: 1.65168
-#    LSST_B1_3: 1.61423
-#    LSST_B1_4: 1.92886
-#    LSST_B1_5: 2.11633
-#    w0pwa: -0.9 (wa = 0)
-#    w: -0.9
-#  LSST_BMAG_1:
-#    value: -0.898
-#    latex: b_\mathrm{BMAG-LSST}^1
-#  LSST_BMAG_2:
-#    value: -0.659
-#    latex: b_\mathrm{BMAG-LSST}^2
-#  LSST_BMAG_3:
-#    value: -0.403
-#    latex: b_\mathrm{BMAG-LSST}^3
-#  LSST_BMAG_4:
-#    value: -0.0704
-#    latex: b_\mathrm{BMAG-LSST}^4
-#  LSST_BMAG_5:
-#    value: 0.416
-#    latex: b_\mathrm{BMAG-LSST}^5
+    # 1 EE2, 2 Halofit
+    non_linear_emul: 2
 
 params:
   As_1e9:
@@ -65,9 +24,9 @@ params:
     ref:
       dist: norm
       loc: 2.1
-      scale: 0.65
-    proposal: 0.4
-    latex: 10^9 A_\mathrm{s})
+      scale: 0.1
+    proposal: 0.1
+    latex: 10^9 A_\mathrm{s}
     drop: true
     renames: A
   ns:
@@ -77,8 +36,8 @@ params:
     ref:
       dist: norm
       loc: 0.96605
-      scale: 0.01
-    proposal: 0.01
+      scale: 0.005
+    proposal: 0.005
     latex: n_\mathrm{s}
   H0:
     prior:
@@ -87,8 +46,8 @@ params:
     ref:
       dist: norm
       loc: 67.32
-      scale: 5
-    proposal: 3
+      scale: 2
+    proposal: 1
     latex: H_0
   omegab:
     prior:
@@ -97,8 +56,8 @@ params:
     ref:
       dist: norm
       loc: 0.0495
-      scale: 0.004
-    proposal: 0.004
+      scale: 0.0025
+    proposal: 0.0025
     latex: \Omega_\mathrm{b}
     drop: true
   omegam:
@@ -108,8 +67,8 @@ params:
     ref:
       dist: norm
       loc: 0.316
-      scale: 0.02
-    proposal: 0.02
+      scale: 0.01
+    proposal: 0.01
     latex: \Omega_\mathrm{m}
     drop: true
   w:
@@ -119,8 +78,8 @@ params:
     ref:
       dist: norm
       loc: -0.99
-      scale: 0.05
-    proposal: 0.05
+      scale: 0.02
+    proposal: 0.02
     latex: w_{0,\mathrm{DE}}
   mnu:
     value: 0.06
@@ -324,23 +283,55 @@ theory:
       accurate_massive_neutrino_transfers: false
       k_per_logint: 20
 
-sampler:
-  polychord:
-    path: null
-    nlive: 128
-    num_repeats: 2d
-    do_clustering: false
-    precision_criterion: 0.001
-    boost_posterior: 10
-    feedback: 2
-    blocking:
-      - [1,
-          [
-            As_1e9, ns, H0, omegab, omegam, w,
-            LSST_DZ_S1, LSST_DZ_S2, LSST_DZ_S3, LSST_DZ_S4, LSST_DZ_S5, 
-            LSST_A1_1, LSST_A1_2,
-            LSST_M1, LSST_M2, LSST_M3, LSST_M4, LSST_M5
-          ]
-        ]
+post:
+  skip: 0.35
+  thin: 3
+  suffix: FHTEE2 # FROM HALOFIT TO EE2
+  remove:
+    theory:
+      camb:
+        path: ./external_modules/code/CAMB
+        stop_at_error: False
+        use_renames: True
+        extra_args:
+          halofit_version: takahashi
+          AccuracyBoost: 1.1
+          lens_potential_accuracy: 1.0
+          num_massive_neutrinos: 1
+          nnu: 3.046
+          dark_energy_model: ppf
+          accurate_massive_neutrino_transfers: false
+          k_per_logint: 20
+    likelihood:
+      lsst_y1.lsst_cosmic_shear:
+        path: ./external_modules/data/lsst_y1
+        accuracyboost: 1.0
+        integration_accuracy: 0
+        kmax_boltzmann: 5.0
+        # 1 EE2, 2 Halofit
+        non_linear_emul: 2
+  add:
+    theory:
+      camb:
+        path: ./external_modules/code/CAMB
+        stop_at_error: False
+        use_renames: True
+        extra_args:
+          halofit_version: takahashi
+          AccuracyBoost: 1.1
+          lens_potential_accuracy: 1.0
+          num_massive_neutrinos: 1
+          nnu: 3.046
+          dark_energy_model: ppf
+          accurate_massive_neutrino_transfers: false
+          k_per_logint: 20  
+    likelihood:
+      lsst_y1.lsst_cosmic_shear:
+        path: ./external_modules/data/lsst_y1
+        accuracyboost: 1.0
+        integration_accuracy: 0
+        kmax_boltzmann: 1.0
+        # 1 EE2, 2 Halofit
+        non_linear_emul: 1
 
-output: ./projects/lsst_y1/chains/EXAMPLE_POLY3
+output: ./projects/lsst_y1/chains/EXAMPLE_MCMC1

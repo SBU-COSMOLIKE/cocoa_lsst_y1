@@ -41,3 +41,13 @@ MCMC:
 ## Deleting Cosmolike projects <a name="running_cosmolike_projects"></a>
 
 :warning: (**warning**) :warning: Never delete the `lsst_y1` folder from the project folder without running `stop_cocoa` first; otherwise, Cocoa will have ill-defined soft links at `Cocoa/cobaya/cobaya/likelihoods/`, `Cocoa/external_modules/code/` and `Cocoa/external_modules/data/`
+
+## MCMC Convergence Criteria <a name="running_cosmolike_projects"></a>
+
+  We are strict in our convergence criteria on `EXAMPLE_MCMC[0-9].YAML` MCMC examples.
+  
+    Rminus1_stop: 0.005
+    # Gelman-Rubin R-1 on std deviations
+    Rminus1_cl_stop: 0.15
+    
+For most applications, these settings are overkill (except when computing some tension and goodness of fit metrics). Please adjust these settings to your needs. 
