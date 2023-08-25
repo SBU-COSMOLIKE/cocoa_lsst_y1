@@ -4,6 +4,8 @@ import os
 import numpy as np
 import scipy
 from scipy.interpolate import interp1d
+# JVR - adding 2D interpolator
+from scipy.interpolate import RegularGridInterpolator
 import sys
 import time
 
@@ -17,6 +19,7 @@ import math
 
 # JVR - Importing COLA Emulators
 from COLA_Emulators.NN import nn_emu_lcdm
+import COLA_Emulators.NN.train_utils as emu_utils
 
 import cosmolike_lsst_y1_interface as ci
 
@@ -339,10 +342,34 @@ class _cosmolike_prototype_base(DataSetLikelihood):
       cola_ks = self.emulator.cola_ks_default
       cola_zs = self.emulator.cola_redshifts
       boost_at_cola_ks_and_zs = self.emulator.get_boost(params)
+      # First, I need to interpolate to the Cosmolike zs that are within our range
+      # Notice that, for z > 3, the boost is given by fill_value=1
+      boost_interpolator = RegularGridInterpolator((cola_zs, cola_ks), boost_at_cola_ks_and_zs, bounds_error=False, fill_value=1)
+      boost_at_cola_ks = boost_interpolator((self.z_interp_2D, cola_ks))
 
-      assert False, "Implementation of COLA NN not finished"
+      logkbt = np.log10(cola_ks)
+      # Now, I process just like EE2 implementation
+      for i in range(self.len_z_interp_2D):    
+        interp = interp1d(logkbt, 
+            np.log(boost_at_cola_ks[i]), 
+            kind = 'linear', 
+            fill_value = 'extrapolate', 
+            assume_sorted = True
+          )
+        # With the exception that we need to smear the linear power spectrum
+        qk = interp(log10k_interp_2D)
+        pk_l = np.exp(lnPL[i::self.len_z_interp_2D])
+        pk_l_ = pk_l[425:815]
+        ks_smear = k_interp_2D[425:815]
+        pk_nw = emu_utils.smooth_bao(ks_smear, pk_l_)
+        pk_smeared_ = emu_utils.smear_bao(ks_smear, pk_l_, pk_nw)
+        pk_smeared = np.concatenate([pk_l[0:425],pk_smeared_,pk_l[815:self.len_k_interp_2D]])
+        lnpk_total = np.log(pk_smeared) + qk
+        lnpk_total[self.k_interp_2D/h < kbt[0]] = np.log(pk_l[self.k_interp_2D/h < kbt[0]])
+        lnPNL[i::self.len_z_interp_2D] = lnpk_total
 
-    
+    elif self.non_linear_emul == 4:
+      assert False, "Other emulators not implemented"
 
     # Compute chi(z) - convert to Mpc/h
     chi = self.provider.get_comoving_radial_distance(self.z_interp_1D) * h
