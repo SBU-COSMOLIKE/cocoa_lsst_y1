@@ -18,8 +18,9 @@ import euclidemu2
 import math
 
 # JVR - Importing COLA Emulators
+sys.path.append("./projects/lsst_y1/")
 from COLA_Emulators.NN import nn_emu_lcdm
-import COLA_Emulators.NN.train_utils as emu_utils
+from COLA_Emulators.NN import train_utils as emu_utils
 
 import cosmolike_lsst_y1_interface as ci
 

@@ -40,8 +40,8 @@ ref['w'] = -1
 redshifts = np.array([9.182, 7.690, 6.579, 5.720, 5.036, 4.478, 4.015, 3.624, 3.289, 3.000, 2.750, 2.529, 2.333, 2.158, 2.000, 1.824, 1.667, 1.526, 1.400, 1.286, 1.182, 1.087, 1.000, 0.929, 0.862, 0.800, 0.742, 0.688, 0.636, 0.588, 0.543, 0.500, 0.457, 0.417, 0.378, 0.342, 0.308, 0.275, 0.244, 0.214, 0.186, 0.159, 0.133, 0.109, 0.085, 0.062, 0.041, 0.020, 0.000])
 redshifts = np.flip(redshifts)
 path_to_train = "/home/grads/data/jonathan/cola_projects/COLA_output/LCDM/400_1"
-ks_cola_default = np.loadtxt(f"{path_to_train}/a/output/ref/pofk_ref_total_z0.000.txt", unpack=True, usecols=(0))
-ks_cola_default = ks_cola_default[:512] # Need to restrain to k = pi
+#ks_cola_default = np.loadtxt(f"{path_to_train}/a/output/ref/pofk_ref_total_z0.000.txt", unpack=True, usecols=(0))
+#ks_cola_default = ks_cola_default[:512] # Need to restrain to k = pi
 #------------------------------------------------------------------------------------------------------------
 def is_cosmo_inside_ee2_box(params):
     """

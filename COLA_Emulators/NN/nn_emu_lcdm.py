@@ -2,7 +2,14 @@
 import os
 import numpy as np
 import keras
-from train_utils import lims
+
+lims = {}
+lims['h'] = [0.61, 0.73]
+lims['Omegab'] = [0.04, 0.06]
+lims['Omegam'] = [0.24, 0.4]
+lims['As'] = [1.7e-9, 2.5e-9]
+lims['ns'] = [0.92, 1]
+lims['w'] = [-1.3, -0.7]
 
 num_pcs = 11
 path_to_emulator =  os.path.dirname(__file__)
