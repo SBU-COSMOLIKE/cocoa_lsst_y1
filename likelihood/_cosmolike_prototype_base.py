@@ -3,9 +3,11 @@ from __future__ import absolute_import, division, print_function
 import os
 import numpy as np
 import scipy
-from scipy.interpolate import interp1d
+import scipy.interpolate
+from scipy.interpolate import interp1d, interp2d
 # JVR - adding 2D interpolator
 from scipy.interpolate import RegularGridInterpolator
+from scipy.signal import savgol_filter
 import sys
 import time
 
@@ -21,6 +23,11 @@ import math
 sys.path.append("./projects/lsst_y1/")
 from COLA_Emulators.NN import nn_emu_lcdm
 from COLA_Emulators.NN import train_utils as emu_utils
+
+# JG
+from COLA_Emulators.GP.LCDM_cola_emulator1 import cola_emulator as gp_emulator
+import matplotlib
+import matplotlib.pyplot as plt
 
 import cosmolike_lsst_y1_interface as ci
 
@@ -123,9 +130,11 @@ class _cosmolike_prototype_base(DataSetLikelihood):
       np.linspace(1080,2000,20)),axis=0) #CMB 6x2pt g_CMB (possible in the future)
     self.z_interp_1D[0] = 0
 
+    # COLA begins
     self.z_interp_2D = np.linspace(0,2.0,95)
-    self.z_interp_2D = np.concatenate((self.z_interp_2D, np.linspace(2.0,10,5)),axis=0)
+    self.z_interp_2D = np.concatenate((self.z_interp_2D, np.linspace(3.0,10.0,5)),axis=0)
     self.z_interp_2D[0] = 0
+    # COLA ends
 
     self.len_z_interp_2D = len(self.z_interp_2D)
     self.len_log10k_interp_2D = 1200
@@ -208,6 +217,27 @@ class _cosmolike_prototype_base(DataSetLikelihood):
       # Halofit
       self.emulator = None
     elif self.non_linear_emul == 3:
+      # COLA GP Emulator for LCDM
+      emu_path = './projects/lsst_y1/COLA_Emulators/GP/LCDM_cola_emulator1/'
+      self.lhs = np.loadtxt(emu_path + 'lhs_norm.txt')
+      self.ks_emu = np.loadtxt(emu_path + '/ks.txt')
+      self.zs_cola = gp_emulator.redshifts_ee2
+      self.qs_reduced = []
+      self.pcas = []
+      self.means = []
+      self.all_gp_params = []
+      for j in range(len(self.zs_cola)):
+        z_str = "{:.3f}".format(self.zs_cola[j])
+        self.means.append(np.loadtxt(f'{emu_path}/means/z{z_str}.txt'))
+        self.pcas.append(np.loadtxt(f'{emu_path}/PCs/z{z_str}.txt'))
+        self.qs_reduced.append(np.loadtxt(f'{emu_path}/data/z{z_str}.txt'))
+        self.all_gp_params.append(np.loadtxt(emu_path+f'hyperparameters/hyperparams_z{z_str}.txt'))
+      print('[nonlinear] Initializing GP Emulator.')
+      self.emulator = gp_emulator.initialize_emulator(self.all_gp_params,self.qs_reduced,self.lhs) 
+      print('[nonlinear] GP Emulator initialized.')
+      print('[nonlinear] Using COLA GP emulator')
+      #self.emulator = nn_emu_lcdm
+    elif self.non_linear_emul == 4:
       # COLA NN Emulator for LCDM
       self.emulator = nn_emu_lcdm
     else:
@@ -287,7 +317,7 @@ class _cosmolike_prototype_base(DataSetLikelihood):
     
     t1 = PKNL.logP(self.z_interp_2D, self.k_interp_2D).flatten()
     t2 = PKL.logP(self.z_interp_2D, self.k_interp_2D).flatten()
-    
+
     # Cosmolike wants k in h/Mpc
     log10k_interp_2D = self.log10k_interp_2D - np.log10(h)
     
@@ -311,7 +341,7 @@ class _cosmolike_prototype_base(DataSetLikelihood):
       kbt = np.power(10.0, np.linspace(-2.0589, 0.973, self.len_k_interp_2D))
       kbt, tmp_bt = self.emulator.get_boost(params, self.z_interp_2D, kbt)
       logkbt = np.log10(kbt)
-
+      lnpk_ee2 = []
       for i in range(self.len_z_interp_2D):    
         interp = interp1d(logkbt, 
             np.log(tmp_bt[i]), 
@@ -324,7 +354,8 @@ class _cosmolike_prototype_base(DataSetLikelihood):
         lnbt[np.power(10,log10k_interp_2D) < 8.73e-3] = 0.0
     
         lnPNL[i::self.len_z_interp_2D]  = lnPL[i::self.len_z_interp_2D] + lnbt
-      
+        lnpk_ee2.append(lnPL[i::self.len_z_interp_2D] + lnbt)
+      #np.savetxt('./projects/lsst_y1/debug_ee2.txt', lnpk_ee2)
     elif self.non_linear_emul == 2:
       # Halofit
       for i in range(self.len_z_interp_2D):
@@ -332,6 +363,52 @@ class _cosmolike_prototype_base(DataSetLikelihood):
       lnPNL += np.log((h**3))   
 
     elif self.non_linear_emul == 3:
+      # COLA GP
+      params = {
+        'Omm'  : self.provider.get_param("omegam"),
+        'As'   : self.provider.get_param("As"),
+        'Omb'  : self.provider.get_param("omegab"),
+        'ns'   : self.provider.get_param("ns"),
+        'h'    : h
+      }
+      param_names = ['Omm','Omb', 'ns', 'As', 'h']
+      params_ = [gp_emulator.normalize_param(gp_emulator.param_mins[i], gp_emulator.param_maxs[i], params[param_names[i]]) for i in range(len(param_names))]
+      tmp_qk = gp_emulator.emulate_all_zs(params_, self.emulator, self.qs_reduced, self.pcas, self.means, self.ks_emu, self.zs_cola)
+      #Need linear pk in cola z's to smear 40 times instead of 100
+      pk_l = np.exp(PKL.logP(self.zs_cola, self.k_interp_2D) + np.log(h**3))
+      log10_ks_emu = np.log10(self.ks_emu)
+      lnpk_total_ = []
+      #These are the cocoa k-indices where cola kmin and kmax lie
+      k_l_index = gp_emulator.find_crossing_index(self.k_interp_2D/h, self.ks_emu[0])
+      k_r_index = gp_emulator.find_crossing_index(self.k_interp_2D/h, self.ks_emu[-1])
+      for i in range(len(self.zs_cola)): 
+        filtered_qk_extrap = savgol_filter(tmp_qk[i][len(self.ks_emu)-25:],7,1)  
+        #This interp is to get the extrapolated k range
+        qk_extrap = interp1d(log10_ks_emu[len(self.ks_emu)-25:], 
+            filtered_qk_extrap,
+            kind = 'linear', 
+            fill_value = 'extrapolate', 
+            assume_sorted = True)
+        #This interp is for the remaining k range
+        qk_interp = interp1d(log10_ks_emu,  
+            tmp_qk[i],
+            kind = 'linear', 
+            fill_value = 'extrapolate', 
+            assume_sorted = True
+          )
+        qk = np.zeros(len(self.k_interp_2D))
+        qk[k_l_index:k_r_index] = qk_interp(log10k_interp_2D[k_l_index:k_r_index])
+        qk[k_r_index:] = qk_extrap(log10k_interp_2D[k_r_index:])
+        pk_nw = gp_emulator.smooth_bao(self.k_interp_2D/h, pk_l[i])
+        pk_smeared = gp_emulator.smear_bao(self.k_interp_2D/h, pk_l[i], pk_nw)
+        lnpk_total_.append(np.log(pk_smeared) + qk)
+      #Using interp2d to interp in z only
+      lnpk_total_interp = interp2d(self.k_interp_2D,self.zs_cola,lnpk_total_)
+      lnpk_total = lnpk_total_interp(self.k_interp_2D,self.z_interp_2D)
+      for i in range(self.len_z_interp_2D): 
+        lnPNL[i::self.len_z_interp_2D] = lnpk_total[i]
+       
+    elif self.non_linear_emul == 4:
       # COLA NN
       params = {
         'Omm'  : self.provider.get_param("omegam"),

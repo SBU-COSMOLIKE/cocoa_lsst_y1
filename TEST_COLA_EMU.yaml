@@ -12,7 +12,7 @@ likelihood:
     integration_accuracy: 10
     kmax_boltzmann: 20.0
     # 1 EE2, 2 Halofit
-    non_linear_emul: 1
+    non_linear_emul: 3
     # ------------------------------------------------------------------------
     # Settings adopted when printing the lsst_y1_theory.modelvector
     # ------------------------------------------------------------------------
