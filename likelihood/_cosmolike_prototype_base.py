@@ -445,23 +445,19 @@ class _cosmolike_prototype_base(DataSetLikelihood):
               assume_sorted = True
             )
           qk = interp_cola(log10k_interp_2D)
-          qk[log10k_interp_2D < np.log10(cola_ks[0])] = 0      
+          qk[log10k_interp_2D < np.log10(cola_ks[0])] = 0
           pk_l = np.exp(lnPL[i::self.len_z_interp_2D])
-          pk_l_ = pk_l[425:815]
-          ks_smear = self.k_interp_2D[425:815]
-          pk_nw = emu_utils.smooth_bao(ks_smear, pk_l_)
-          pk_smeared_ = emu_utils.smear_bao(ks_smear, pk_l_, pk_nw)
-          #pk_smeared_ = emu_utils.smear_bao(ks_smear, pk_smeared_, pk_nw)
-          #pk_smeared_ = emu_utils.smear_bao(ks_smear, pk_smeared_, pk_nw)
-          pk_smeared = np.concatenate([pk_l[0:425], pk_smeared_, pk_l[815:self.len_k_interp_2D]])
+          pk_nw = gp_emulator.smooth_bao(self.k_interp_2D/h, pk_l)
+          pk_smeared = gp_emulator.smear_bao(self.k_interp_2D/h, pk_l, pk_nw)
+          pk_smeared = gp_emulator.smear_bao(self.k_interp_2D/h, pk_smeared, pk_nw)
           lnpk_smeared = np.log(pk_smeared) + qk
           lnpk_nosmear = np.log(pk_l) + qk
 
           # Substituting small scales
           #lnpk_smeared[log10k_interp_2D > np.log10(np.pi)] = lnpk_ee2[log10k_interp_2D > np.log10(np.pi)]
           #lnpk_nosmear[log10k_interp_2D > np.log10(np.pi)] = lnpk_ee2[log10k_interp_2D > np.log10(np.pi)]
-
           lnPNL[i::self.len_z_interp_2D] = lnpk_smeared
+          
         else:
           # After z = 3, we just use Halofit
           lnPNL[i::self.len_z_interp_2D]  = t1[i*self.len_k_interp_2D:(i+1)*self.len_k_interp_2D] + np.log((h**3))
