@@ -1,8 +1,13 @@
 # NN COLA Emulator
 import os
+import multiprocessing
+from functools import partial
+import multiprocessing
+import concurrent
 import numpy as np
 import keras
 
+# Parameter limits for training
 lims = {}
 lims['h'] = [0.61, 0.73]
 lims['Omegab'] = [0.04, 0.06]
@@ -16,6 +21,8 @@ path_to_emulator =  os.path.dirname(__file__)
 cola_redshifts = np.loadtxt(f"{path_to_emulator}/data/cola_zs.txt")
 cola_ks_default = np.loadtxt(f"{path_to_emulator}/data/cola_ks_default.txt")
 cola_ks_high = None
+
+num_cpus = multiprocessing.cpu_count()
 
 def normalize_params(params):
     '''
@@ -59,7 +66,7 @@ def load_pcas():
     avgs = np.zeros((len(cola_redshifts), len(cola_ks_default)))
     pcs = np.zeros((len(cola_redshifts), 11, len(cola_ks_default)))
     for i, z in enumerate(cola_redshifts):
-        if z < 2:
+        if True or z < 2:
             avgs[i] = np.loadtxt(f"{path_to_emulator}/data/averages_lcdm/avg_{i}.txt")
             pcs[i] = np.loadtxt(f"{path_to_emulator}/data/pc_basis_lcdm/pcs_{i}.txt")
         else:
@@ -85,6 +92,36 @@ def inverse_transform(components, z_index):
         result += components[i] * pcs[z_index, i]
     return result
 
+def get_logboost_at_z(z_index, cosmo_params):
+    As = cosmo_params['As']
+    Omega_m = cosmo_params['Omm']
+    Omega_b = cosmo_params['Omb']
+    ns = cosmo_params['ns']
+    h = cosmo_params['h']
+    norm_params = normalize_params([Omega_m, Omega_b, ns, As, h])
+        
+    principal_components = nn_models[z_index](np.array([norm_params]))[0]
+    norm_q = inverse_transform(principal_components, z_index)
+    q = norm_q * (maxs[z_index] - mins[z_index]) + mins[z_index]
+    return q
+
+def get_logboost_parallel(cosmo_params):
+    z_indices = list(range(len(cola_redshifts)))
+    qs = np.empty((len(cola_redshifts), len(cola_ks_default)))
+    get_logboost_at_z_for_cosmo = partial(get_logboost_at_z, cosmo_params=cosmo_params)
+    with concurrent.futures.ThreadPoolExecutor(max_workers=num_cpus) as executor:
+        # Start the load operations and mark each future with its item
+        gen = executor.map(get_logboost_at_z_for_cosmo, z_indices)
+        for i, x in enumerate(gen):
+            qs[i] = x
+    return qs
+
+def get_logboost(cosmo_params):
+    qs = np.empty((len(cola_redshifts), len(cola_ks_default)))
+    for i, z in enumerate(cola_redshifts):
+        qs[i] = get_logboost_at_z(i, cosmo_params)
+    return qs   
+
 def get_boost(cosmo_params, ks = cola_ks_default, zs = cola_redshifts):
     """
     Returns an array of boosts at given ks and zs for the cosmology defined in cosmo_params
@@ -93,23 +130,8 @@ def get_boost(cosmo_params, ks = cola_ks_default, zs = cola_redshifts):
         - `ks`: array of scales to return
         - `zs`: array of redshifts to return
     """
-    global maxs, mins, nn_models
-    As = cosmo_params['As']
-    Omega_m = cosmo_params['Omm']
-    Omega_b = cosmo_params['Omb']
-    ns = cosmo_params['ns']
-    h = cosmo_params['h']
-    norm_params = normalize_params([Omega_m, Omega_b, ns, As, h])
-    
-    expqs = np.zeros((len(cola_redshifts), len(cola_ks_default)))
-    
-    for i, z in enumerate(cola_redshifts):
-        principal_components = nn_models[i](np.array([norm_params]))[0]
-        norm_qs = inverse_transform(principal_components, i)
-        qs = norm_qs * (maxs[i] - mins[i]) + mins[i]
-        expqs[i] = np.exp(qs)
+    return np.exp(get_logboost(cosmo_params))
 
-    return expqs
 
 mins, maxs = load_normalization_factors()
 pcs, avgs = load_pcas()

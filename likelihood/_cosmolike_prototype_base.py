@@ -407,7 +407,7 @@ class _cosmolike_prototype_base(DataSetLikelihood):
       lnpk_total = lnpk_total_interp(self.k_interp_2D,self.z_interp_2D)
       for i in range(self.len_z_interp_2D): 
         lnPNL[i::self.len_z_interp_2D] = lnpk_total[i]
-       
+
     elif self.non_linear_emul == 4:
       # COLA NN
       params = {
@@ -415,38 +415,57 @@ class _cosmolike_prototype_base(DataSetLikelihood):
         'As'   : self.provider.get_param("As"),
         'Omb'  : self.provider.get_param("omegab"),
         'ns'   : self.provider.get_param("ns"),
-        'h'    : h
+        'h'    : h,
+        'mnu'  : 0.058,
+        'w'    : -1,
+        'wa'   : 0
       }
       cola_ks = self.emulator.cola_ks_default
       cola_zs = self.emulator.cola_redshifts
-      boost_at_cola_ks_and_zs = self.emulator.get_boost(params)
+      logboost_cola = self.emulator.get_logboost(params)
+
       # First, I need to interpolate to the Cosmolike zs that are within our range
       # Notice that, for z > 3, the boost is given by fill_value=1
-      boost_interpolator = RegularGridInterpolator((cola_zs, cola_ks), boost_at_cola_ks_and_zs, bounds_error=False, fill_value=1)
-      boost_at_cola_ks = boost_interpolator((self.z_interp_2D, cola_ks))
-
-      logkbt = np.log10(cola_ks)
+      logboost_interpolator = RegularGridInterpolator((cola_zs, cola_ks), logboost_cola, bounds_error=False, fill_value=1)
+      logboost_cola = logboost_interpolator(np.array([(z, k) for z in self.z_interp_2D for k in cola_ks]))
+      logboost_cola = logboost_cola.reshape((len(self.z_interp_2D), len(cola_ks)))
+      
+      logk_cola = np.log10(cola_ks)
       # Now, I process just like EE2 implementation
-      for i in range(self.len_z_interp_2D):    
-        interp = interp1d(logkbt, 
-            np.log(boost_at_cola_ks[i]), 
-            kind = 'linear', 
-            fill_value = 'extrapolate', 
-            assume_sorted = True
-          )
-        # With the exception that we need to smear the linear power spectrum
-        qk = interp(log10k_interp_2D)
-        pk_l = np.exp(lnPL[i::self.len_z_interp_2D])
-        pk_l_ = pk_l[425:815]
-        ks_smear = k_interp_2D[425:815]
-        pk_nw = emu_utils.smooth_bao(ks_smear, pk_l_)
-        pk_smeared_ = emu_utils.smear_bao(ks_smear, pk_l_, pk_nw)
-        pk_smeared = np.concatenate([pk_l[0:425],pk_smeared_,pk_l[815:self.len_k_interp_2D]])
-        lnpk_total = np.log(pk_smeared) + qk
-        lnpk_total[self.k_interp_2D/h < kbt[0]] = np.log(pk_l[self.k_interp_2D/h < kbt[0]])
-        lnPNL[i::self.len_z_interp_2D] = lnpk_total
+      for i in range(self.len_z_interp_2D):
+        if self.z_interp_2D[i] <= cola_zs[-1]:
+          num_pts_filter = 17
+          last_points = logboost_cola[i][-num_pts_filter:]
+          last_points_filtered = savgol_filter(last_points, num_pts_filter, 1)
+          logboost_cola_filtered = np.concatenate((logboost_cola[i][:-num_pts_filter], last_points_filtered))
+          interp_cola = interp1d(logk_cola, 
+              logboost_cola_filtered, 
+              kind = 'linear', 
+              fill_value = 'extrapolate',
+              assume_sorted = True
+            )
+          qk = interp_cola(log10k_interp_2D)
+          qk[log10k_interp_2D < np.log10(cola_ks[0])] = 0      
+          pk_l = np.exp(lnPL[i::self.len_z_interp_2D])
+          pk_l_ = pk_l[425:815]
+          ks_smear = self.k_interp_2D[425:815]
+          pk_nw = emu_utils.smooth_bao(ks_smear, pk_l_)
+          pk_smeared_ = emu_utils.smear_bao(ks_smear, pk_l_, pk_nw)
+          #pk_smeared_ = emu_utils.smear_bao(ks_smear, pk_smeared_, pk_nw)
+          #pk_smeared_ = emu_utils.smear_bao(ks_smear, pk_smeared_, pk_nw)
+          pk_smeared = np.concatenate([pk_l[0:425], pk_smeared_, pk_l[815:self.len_k_interp_2D]])
+          lnpk_smeared = np.log(pk_smeared) + qk
+          lnpk_nosmear = np.log(pk_l) + qk
 
-    elif self.non_linear_emul == 4:
+          # Substituting small scales
+          #lnpk_smeared[log10k_interp_2D > np.log10(np.pi)] = lnpk_ee2[log10k_interp_2D > np.log10(np.pi)]
+          #lnpk_nosmear[log10k_interp_2D > np.log10(np.pi)] = lnpk_ee2[log10k_interp_2D > np.log10(np.pi)]
+
+          lnPNL[i::self.len_z_interp_2D] = lnpk_smeared
+        else:
+          # After z = 3, we just use Halofit
+          lnPNL[i::self.len_z_interp_2D]  = t1[i*self.len_k_interp_2D:(i+1)*self.len_k_interp_2D] + np.log((h**3))
+    else:
       assert False, "Other emulators not implemented"
 
     # Compute chi(z) - convert to Mpc/h
