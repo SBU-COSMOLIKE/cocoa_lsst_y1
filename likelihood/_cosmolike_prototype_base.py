@@ -434,7 +434,7 @@ class _cosmolike_prototype_base(DataSetLikelihood):
       # Now, I process just like EE2 implementation
       for i in range(self.len_z_interp_2D):
         if self.z_interp_2D[i] <= cola_zs[-1]:
-          num_pts_filter = 17
+          num_pts_filter = 3
           last_points = logboost_cola[i][-num_pts_filter:]
           last_points_filtered = savgol_filter(last_points, num_pts_filter, 1)
           logboost_cola_filtered = np.concatenate((logboost_cola[i][:-num_pts_filter], last_points_filtered))
@@ -449,13 +449,7 @@ class _cosmolike_prototype_base(DataSetLikelihood):
           pk_l = np.exp(lnPL[i::self.len_z_interp_2D])
           pk_nw = gp_emulator.smooth_bao(self.k_interp_2D/h, pk_l)
           pk_smeared = gp_emulator.smear_bao(self.k_interp_2D/h, pk_l, pk_nw)
-          pk_smeared = gp_emulator.smear_bao(self.k_interp_2D/h, pk_smeared, pk_nw)
           lnpk_smeared = np.log(pk_smeared) + qk
-          lnpk_nosmear = np.log(pk_l) + qk
-
-          # Substituting small scales
-          #lnpk_smeared[log10k_interp_2D > np.log10(np.pi)] = lnpk_ee2[log10k_interp_2D > np.log10(np.pi)]
-          #lnpk_nosmear[log10k_interp_2D > np.log10(np.pi)] = lnpk_ee2[log10k_interp_2D > np.log10(np.pi)]
           lnPNL[i::self.len_z_interp_2D] = lnpk_smeared
           
         else:
