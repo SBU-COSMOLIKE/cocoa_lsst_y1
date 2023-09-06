@@ -382,9 +382,11 @@ class _cosmolike_prototype_base(DataSetLikelihood):
       k_l_index = gp_emulator.find_crossing_index(self.k_interp_2D/h, self.ks_emu[0])
       k_r_index = gp_emulator.find_crossing_index(self.k_interp_2D/h, self.ks_emu[-1])
       for i in range(len(self.zs_cola)): 
-        filtered_qk_extrap = savgol_filter(tmp_qk[i][len(self.ks_emu)-25:],7,1)  
+        num_pts_filter = 3
+        last_points = tmp_qk[i][-num_pts_filter:]
+        filtered_qk_extrap = savgol_filter(last_points, num_pts_filter, 1)  
         #This interp is to get the extrapolated k range
-        qk_extrap = interp1d(log10_ks_emu[len(self.ks_emu)-25:], 
+        qk_extrap = interp1d(log10_ks_emu[len(self.ks_emu)-num_pts_filter:], 
             filtered_qk_extrap,
             kind = 'linear', 
             fill_value = 'extrapolate', 
