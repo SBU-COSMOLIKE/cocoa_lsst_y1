@@ -2,11 +2,11 @@
 This branch of the `lsst_y1` repository contains yaml files for LSST-Y1 chains to be run in Cocoa, using the COLA emulators as well as Euclid Emulator 2.
 
 ## Description
-All chains run with LSST-Y1 Cosmic Shear, EE2 fiducial data vector, same nuisance parameter priors (pessimistic IA NLA, optimistic photo-z and shear calibration). The priors for cosmological parameters are the EE2 box boundaries. We are only considering wCDM. The convergence criterion is given by `R-1 < 0.005`.
+The fiducial data vector `data/EE2_FIDUCIAL.modelvector` was generated with the yaml file `CREATE_EE2_FIDUCIAL_DATA_VECTOR.yaml`. A noise realization was added to the data vector, using the Python script `add_noise_to_data_vector.py`, resulting in the file `data/EE2_FIDUCIAL_NOISED.modelvector`. For each of the masks, one `dataset` file was created, in `data/LSST_Y1_MX_EE2_FID.dataset`. For testing purposes, an additional dataset `LSST_Y1_M6_EE2_NO_NOISE.dataset` was created using the noiseless data vector. The noiseless dataset is used in `TEST_COLA_EMU_SHEAR.yaml`, which is a simple evaluation at the fiducial parameters.
 
-The variables are: masks (scale cuts), the emulators (EE2, COLA, COLA+10, COLA+25, COLA+100, where COLA+X means COLA with X anchors).
+All chains run with LSST-Y1 Cosmic Shear, EE2 fiducial noised data vector, same nuisance parameter priors (pessimistic IA with NLA, optimistic photo-z and shear calibration). The priors for cosmological parameters are the EE2 box boundaries. We are only considering wCDM. The convergence criterion is given by `R-1 < 0.005`.
 
-THe fiducial data vector `data/EE2_FIDUCIAL.modelvector` was generated with the yaml file `CREATE_EE2_FIDUCIAL_DATA_VECTOR.yaml`. A noise realization was added to the data vector, using the Python script `add_noise_to_data_vector.py`, resulting in the file `data/EE2_FIDUCIAL_NOISED.modelvector`. For each mask, one `dataset` file was created, in `data/LSST_Y1_MX_EE2_FID.dataset`. For testing purposes, an additional dataset `LSST_Y1_M6_EE2_NO_NOISE.dataset` was created using the noiseless data vector. The noiseless dataset is used in `TEST_COLA_EMU_SHEAR.yaml`
+The variables between chains are: masks (scale cuts), the emulators (EE2, COLA, COLA+10, COLA+25, COLA+100, where COLA+X means COLA with X anchors).
 
 The nonlinear emulators are set in the yaml file under the `non_linear_emul` option. They are numbered as:
 
@@ -22,9 +22,9 @@ The nonlinear emulators are set in the yaml file under the `non_linear_emul` opt
 
 More emulators will be added since we need to implement the different anchors, COLA precision, dark energy models...
 
-**NOTE**: There are still some placeholders in the yaml files, namely `COLA_EMU_NO_ANCHOR`, `COLA_EMU_10_ANCHORS`, `COLA_EMU_25_ANCHORS` and `COLA_EMU_100_ANCHORS`. Before running chains, these strings need to be substituted by the actual numbers representing the chosen emulator.
+**NOTE**: There are still some placeholder strings in the yaml files, namely `COLA_EMU_NO_ANCHOR`, `COLA_EMU_10_ANCHORS`, `COLA_EMU_25_ANCHORS` and `COLA_EMU_100_ANCHORS`. This is because we haven't decided on the emulator to run the bulk of the chains and the emulators with multiple anchors are still not implemented. Before running chains, the placeholder strings need to be substituted by the actual numbers representing the chosen emulator.
 
-## List
+## List of chains
 1 - EE2, M1
 
 2 - EE2, M2
