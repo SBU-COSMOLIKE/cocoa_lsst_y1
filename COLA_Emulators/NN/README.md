@@ -1,5 +1,5 @@
 # Emulators/COLA/NN
-Files for training and using the COLA NN emulator.
+Files for using the COLA NN emulator. Check the Jupyter Notebook `Emulator Demo.ipynb` for usage.
 
 ## Usage:
 - Clone the repository

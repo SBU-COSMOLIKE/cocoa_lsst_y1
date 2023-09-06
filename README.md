@@ -1,5 +1,5 @@
 # LSST-Y1 COLA Chains
-This branch of the `lsst_y1` repository contains yaml files for LSST-Y1 chains to be run in Cocoa, using the COLA emulators as well as Euclid Emulator 2. Please, read the description before running any chains.
+This branch of the `lsst_y1` repository contains yaml files for LSST-Y1 chains to be run in Cocoa, using the COLA emulators as well as Euclid Emulator 2. Please, read this documentation before running any chains.
 
 ## Description
 The fiducial data vector `data/EE2_FIDUCIAL.modelvector` was generated with the yaml file `CREATE_EE2_FIDUCIAL_DATA_VECTOR.yaml`. A noise realization was added to the data vector, using the Python script `add_noise_to_data_vector.py`, resulting in the file `data/EE2_FIDUCIAL_NOISED.modelvector`. For each of the masks, one `dataset` file was created, in `data/LSST_Y1_MX_EE2_FID.dataset`. For testing purposes, an additional dataset `LSST_Y1_M6_EE2_NO_NOISE.dataset` was created using the noiseless data vector. The noiseless dataset is used in `TEST_COLA_EMU_SHEAR.yaml`, which is a simple evaluation at the fiducial parameters.
