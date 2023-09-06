@@ -5,7 +5,7 @@ stop_at_error: True
 likelihood:
   lsst_y1.lsst_3x2pt:
     path: ./external_modules/data/lsst_y1
-    data_file: LSST_Y1_M6_EE2_FID.dataset 
+    data_file: LSST_Y1_M6_EE2_NO_NOISE.dataset 
     print_datavector: False
     #print_datavector_file: "./projects/lsst_y1/data/EE2_FIDUCIAL.modelvector"
     accuracyboost: 3.0

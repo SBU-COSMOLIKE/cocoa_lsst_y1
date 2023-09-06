@@ -21,8 +21,7 @@ import math
 
 # JVR - Importing COLA Emulators
 sys.path.append("./projects/lsst_y1/")
-from COLA_Emulators.NN import nn_emu_lcdm
-from COLA_Emulators.NN import train_utils as emu_utils
+
 
 # JG
 from COLA_Emulators.GP.LCDM_cola_emulator1 import cola_emulator as gp_emulator
@@ -236,10 +235,11 @@ class _cosmolike_prototype_base(DataSetLikelihood):
       self.emulator = gp_emulator.initialize_emulator(self.all_gp_params,self.qs_reduced,self.lhs) 
       print('[nonlinear] GP Emulator initialized.')
       print('[nonlinear] Using COLA GP emulator')
-      #self.emulator = nn_emu_lcdm
     elif self.non_linear_emul == 4:
-      # COLA NN Emulator for LCDM
-      self.emulator = nn_emu_lcdm
+      # COLA NN Emulator for wCDM
+      print("[nonlinear] Initializing COLA NN wCDM emulator...")
+      from COLA_Emulators.NN import nn_emu_wcdm
+      self.emulator = nn_emu_wcdm
     else:
       raise LoggedError(self.log, "non_linear_emul = %d is an invalid option", self.non_linear_emul)
 
@@ -419,7 +419,7 @@ class _cosmolike_prototype_base(DataSetLikelihood):
         'ns'   : self.provider.get_param("ns"),
         'h'    : h,
         'mnu'  : 0.058,
-        'w'    : -1,
+        'w'    : self.provider.get_param("w"),
         'wa'   : 0
       }
       cola_ks = self.emulator.cola_ks_default
