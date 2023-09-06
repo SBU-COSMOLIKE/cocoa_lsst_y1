@@ -6,7 +6,7 @@ The fiducial data vector `data/EE2_FIDUCIAL.modelvector` was generated with the 
 
 All chains run with LSST-Y1 Cosmic Shear, EE2 fiducial noised data vector, same nuisance parameter priors (pessimistic IA with NLA, optimistic photo-z and shear calibration). The priors for cosmological parameters are the EE2 box boundaries. We are only considering wCDM. The convergence criterion is given by `R-1 < 0.005`.
 
-The variables between chains are: masks (scale cuts), the emulators (EE2, COLA, COLA+10, COLA+25, COLA+100, where COLA+X means COLA with X anchors).
+The variables between chains are: masks (scale cuts), the emulators (EE2, Halofit, COLA, COLA+10, COLA+25, COLA+100, where COLA+X means COLA with X anchors).
 
 The nonlinear emulators are set in the yaml file under the `non_linear_emul` option. They are numbered as:
 
@@ -23,6 +23,8 @@ The nonlinear emulators are set in the yaml file under the `non_linear_emul` opt
 More emulators will be added since we need to implement the different anchors, COLA precision, dark energy models...
 
 **NOTE**: There are still some placeholder strings in the yaml files, namely `COLA_EMU_NO_ANCHOR`, `COLA_EMU_10_ANCHORS`, `COLA_EMU_25_ANCHORS` and `COLA_EMU_100_ANCHORS`. This is because we haven't decided on the emulator to run the bulk of the chains and the emulators with multiple anchors are still not implemented. Before running chains, the placeholder strings need to be substituted by the actual numbers representing the chosen emulator.
+
+**NOTE**: We still need to think about accuracy settings for both CAMB and Cosmolike.
 
 ## List of chains
 1 - EE2, M1
@@ -74,6 +76,22 @@ More emulators will be added since we need to implement the different anchors, C
 24 - COLA+100, M4
 
 25 - COLA+100, M5
+
+26 - Halofit, M1
+
+27 - Halofit, M2
+
+28 - Halofit, M3
+
+29 - Halofit, M4
+
+30 - Halofit, M5
+
+900 - COLA GP, M1
+
+901 - COLA NN, M1
+
+902 - COLA PCE, M1
 
 
 ## Running Cosmolike projects <a name="running_cosmolike_projects"></a> 
