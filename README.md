@@ -1,3 +1,65 @@
+# LSST-Y1 COLA Chains
+This branch of the `lsst_y1` repository contains yaml files for LSST-Y1 chains to be run in Cocoa, using the COLA emulators as well as Euclid Emulator 2.
+
+## Description
+All chains run with LSST-Y1 Cosmic Shear, EE2 fiducial data vector, same nuisance parameter priors (pessimistic IA NLA, optimistic photo-z and shear calibration). The priors for cosmological parameters are the EE2 box boundaries. We are only considering wCDM. The convergence criterion is given by `R-1 < 0.005`.
+
+The variables are: masks (scale cuts), the emulators (EE2, COLA, COLA+10, COLA+25, COLA+100, where COLA+X means COLA with X anchors).
+
+**NOTE**: There are still some placeholders in the yaml files, namely `COLA_EMU_NO_ANCHOR`, `COLA_EMU_10_ANCHORS`, `COLA_EMU_25_ANCHORS` and `COLA_EMU_100_ANCHORS`. Before running chains, these strings need to be substituted by the actual numbers representing each chain.
+
+## List
+1 - EE2, M1
+
+2 - EE2, M2
+
+3 - EE2, M3
+
+4 - EE2, M4
+
+5 - EE2, M5
+
+6 - COLA, M1
+
+7 - COLA, M2
+
+8 - COLA, M3
+
+9 - COLA, M4
+
+10 - COLA, M5
+
+11 - COLA+10, M1
+
+12 - COLA+10, M2
+
+13 - COLA+10, M3
+
+14 - COLA+10, M4
+
+15 - COLA+10, M5
+
+16 - COLA+25, M1
+
+17 - COLA+25, M2
+
+18 - COLA+25, M3
+
+19 - COLA+25, M4
+
+20 - COLA+25, M5
+
+21 - COLA+100, M1
+
+22 - COLA+100, M2
+
+23 - COLA+100, M3
+
+24 - COLA+100, M4
+
+25 - COLA+100, M5
+
+
 ## Running Cosmolike projects <a name="running_cosmolike_projects"></a> 
 
 In this tutorial, we assume the user installed Cocoa via the *Conda installation* method, and the name of the Conda environment is `cocoa`. We also presume the user's terminal is in the folder where Cocoa was cloned.

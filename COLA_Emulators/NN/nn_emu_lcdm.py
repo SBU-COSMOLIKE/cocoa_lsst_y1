@@ -7,7 +7,6 @@ import concurrent
 import numpy as np
 import keras
 
-# Parameter limits for training
 lims = {}
 lims['h'] = [0.61, 0.73]
 lims['Omegab'] = [0.04, 0.06]
@@ -66,12 +65,8 @@ def load_pcas():
     avgs = np.zeros((len(cola_redshifts), len(cola_ks_default)))
     pcs = np.zeros((len(cola_redshifts), 11, len(cola_ks_default)))
     for i, z in enumerate(cola_redshifts):
-        if True or z < 2:
-            avgs[i] = np.loadtxt(f"{path_to_emulator}/data/averages_lcdm/avg_{i}.txt")
-            pcs[i] = np.loadtxt(f"{path_to_emulator}/data/pc_basis_lcdm/pcs_{i}.txt")
-        else:
-            avgs[i,:256] = np.loadtxt(f"{path_to_emulator}/data/averages_lcdm/avg_{i}.txt")
-            pcs[i,:,:256] = np.loadtxt(f"{path_to_emulator}/data/pc_basis_lcdm/pcs_{i}.txt")
+        avgs[i] = np.loadtxt(f"{path_to_emulator}/data/averages_lcdm/avg_{i}.txt")
+        pcs[i] = np.loadtxt(f"{path_to_emulator}/data/pc_basis_lcdm/pcs_{i}.txt")
     return pcs, avgs
     
 def load_normalization_factors():
