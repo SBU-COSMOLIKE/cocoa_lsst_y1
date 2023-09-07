@@ -5,14 +5,14 @@ stop_at_error: True
 likelihood:
   lsst_y1.lsst_cosmic_shear:
     path: ./external_modules/data/lsst_y1
-    data_file: LSST_Y1_M6_EE2_NO_NOISE.dataset 
+    data_file: LSST_Y1_M5_EE2_NO_NOISE.dataset 
     print_datavector: False
     #print_datavector_file: "./projects/lsst_y1/data/EE2_FIDUCIAL.modelvector"
     accuracyboost: 1.0
     integration_accuracy: 0
     kmax_boltzmann: 5.0
     # 1 EE2, 2 Halofit, 3 COLA GP, 4 COLA NN
-    non_linear_emul: 3
+    non_linear_emul: 4
     # ------------------------------------------------------------------------
     # Settings adopted when printing the lsst_y1_theory.modelvector
     # ------------------------------------------------------------------------
