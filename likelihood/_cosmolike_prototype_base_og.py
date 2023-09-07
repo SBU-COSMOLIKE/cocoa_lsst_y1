@@ -21,11 +21,11 @@ import math
 
 # JVR - Importing COLA Emulators
 sys.path.append("./projects/lsst_y1/")
-
+from COLA_Emulators.NN import nn_emu_lcdm
+from COLA_Emulators.NN import train_utils as emu_utils
 
 # JG
 from COLA_Emulators.GP.LCDM_cola_emulator1 import cola_emulator as gp_emulator
-from COLA_Emulators.Cython_Filter_Files import filter_f as bao_smear
 import matplotlib
 import matplotlib.pyplot as plt
 
@@ -236,11 +236,10 @@ class _cosmolike_prototype_base(DataSetLikelihood):
       self.emulator = gp_emulator.initialize_emulator(self.all_gp_params,self.qs_reduced,self.lhs) 
       print('[nonlinear] GP Emulator initialized.')
       print('[nonlinear] Using COLA GP emulator')
+      #self.emulator = nn_emu_lcdm
     elif self.non_linear_emul == 4:
-      # COLA NN Emulator for wCDM
-      print("[nonlinear] Initializing COLA NN wCDM emulator...")
-      from COLA_Emulators.NN import nn_emu_wcdm
-      self.emulator = nn_emu_wcdm
+      # COLA NN Emulator for LCDM
+      self.emulator = nn_emu_lcdm
     else:
       raise LoggedError(self.log, "non_linear_emul = %d is an invalid option", self.non_linear_emul)
 
@@ -382,7 +381,6 @@ class _cosmolike_prototype_base(DataSetLikelihood):
       #These are the cocoa k-indices where cola kmin and kmax lie
       k_l_index = gp_emulator.find_crossing_index(self.k_interp_2D/h, self.ks_emu[0])
       k_r_index = gp_emulator.find_crossing_index(self.k_interp_2D/h, self.ks_emu[-1])
-      full_qk = []
       for i in range(len(self.zs_cola)): 
         num_pts_filter = 3
         last_points = tmp_qk[i][-num_pts_filter:]
@@ -403,12 +401,9 @@ class _cosmolike_prototype_base(DataSetLikelihood):
         qk = np.zeros(len(self.k_interp_2D))
         qk[k_l_index:k_r_index] = qk_interp(log10k_interp_2D[k_l_index:k_r_index])
         qk[k_r_index:] = qk_extrap(log10k_interp_2D[k_r_index:])
-        full_qk.append(qk)
-
-      pk_nw = bao_smear.smooth_bao_ver1(self.k_interp_2D/h, pk_l)
-      pk_smeared = bao_smear.smear_bao_vec(self.k_interp_2D/h, pk_l, pk_nw)
-      for i in range(len(self.zs_cola)):
-        lnpk_total_.append(np.log(pk_smeared[i]) + full_qk[i])
+        pk_nw = gp_emulator.smooth_bao(self.k_interp_2D/h, pk_l[i])
+        pk_smeared = gp_emulator.smear_bao(self.k_interp_2D/h, pk_l[i], pk_nw)
+        lnpk_total_.append(np.log(pk_smeared) + qk)
       #Using interp2d to interp in z only
       lnpk_total_interp = interp2d(self.k_interp_2D,self.zs_cola,lnpk_total_)
       lnpk_total = lnpk_total_interp(self.k_interp_2D,self.z_interp_2D)
@@ -424,7 +419,7 @@ class _cosmolike_prototype_base(DataSetLikelihood):
         'ns'   : self.provider.get_param("ns"),
         'h'    : h,
         'mnu'  : 0.058,
-        'w'    : self.provider.get_param("w"),
+        'w'    : -1,
         'wa'   : 0
       }
       cola_ks = self.emulator.cola_ks_default
