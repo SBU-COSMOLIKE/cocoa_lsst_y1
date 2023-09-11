@@ -1,4 +1,4 @@
-data_file = EE2_FIDUCIAL.modelvector
+data_file = EE2_FIDUCIAL_NO_NOISE.modelvector
 cov_file = cov_lsst_y1
 mask_file = LSST_Y1_M5_GGLOLAP0.05.mask
 nz_lens_file = lens_LSSTY1.nz 
