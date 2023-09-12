@@ -241,6 +241,11 @@ class _cosmolike_prototype_base(DataSetLikelihood):
       print("[nonlinear] Initializing COLA NN wCDM emulator...")
       from COLA_Emulators.NN import nn_emu_wcdm
       self.emulator = nn_emu_wcdm
+
+    elif self.non_linear_emul == 8:
+      print("[nonlinear] Initializing COLA NN wCDM emulator with 25 anchors...")
+      from COLA_Emulators.NN import nn_emu_wcdm_25refs
+      self.emulator = nn_emu_wcdm_25refs
     else:
       raise LoggedError(self.log, "non_linear_emul = %d is an invalid option", self.non_linear_emul)
 
@@ -415,7 +420,7 @@ class _cosmolike_prototype_base(DataSetLikelihood):
       for i in range(self.len_z_interp_2D): 
         lnPNL[i::self.len_z_interp_2D] = lnpk_total[i]
 
-    elif self.non_linear_emul == 4:
+    elif self.non_linear_emul == 4 or self.non_linear_emul == 8:
       # COLA NN
       params = {
         'Omm'  : self.provider.get_param("omegam"),
