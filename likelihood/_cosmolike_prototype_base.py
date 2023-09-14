@@ -382,18 +382,26 @@ class _cosmolike_prototype_base(DataSetLikelihood):
       tmp_qk = gp_emulator.emulate_all_zs(params_, self.emulator, self.qs_reduced, self.pcas, self.means, self.ks_emu, self.zs_cola)
       #Need linear pk in cola z's to smear 40 times instead of 100
       pk_l = np.exp(PKL.logP(self.zs_cola, self.k_interp_2D) + np.log(h**3))
-      log10_ks_emu = np.log10(self.ks_emu)
       lnpk_total_ = []
       #These are the cocoa k-indices where cola kmin and kmax lie
       k_l_index = gp_emulator.find_crossing_index(self.k_interp_2D/h, self.ks_emu[0])
-      k_r_index = gp_emulator.find_crossing_index(self.k_interp_2D/h, self.ks_emu[-1])
+      k_r_index1 = gp_emulator.find_crossing_index(self.k_interp_2D/h, self.ks_emu[-1])
+      k_r_index2 = gp_emulator.find_crossing_index(self.k_interp_2D/h, self.ks_emu[255])
       full_qk = []
       for i in range(len(self.zs_cola)): 
         num_pts_filter = 3
+        if i<35:
+          len_ks_emu = 512
+          k_r_index = k_r_index1
+          log10_ks_emu = np.log10(self.ks_emu)
+        else:
+          len_ks_emu = 256
+          k_r_index = k_r_index2
+          log10_ks_emu = np.log10(self.ks_emu[:256])
         last_points = tmp_qk[i][-num_pts_filter:]
         filtered_qk_extrap = savgol_filter(last_points, num_pts_filter, 1)  
         #This interp is to get the extrapolated k range
-        qk_extrap = interp1d(log10_ks_emu[len(self.ks_emu)-num_pts_filter:], 
+        qk_extrap = interp1d(log10_ks_emu[len_ks_emu - num_pts_filter:], 
             filtered_qk_extrap,
             kind = 'linear', 
             fill_value = 'extrapolate', 
