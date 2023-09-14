@@ -241,11 +241,6 @@ class _cosmolike_prototype_base(DataSetLikelihood):
       print("[nonlinear] Initializing COLA NN wCDM emulator...")
       from COLA_Emulators.NN import nn_emu_wcdm
       self.emulator = nn_emu_wcdm
-
-    elif self.non_linear_emul == 8:
-      print("[nonlinear] Initializing COLA NN wCDM emulator with 25 anchors...")
-      from COLA_Emulators.NN import nn_emu_wcdm_25refs
-      self.emulator = nn_emu_wcdm_25refs
     else:
       raise LoggedError(self.log, "non_linear_emul = %d is an invalid option", self.non_linear_emul)
 
@@ -382,26 +377,18 @@ class _cosmolike_prototype_base(DataSetLikelihood):
       tmp_qk = gp_emulator.emulate_all_zs(params_, self.emulator, self.qs_reduced, self.pcas, self.means, self.ks_emu, self.zs_cola)
       #Need linear pk in cola z's to smear 40 times instead of 100
       pk_l = np.exp(PKL.logP(self.zs_cola, self.k_interp_2D) + np.log(h**3))
+      log10_ks_emu = np.log10(self.ks_emu)
       lnpk_total_ = []
       #These are the cocoa k-indices where cola kmin and kmax lie
       k_l_index = gp_emulator.find_crossing_index(self.k_interp_2D/h, self.ks_emu[0])
-      k_r_index1 = gp_emulator.find_crossing_index(self.k_interp_2D/h, self.ks_emu[-1])
-      k_r_index2 = gp_emulator.find_crossing_index(self.k_interp_2D/h, self.ks_emu[255])
+      k_r_index = gp_emulator.find_crossing_index(self.k_interp_2D/h, self.ks_emu[-1])
       full_qk = []
       for i in range(len(self.zs_cola)): 
         num_pts_filter = 3
-        if i<35:
-          len_ks_emu = 512
-          k_r_index = k_r_index1
-          log10_ks_emu = np.log10(self.ks_emu)
-        else:
-          len_ks_emu = 256
-          k_r_index = k_r_index2
-          log10_ks_emu = np.log10(self.ks_emu[:256])
         last_points = tmp_qk[i][-num_pts_filter:]
         filtered_qk_extrap = savgol_filter(last_points, num_pts_filter, 1)  
         #This interp is to get the extrapolated k range
-        qk_extrap = interp1d(log10_ks_emu[len_ks_emu - num_pts_filter:], 
+        qk_extrap = interp1d(log10_ks_emu[len(self.ks_emu)-num_pts_filter:], 
             filtered_qk_extrap,
             kind = 'linear', 
             fill_value = 'extrapolate', 
@@ -428,7 +415,7 @@ class _cosmolike_prototype_base(DataSetLikelihood):
       for i in range(self.len_z_interp_2D): 
         lnPNL[i::self.len_z_interp_2D] = lnpk_total[i]
 
-    elif self.non_linear_emul == 4 or self.non_linear_emul == 8:
+    elif self.non_linear_emul == 4:
       # COLA NN
       params = {
         'Omm'  : self.provider.get_param("omegam"),
@@ -440,42 +427,41 @@ class _cosmolike_prototype_base(DataSetLikelihood):
         'w'    : self.provider.get_param("w"),
         'wa'   : 0
       }
-      
       cola_ks = self.emulator.cola_ks_default
-      log10_cola_ks = np.log10(cola_ks)
       cola_zs = self.emulator.cola_redshifts
       logboost_cola = self.emulator.get_logboost(params)
 
-      # Getting linear power spectrum at cola zs and smearing
-      pk_l = np.exp(PKL.logP(cola_zs, self.k_interp_2D) + np.log(h**3))
-      pk_nw = bao_smear.smooth_bao_ver1(self.k_interp_2D/h, pk_l)
-      pk_smeared = bao_smear.smear_bao_vec(self.k_interp_2D/h, pk_l, pk_nw)
-
-      lnpk_total_ = np.zeros((len(cola_zs), len(self.k_interp_2D)))
-      full_qk = np.zeros((len(cola_zs), len(self.k_interp_2D)))
-      for i in range(len(cola_zs)):
-        num_pts_filter = 3
-        last_points = logboost_cola[i][-num_pts_filter:]
-        last_points_filtered = savgol_filter(last_points, num_pts_filter, 1)  
-        logboost_cola_filtered = np.concatenate((logboost_cola[i][:-num_pts_filter], last_points_filtered))
-        #This interp is to get the extrapolated k range
-        interp_cola = interp1d(log10_cola_ks, 
+      # First, I need to interpolate to the Cosmolike zs that are within our range
+      # Notice that, for z > 3, the boost is given by fill_value=1
+      logboost_interpolator = RegularGridInterpolator((cola_zs, cola_ks), logboost_cola, bounds_error=False, fill_value=1)
+      logboost_cola = logboost_interpolator(np.array([(z, k) for z in self.z_interp_2D for k in cola_ks]))
+      logboost_cola = logboost_cola.reshape((len(self.z_interp_2D), len(cola_ks)))
+      
+      logk_cola = np.log10(cola_ks)
+      # Now, I process just like EE2 implementation
+      for i in range(self.len_z_interp_2D):
+        if self.z_interp_2D[i] <= cola_zs[-1]:
+          num_pts_filter = 3
+          last_points = logboost_cola[i][-num_pts_filter:]
+          last_points_filtered = savgol_filter(last_points, num_pts_filter, 1)
+          logboost_cola_filtered = np.concatenate((logboost_cola[i][:-num_pts_filter], last_points_filtered))
+          interp_cola = interp1d(logk_cola, 
               logboost_cola_filtered, 
               kind = 'linear', 
               fill_value = 'extrapolate',
               assume_sorted = True
-        )
-        qk = interp_cola(log10k_interp_2D)
-        qk[log10k_interp_2D < np.log10(cola_ks[0])] = 0
-        full_qk[i] = qk
-      
-      lnpk_total_ = np.log(pk_smeared) + full_qk
-      
-      #Using interp2d to interp in z only
-      lnpk_total_interp = interp2d(self.k_interp_2D, cola_zs, lnpk_total_)
-      lnpk_total = lnpk_total_interp(self.k_interp_2D, self.z_interp_2D)
-      for i in range(self.len_z_interp_2D): 
-        lnPNL[i::self.len_z_interp_2D] = lnpk_total[i]
+            )
+          qk = interp_cola(log10k_interp_2D)
+          qk[log10k_interp_2D < np.log10(cola_ks[0])] = 0
+          pk_l = np.exp(lnPL[i::self.len_z_interp_2D])
+          pk_nw = gp_emulator.smooth_bao(self.k_interp_2D/h, pk_l)
+          pk_smeared = gp_emulator.smear_bao(self.k_interp_2D/h, pk_l, pk_nw)
+          lnpk_smeared = np.log(pk_smeared) + qk
+          lnPNL[i::self.len_z_interp_2D] = lnpk_smeared
+          
+        else:
+          # After z = 3, we just use Halofit
+          lnPNL[i::self.len_z_interp_2D]  = t1[i*self.len_k_interp_2D:(i+1)*self.len_k_interp_2D] + np.log((h**3))
     else:
       assert False, "Other emulators not implemented"
 

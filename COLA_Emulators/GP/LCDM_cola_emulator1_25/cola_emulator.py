@@ -20,6 +20,7 @@ num_points = 400
 num_points_test = 10
 redshifts = get_redshifts(20, [3,2,1,0.5,0], [12,5,8,9,17])
 redshifts_ee2 = [redshifts[i] for i in range(40)]
+z_cut = 34
 N_pc = 10
 param_mins = [0.232, 0.039, 0.916, 1.66e-9, 0.604]
 param_maxs = [0.408, 0.061, 1.004, 2.54e-9, 0.736]
