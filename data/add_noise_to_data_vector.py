@@ -1,12 +1,24 @@
+import sys
 import numpy as np
 
 # Loading cov data
 print("Reading cov cov_lsst_y1")
 cov_data = np.loadtxt("cov_lsst_y1")
 
+if len(sys.argv) != 2:
+    print(f"USAGE: {sys.argv[0]} <DATA_VECTOR>")
+    print(f"    <DATA_VECTOR>: file to the data vector")
+    exit(1)
+
+data_vector_file = sys.argv[1]
+
 # Loading data vector
-print("Reading data vector EE2_FIDUCIAL.modelvector")
-data_vector = np.loadtxt("EE2_FIDUCIAL.modelvector", usecols=(1,))
+print(f"Reading data vector {data_vector_file}")
+try:
+    data_vector = np.loadtxt(f"{data_vector_file}", usecols=(1,))
+except FileNotFoundError:
+    print(f"Could not load file {data_vector_file}")
+    exit(1)
 
 # Parsing cov data
 dv_length = len(data_vector)
@@ -23,9 +35,16 @@ noise_realization = np.random.multivariate_normal(mean=np.zeros((dv_length)), co
 # Adding noise realization to data vector
 data_vector_with_noise = data_vector + noise_realization
 
+# Saving noisy data vector with different name
+# e.g. if the data vector is EE2_NO_NOISE.modelvector
+# the new name will be EE2_NOISED.modelvector
+new_name = data_vector_file.replace("NO_NOISE", "NOISED")
+
+assert new_name != data_vector_file, "Aborting operation: new file name is identical to original one."
+
 # Saving noisy data vector to file
-with open("EE2_FIDUCIAL_NOISED.modelvector", "w") as f:
+with open(new_name, "w") as f:
     for i, element in enumerate(data_vector_with_noise):
         f.write(f"{i} {element:.8e}\n")
 
-print("Finished! Saved noisy data vector in EE2_FIDUCIAL_NOISED.modelvector")
+print(f"Finished! Saved noisy data vector in {new_name}")
