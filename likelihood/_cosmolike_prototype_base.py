@@ -221,7 +221,7 @@ class _cosmolike_prototype_base(DataSetLikelihood):
       self.emulator = None
     elif self.non_linear_emul == 3:
       # COLA GP Emulator for LCDM
-      emu_path = sys_path + f'COLA_Emulators/GP/{self.model}_cola_emulator{self.cola_precision}_{self.num_refs}/'
+      emu_path = sys_path + f'COLA_Emulators/GP/{self.cola_emu_mode}_cola_emulator{self.cola_precision}_{self.num_refs}/'
       sys.path.append(emu_path)
       import cola_emulator
       self.emulator = cola_emulator
@@ -244,15 +244,17 @@ class _cosmolike_prototype_base(DataSetLikelihood):
       print('[nonlinear] Using COLA GP emulator')
     elif self.non_linear_emul == 4:
       # COLA NN Emulator for wCDM
-      sys.path.append('./projects/lsst_y1/')
-      print("[nonlinear] Initializing COLA NN wCDM emulator...")
-      from COLA_Emulators.NN import nn_emu_wcdm
-      self.emulator = nn_emu_wcdm
-
-    elif self.non_linear_emul == 8:
-      print("[nonlinear] Initializing COLA NN wCDM emulator with 25 anchors...")
-      from COLA_Emulators.NN import nn_emu_wcdm_25refs
-      self.emulator = nn_emu_wcdm_25refs
+      print("[nonlinear] Initializing COLA NN emulator...")
+      if self.cola_emu_mode == "LCDM":
+        from COLA_Emulators.NN import nn_emu_wcdm
+        self.emulator = nn_emu_wcdm
+      elif self.cola_emu_mode == "wCDM":
+        if self.num_refs == 1:
+          from COLA_Emulators.NN import nn_emu_wcdm
+          self.emulator = nn_emu_wcdm
+        elif self.num_refs == 25:
+          from COLA_Emulators.NN import nn_emu_wcdm_25refs
+          self.emulator = nn_emu_wcdm_25refs
     else:
       raise LoggedError(self.log, "non_linear_emul = %d is an invalid option", self.non_linear_emul)
 
