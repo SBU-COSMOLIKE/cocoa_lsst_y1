@@ -246,13 +246,16 @@ class _cosmolike_prototype_base(DataSetLikelihood):
       # COLA NN Emulator for wCDM
       print("[nonlinear] Initializing COLA NN emulator...")
       if self.cola_emu_mode == "LCDM":
+        print("[nonlinear] Using LambdaCDM emulator")
         from COLA_Emulators.NN import nn_emu_wcdm
         self.emulator = nn_emu_wcdm
       elif self.cola_emu_mode == "wCDM":
         if self.num_refs == 1:
+          print("[nonlinear] Using wCDM emulator with 1 anchor")
           from COLA_Emulators.NN import nn_emu_wcdm
           self.emulator = nn_emu_wcdm
         elif self.num_refs == 25:
+          print("[nonlinear] Using wCDM emulator with 25 anchors")
           from COLA_Emulators.NN import nn_emu_wcdm_25refs
           self.emulator = nn_emu_wcdm_25refs
     else:
