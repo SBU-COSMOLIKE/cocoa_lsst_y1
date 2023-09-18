@@ -1,12 +1,17 @@
 # LSST-Y1 COLA Chains
 This branch of the `lsst_y1` repository contains yaml files for LSST-Y1 chains to be run in Cocoa, using the COLA emulators as well as Euclid Emulator 2. Please, read this documentation before running any chains.
 
-## Description
-The fiducial data vector `data/EE2_FIDUCIAL.modelvector` was generated with the yaml file `CREATE_EE2_FIDUCIAL_DATA_VECTOR.yaml`. A noise realization was added to the data vector, using the Python script `add_noise_to_data_vector.py`, resulting in the file `data/EE2_FIDUCIAL_NOISED.modelvector`. For each of the masks, one `dataset` file was created, in `data/LSST_Y1_MX_EE2_FID.dataset`. For testing purposes, an additional dataset `LSST_Y1_M6_EE2_NO_NOISE.dataset` was created using the noiseless data vector. The noiseless dataset is used in `TEST_COLA_EMU_SHEAR.yaml`, which is a simple evaluation at the fiducial parameters.
+## COLA Emulators
+The source code for all COLA emulators used in the project are stored under the `COLA_Emulators/` folder.
 
-All chains run with LSST-Y1 Cosmic Shear, EE2 fiducial noised data vector, same nuisance parameter priors (pessimistic IA with NLA, optimistic photo-z and shear calibration). The priors for cosmological parameters are the EE2 box boundaries. We are only considering wCDM. The convergence criterion is given by `R-1 < 0.005`.
+## Analysis Description
+The fiducial data vector `data/EE2_FIDUCIAL_NO_NOISE.modelvector` was generated with the yaml file `yamls/CREATE_EE2_FIDUCIAL_DATA_VECTOR.yaml`. A noise realization was added to the data vector, using the Python script `data/add_noise_to_data_vector.py`, resulting in the file `data/EE2_FIDUCIAL_NOISED.modelvector`. For each of the masks, one `dataset` file was created, in `data/LSST_Y1_MX_EE2_FID.dataset`, where `X` represents the number of tha mask, `M1` being the most aggressive and `M5` the most conservative. For testing purposes, an additional dataset `LSST_Y1_M6_EE2_NO_NOISE.dataset` was created using the noiseless data vector. The noiseless dataset is used in `TEST_COLA_EMU_SHEAR.yaml`, which is a simple evaluation at the fiducial parameters.
 
-The variables between chains are: masks (scale cuts), the emulators (EE2, Halofit, COLA, COLA+10, COLA+25, COLA+100, where COLA+X means COLA with X anchors).
+Using the same methodology, other eight fiducial data vectors were created, varying the parameters `Omega_m`, `As` and `ns`. We define a 2x2 grid in the `Omega_m`-`As` plane, and choose values in-between the reference and borders of each parameter limit. For instance, the parameter `As` has limits `1.7e-9` to `2.5e-9`, and the reference is in the middle, `2.1e-9`. Thus, we choose two values of `As`: the low value `1.9e-9` and high value `2.3e-9`. `Omega_m` varies to `0.28` and `0.36`, and `ns` varies to `0.94` and `0.98`. The yamls used to create the eight data vectors are saved in `yamls/OM_[HIGH/LOW]_[AS-NS]_[HIGH/LOW].yaml`. After that, noise realization was added to each data vector.
+
+All chains run with LSST-Y1 Cosmic Shear, same nuisance parameter priors (pessimistic IA with NLA, optimistic photo-z and shear calibration). The priors for cosmological parameters are the EE2 box boundaries. We are only considering wCDM. The convergence criterion is given by `R-1 < 0.005`.
+
+The variables between chains are: masks (scale cuts), the emulators (EE2, Halofit, COLA), the number of anchors (1/10/25/100) and the fiducial data vector (EE2 reference, Omega_m high/low, As high/low, ns high/low).
 
 The nonlinear emulators are set in the yaml file under the `non_linear_emul` option. They are numbered as:
 
@@ -20,6 +25,10 @@ The nonlinear emulators are set in the yaml file under the `non_linear_emul` opt
 
 5 - PCE;
 
+For COLA Emulators, the number of anchors is set in the yaml file under the option `num_refs`, set to 1 by default.
+
+To change between LCDM and wCDM COLA emulators, use the option `cola_emu_mode: LCDM` or `cola_emu_mode: wCDM`.
+
 More emulators will be added since we need to implement the different anchors, COLA precision, dark energy models...
 
 **NOTE**: There are still some placeholder strings in the yaml files, namely `COLA_EMU_NO_ANCHOR`, `COLA_EMU_10_ANCHORS`, `COLA_EMU_25_ANCHORS` and `COLA_EMU_100_ANCHORS`. This is because we haven't decided on the emulator to run the bulk of the chains and the emulators with multiple anchors are still not implemented. Before running chains, the placeholder strings need to be substituted by the actual numbers representing the chosen emulator.
@@ -27,65 +36,129 @@ More emulators will be added since we need to implement the different anchors, C
 **NOTE**: We still need to think about accuracy settings for both CAMB and Cosmolike.
 
 ## List of chains
-1 - EE2, M1
+The format for each entry is
 
-2 - EE2, M2
+INDEX - Emulator / Mask / Model / Anchors / Fiducial cosmology
 
-3 - EE2, M3
+1 - EE2 / M1 / wCDM / -- / EE2 reference
 
-4 - EE2, M4
+2 - EE2 / M2 / wCDM / -- / EE2 reference
 
-5 - EE2, M5
+3 - EE2 / M3 / wCDM / -- / EE2 reference
 
-6 - COLA, M1
+4 - EE2 / M4 / wCDM / -- / EE2 reference
 
-7 - COLA, M2
+5 - EE2 / M5 / wCDM / -- / EE2 reference
 
-8 - COLA, M3
+6 - COLA / M1 / wCDM / 1 anchor / EE2 reference
 
-9 - COLA, M4
+7 - COLA / M2 / wCDM / 1 anchor / EE2 reference
 
-10 - COLA, M5
+8 - COLA / M3 / wCDM / 1 anchor / EE2 reference
 
-11 - COLA+10, M1
+9 - COLA / M4 / wCDM / 1 anchor / EE2 reference
 
-12 - COLA+10, M2
+10 - COLA / M5 / wCDM / 1 anchor / EE2 reference
 
-13 - COLA+10, M3
+11 - COLA / M1 / wCDM / 10 anchors / EE2 reference
 
-14 - COLA+10, M4
+12 - COLA / M2 / wCDM / 10 anchors / EE2 reference
 
-15 - COLA+10, M5
+13 - COLA / M3 / wCDM / 10 anchors / EE2 reference
 
-16 - COLA+25, M1
+14 - COLA / M4 / wCDM / 10 anchors / EE2 reference
 
-17 - COLA+25, M2
+15 - COLA / M5 / wCDM / 10 anchors / EE2 reference
 
-18 - COLA+25, M3
+16 - COLA / M1 / wCDM / 25 anchors / EE2 reference
 
-19 - COLA+25, M4
+17 - COLA / M2 / wCDM / 25 anchors / EE2 reference
 
-20 - COLA+25, M5
+18 - COLA / M3 / wCDM / 25 anchors / EE2 reference
 
-21 - COLA+100, M1
+19 - COLA / M4 / wCDM / 25 anchors / EE2 reference
 
-22 - COLA+100, M2
+20 - COLA / M5 / wCDM / 25 anchors / EE2 reference
 
-23 - COLA+100, M3
+21 - COLA / M1 / wCDM / 100 anchors / EE2 reference
 
-24 - COLA+100, M4
+22 - COLA / M2 / wCDM / 100 anchors / EE2 reference
 
-25 - COLA+100, M5
+23 - COLA / M3 / wCDM / 100 anchors / EE2 reference
 
-26 - Halofit, M1
+24 - COLA / M4 / wCDM / 100 anchors / EE2 reference
 
-27 - Halofit, M2
+25 - COLA / M5 / wCDM / 100 anchors / EE2 reference
 
-28 - Halofit, M3
+26 - Halofit / M1 / wCDM / -- / EE2 reference
 
-29 - Halofit, M4
+27 - Halofit / M2 / wCDM / -- / EE2 reference
 
-30 - Halofit, M5
+28 - Halofit / M3 / wCDM / -- / EE2 reference
+
+29 - Halofit / M4 / wCDM / -- / EE2 reference
+
+30 - Halofit / M5 / wCDM / -- / EE2 reference
+
+31 - EE2 / M1 / wCDM / -- / High Omega_m High As
+
+32 - EE2 / M2 / wCDM / -- / High Omega_m High As
+
+33 - EE2 / M3 / wCDM / -- / High Omega_m High As
+
+34 - COLA / M1 / wCDM / 1 anchor / High Omega_m High As
+
+35 - COLA / M2 / wCDM / 1 anchor / High Omega_m High As
+
+36 - COLA / M3 / wCDM / 1 anchor / High Omega_m High As
+
+37 - COLA / M1 / wCDM / 10 anchors / High Omega_m High As
+
+38 - COLA / M2 / wCDM / 10 anchors / High Omega_m High As
+
+39 - COLA / M3 / wCDM / 10 anchors / High Omega_m High As
+
+40 - COLA / M1 / wCDM / 25 anchors / High Omega_m High As
+
+41 - COLA / M2 / wCDM / 25 anchors / High Omega_m High As
+
+42 - COLA / M3 / wCDM / 25 anchors / High Omega_m High As
+
+43 - COLA / M1 / wCDM / 100 anchors / High Omega_m High As
+
+44 - COLA / M2 / wCDM / 100 anchors / High Omega_m High As
+
+45 - COLA / M3 / wCDM / 100 anchors / High Omega_m High As
+
+46 - EE2 / M1 / wCDM / -- / High Omega_m Low As
+
+47 - EE2 / M2 / wCDM / -- / High Omega_m Low As
+
+48 - EE2 / M3 / wCDM / -- / High Omega_m Low As
+
+49 - COLA / M1 / wCDM / 1 anchor / High Omega_m Low As
+
+50 - COLA / M2 / wCDM / 1 anchor / High Omega_m Low As
+
+51 - COLA / M3 / wCDM / 1 anchor / High Omega_m Low As
+
+52 - COLA / M1 / wCDM / 10 anchors / High Omega_m Low As
+
+53 - COLA / M2 / wCDM / 10 anchors / High Omega_m Low As
+
+54 - COLA / M3 / wCDM / 10 anchors / High Omega_m Low As
+
+55 - COLA / M1 / wCDM / 25 anchors / High Omega_m Low As
+
+56 - COLA / M2 / wCDM / 25 anchors / High Omega_m Low As
+
+57 - COLA / M3 / wCDM / 25 anchors / High Omega_m Low As
+
+58 - COLA / M1 / wCDM / 100 anchors / High Omega_m Low As
+
+59 - COLA / M2 / wCDM / 100 anchors / High Omega_m Low As
+
+60 - COLA / M3 / wCDM / 100 anchors / High Omega_m Low As
 
 900 - COLA GP, M1
 
