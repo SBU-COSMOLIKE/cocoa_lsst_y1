@@ -5,7 +5,7 @@ Utility script to generate the same yamls for different fiducial data vectors au
 import shutil
 import os
 
-offset = 15
+offset = 60
 
 def replace_on_file(file_path, expr, new_expr):
     n = int(file_path[4:6])
@@ -22,4 +22,4 @@ def replace_on_file(file_path, expr, new_expr):
 
 for i in range(31, 31+offset):
     shutil.copyfile(f"MCMC{i}.yaml", f"MCMC{i+offset}.yaml")
-    replace_on_file(f"MCMC{i+offset}.yaml", "OM_HIGH_AS_HIGH.dataset", "OM_LOW_AS_HIGH.dataset")
+    replace_on_file(f"MCMC{i+offset}.yaml", "HIGH.dataset", "LOW.dataset")
