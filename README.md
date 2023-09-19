@@ -1,5 +1,7 @@
 # LSST-Y1 COLA Chains
-This branch of the `lsst_y1` repository contains yaml files for LSST-Y1 chains to be run in Cocoa, using the COLA emulators as well as Euclid Emulator 2. Please, read this documentation before running any chains.
+This branch of the `lsst_y1` repository contains yaml files for LSST-Y1 chains to be run in Cocoa, using the COLA emulators as well as Euclid Emulator 2. **Please, read this documentation before running any chains.**
+
+**If you encounter any bugs while running chains, please report!**
 
 ## COLA Emulators
 The source code for all COLA emulators used in the project are stored under the `COLA_Emulators/` folder.

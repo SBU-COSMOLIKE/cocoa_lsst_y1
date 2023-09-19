@@ -220,7 +220,7 @@ class _cosmolike_prototype_base(DataSetLikelihood):
       # Halofit
       self.emulator = None
     elif self.non_linear_emul == 3:
-      # COLA GP Emulator for LCDM
+      # COLA GP Emulator
       emu_path = sys_path + f'COLA_Emulators/GP/{self.cola_emu_mode}_cola_emulator{self.cola_precision}_{self.num_refs}/'
       sys.path.append(emu_path)
       import cola_emulator
@@ -246,9 +246,9 @@ class _cosmolike_prototype_base(DataSetLikelihood):
       # COLA NN Emulator for wCDM
       print("[nonlinear] Initializing COLA NN emulator...")
       if self.cola_emu_mode == "LCDM":
-        print("[nonlinear] Using LambdaCDM emulator")
-        from COLA_Emulators.NN import nn_emu_wcdm
-        self.emulator = nn_emu_wcdm
+        print("[nonlinear] Using LambdaCDM COLA emulator with 1 anchor")
+        from COLA_Emulators.NN import nn_emu_lcdm
+        self.emulator = nn_emu_lcdm
       elif self.cola_emu_mode == "wCDM":
         if self.num_refs == 1:
           print("[nonlinear] Using wCDM emulator with 1 anchor")
@@ -444,7 +444,7 @@ class _cosmolike_prototype_base(DataSetLikelihood):
       for i in range(self.len_z_interp_2D): 
         lnPNL[i::self.len_z_interp_2D] = lnpk_total[i]
 
-    elif self.non_linear_emul == 4 or self.non_linear_emul == 8:
+    elif self.non_linear_emul == 4:
       # COLA NN
       params = {
         'Omm'  : self.provider.get_param("omegam"),
