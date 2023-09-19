@@ -382,7 +382,7 @@ class _cosmolike_prototype_base(DataSetLikelihood):
 
     elif self.non_linear_emul == 3:
       # COLA 
-      w_ = (-1 if self.model == 'LCDM' else self.provider.get_param("w"))
+      w_ = (-1 if self.cola_emu_mode == 'LCDM' else self.provider.get_param("w"))
       params = {
         'Omm'  : self.provider.get_param("omegam"),
         'As'   : self.provider.get_param("As"),
@@ -392,7 +392,7 @@ class _cosmolike_prototype_base(DataSetLikelihood):
         'w'    : w_
       }
       param_names = ['Omm','Omb', 'ns', 'As', 'h']
-      if self.model == 'wCDM':
+      if self.cola_emu_mode == 'wCDM':
         param_names.append('w')
       params_ = [self.emulator.normalize_param(self.emulator.param_mins[i], self.emulator.param_maxs[i], params[param_names[i]]) for i in range(len(param_names))]
       tmp_qk = self.emulator.emulate_all_zs(params_, self.gp_emulator, self.qs_reduced, self.pcas, self.means, self.ks_emu, self.zs_cola)

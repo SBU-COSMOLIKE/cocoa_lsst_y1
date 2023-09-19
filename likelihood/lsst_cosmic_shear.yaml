@@ -7,7 +7,7 @@ kmax_boltzmann: 5.0
 speed: 1
 non_linear_emul: 2
 cola_precision: 1
-cola_emu_mode: 'wCDM'
+cola_emu_mode: "wCDM"
 num_refs: 1
 
 print_intermediate_products: False

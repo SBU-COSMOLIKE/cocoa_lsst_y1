@@ -338,11 +338,17 @@ INDEX - Emulator / Mask / Model / Anchors / Fiducial cosmology
 
 150 - COLA / M3 / wCDM / 100 anchors / Low Omega_m Low ns
 
-900 - COLA GP, M1
+900 - COLA GP / M1 / wCDM / 1 anchor / EE2 ref
 
-901 - COLA NN, M1
+901 - COLA NN / M1 / wCDM / 1 anchor / EE2 ref
 
-902 - COLA PCE, M1
+902 - COLA PCE / M1 / wCDM / 1 anchor / EE2 ref
+
+903 - COLA GP / M1 / LCDM / 1 anchor / EE2 ref
+
+904 - COLA NN / M1 / LCDM / 1 anchor / EE2 ref
+
+905 - COLA PCE / M1 / LCDM / 1 anchor / EE2 ref
 
 
 ## Running Cosmolike projects <a name="running_cosmolike_projects"></a> 
