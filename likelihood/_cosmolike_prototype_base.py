@@ -243,7 +243,7 @@ class _cosmolike_prototype_base(DataSetLikelihood):
       print('[nonlinear] GP Emulator initialized.')
       print('[nonlinear] Using COLA GP emulator')
     elif self.non_linear_emul == 4:
-      # COLA NN Emulator for wCDM
+      # COLA NN Emulator
       print("[nonlinear] Initializing COLA NN emulator...")
       if self.cola_emu_mode == "LCDM":
         print("[nonlinear] Using LambdaCDM COLA emulator with 1 anchor")
