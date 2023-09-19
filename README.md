@@ -350,6 +350,10 @@ INDEX - Emulator / Mask / Model / Anchors / Fiducial cosmology
 
 905 - COLA PCE / M1 / LCDM / 1 anchor / EE2 ref
 
+906 - EE2 / M1 / LCDM / -- / EE2 ref
+
+907 - Halofit / M1 / LCDM / -- / EE2 ref
+
 
 ## Running Cosmolike projects <a name="running_cosmolike_projects"></a> 
 
