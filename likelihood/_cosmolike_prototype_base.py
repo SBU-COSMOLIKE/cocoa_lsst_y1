@@ -25,6 +25,7 @@ sys_path = './projects/lsst_y1/'
 sys.path.append(sys_path)
 
 
+
 # JG
 # from COLA_Emulators.GP.LCDM_cola_emulator1 import cola_emulator as gp_emulator
 from COLA_Emulators.Cython_Filter_Files import filter_f as bao_smear
@@ -258,6 +259,24 @@ class _cosmolike_prototype_base(DataSetLikelihood):
           print("[nonlinear] Using wCDM emulator with 25 anchors")
           from COLA_Emulators.NN import nn_emu_wcdm_25refs
           self.emulator = nn_emu_wcdm_25refs
+    elif self.non_linear_emul == 5:  
+      # COLA NN Emulator
+      print("[nonlinear] Initializing COLA PCE emulator...")
+      if self.cola_emu_mode == "LCDM":
+        print("[nonlinear] Using LambdaCDM COLA emulator with 1 anchor")
+        from COLA_Emulators.PCE.pce_lcdm_default import emu_cons_proto as emu_lcdm_default_pce 
+        self.emulator = emu_lcdm_default_pce()
+      elif self.cola_emu_mode == "wCDM":
+        if self.num_refs == 1:
+          print("[nonlinear] Using wCDM emulator with 1 anchor")
+          from COLA_Emulators.PCE.pce_wcdm_default import emu_cons_proto2 as emu_wcdm_default_pce 
+
+          self.emulator = emu_wcdm_default_pce()
+        elif self.num_refs == 25:
+          print("[nonlinear] wCDM PCE with 25 anchors not implemented yest, using 1 anchor  ")
+          from COLA_Emulators.PCE.pce_wcdm_default import emu_cons_proto2 as emu_wcdm_default_pce 
+
+          self.emulator = emu_wcdm_default_pce()
     else:
       raise LoggedError(self.log, "non_linear_emul = %d is an invalid option", self.non_linear_emul)
 
@@ -343,6 +362,12 @@ class _cosmolike_prototype_base(DataSetLikelihood):
       lnPL[i::self.len_z_interp_2D]  = t2[i*self.len_k_interp_2D:(i+1)*self.len_k_interp_2D]
     lnPL  += np.log((h**3))
 
+ 
+
+
+
+ 
+             
     if self.non_linear_emul == 1:
       # EE2
       params = {
@@ -492,6 +517,53 @@ class _cosmolike_prototype_base(DataSetLikelihood):
       lnpk_total = lnpk_total_interp(self.k_interp_2D, self.z_interp_2D)
       for i in range(self.len_z_interp_2D): 
         lnPNL[i::self.len_z_interp_2D] = lnpk_total[i]
+
+
+    elif self.non_linear_emul == 5:
+
+        
+      if self.cola_emu_mode == 'wCDM':  
+          params = { 'Omm':np.array([self.provider.get_param("omegam")]),
+                       'Omb':np.array([self.provider.get_param("omegab")]) ,
+                       'ns':np.array([self.provider.get_param("ns")]) ,
+                       'As':np.array([self.provider.get_param("As")]),
+                       'h':np.array([h]),
+                       'w':np.array([self.provider.get_param("w")])}
+      else:  
+          params = { 'Omm':np.array([self.provider.get_param("omegam")]),
+                       'Omb':np.array([self.provider.get_param("omegab")]) ,
+                       'ns':np.array([self.provider.get_param("ns")]) ,
+                       'As':np.array([self.provider.get_param("As")]),
+                       'h':np.array([h])}
+
+        
+      kbt34, log_tmp_bt34, log_tmp_bt6 = self.emulator.get_boost_cocoa(params, log10k_interp_2D)
+
+
+      cola_zs = self.emulator.redshift_default_  
+      lnpk_total_ = np.zeros((len(cola_zs), len(self.k_interp_2D)))
+ 
+        
+     
+      pk_l = np.exp(PKL.logP(cola_zs, self.k_interp_2D) + np.log(h**3))
+      pk_nw = bao_smear.smooth_bao_ver2(self.k_interp_2D/h, pk_l)
+      pk_smeared = bao_smear.smear_bao_vec(self.k_interp_2D/h, pk_l, pk_nw)
+
+      lnpk_total_[:log_tmp_bt34.shape[0]]= log_tmp_bt34 + np.log(pk_smeared[:log_tmp_bt34.shape[0]])
+      lnpk_total_[log_tmp_bt34.shape[0]:]= log_tmp_bt6 + np.log(pk_smeared[log_tmp_bt34.shape[0]:])
+ 
+        
+
+      lnpk_total_interp = interp2d(self.k_interp_2D, cola_zs, lnpk_total_)
+      lnpk_total = lnpk_total_interp(self.k_interp_2D, self.z_interp_2D)
+      np.savetxt('./projects/lsst_y1/debug_lnpk_total_mine2.txt', lnpk_total)              
+  
+      
+      lnPNL = lnpk_total.T.flatten() 
+
+
+
+      
     else:
       assert False, "Other emulators not implemented"
 
