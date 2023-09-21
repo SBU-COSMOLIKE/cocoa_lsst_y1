@@ -1,5 +1,8 @@
 import numpy as np
 import GPy
+import logging
+logger = logging.getLogger("GP")
+logger.setLevel(logging.WARNING)
 
 def get_redshifts(z_ini, output_redshifts, timestep_nsteps):
     redshift_endpoints = [z_ini] + output_redshifts
@@ -49,6 +52,7 @@ def initialize_emulator(all_hyperparams,qs_reduced_,lhs):
             m.Gaussian_noise.variance[0] = all_hyperparams[z_index][pc_index][1]
             m.rbf.lengthscale[0:] = all_hyperparams[z_index][pc_index][2:]
             all_gps[z_index].append(m)
+
     return all_gps
 def inv_pc(pcs_,mean_,vec):
     expanded_q = [mean_[i] for i in range(len(mean_))]

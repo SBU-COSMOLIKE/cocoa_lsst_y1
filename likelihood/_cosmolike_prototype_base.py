@@ -24,10 +24,6 @@ import math
 sys_path = './projects/lsst_y1/'
 sys.path.append(sys_path)
 
-
-
-# JG
-# from COLA_Emulators.GP.LCDM_cola_emulator1 import cola_emulator as gp_emulator
 from COLA_Emulators.Cython_Filter_Files import filter_f as bao_smear
 
 import matplotlib
@@ -240,7 +236,11 @@ class _cosmolike_prototype_base(DataSetLikelihood):
         self.qs_reduced.append(np.loadtxt(f'{emu_path}/data/z{z_str}.txt'))
         self.all_gp_params.append(np.loadtxt(emu_path+f'hyperparameters/hyperparams_z{z_str}.txt'))
       print('[nonlinear] Initializing GP Emulator.')
+      #trick to stop annoying print statements while GP initializes
+      # old_stdout = sys.stdout
+      # sys.stdout = open(os.devnull, "w")
       self.gp_emulator = cola_emulator.initialize_emulator(self.all_gp_params,self.qs_reduced,self.lhs) 
+      #sys.stdout = old_stdout
       print('[nonlinear] GP Emulator initialized.')
       print('[nonlinear] Using COLA GP emulator')
     elif self.non_linear_emul == 4:
