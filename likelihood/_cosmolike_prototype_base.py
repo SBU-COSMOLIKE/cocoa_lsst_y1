@@ -361,13 +361,7 @@ class _cosmolike_prototype_base(DataSetLikelihood):
     for i in range(self.len_z_interp_2D):
       lnPL[i::self.len_z_interp_2D]  = t2[i*self.len_k_interp_2D:(i+1)*self.len_k_interp_2D]
     lnPL  += np.log((h**3))
-
- 
-
-
-
- 
-             
+  
     if self.non_linear_emul == 1:
       # EE2
       params = {
@@ -495,18 +489,18 @@ class _cosmolike_prototype_base(DataSetLikelihood):
       lnpk_total_ = np.zeros((len(cola_zs), len(self.k_interp_2D)))
       full_qk = np.zeros((len(cola_zs), len(self.k_interp_2D)))
       for i in range(len(cola_zs)):
-        num_pts_filter = 3
+        num_pts_filter = 70 #3
         last_points = logboost_cola[i][-num_pts_filter:]
         last_points_filtered = savgol_filter(last_points, num_pts_filter, 1)  
         logboost_cola_filtered = np.concatenate((logboost_cola[i][:-num_pts_filter], last_points_filtered))
         #This interp is to get the extrapolated k range
         interp_cola = interp1d(log10_cola_ks, 
-              logboost_cola_filtered, 
+              np.exp(logboost_cola_filtered), 
               kind = 'linear', 
               fill_value = 'extrapolate',
               assume_sorted = True
         )
-        qk = interp_cola(log10k_interp_2D)
+        qk = np.log(interp_cola(log10k_interp_2D))
         qk[log10k_interp_2D < np.log10(cola_ks[0])] = 0
         full_qk[i] = qk
       
@@ -518,10 +512,8 @@ class _cosmolike_prototype_base(DataSetLikelihood):
       for i in range(self.len_z_interp_2D): 
         lnPNL[i::self.len_z_interp_2D] = lnpk_total[i]
 
-
     elif self.non_linear_emul == 5:
-
-        
+      # COLA PCE
       if self.cola_emu_mode == 'wCDM':  
           params = { 'Omm':np.array([self.provider.get_param("omegam")]),
                        'Omb':np.array([self.provider.get_param("omegab")]) ,
@@ -539,12 +531,9 @@ class _cosmolike_prototype_base(DataSetLikelihood):
         
       kbt34, log_tmp_bt34, log_tmp_bt6 = self.emulator.get_boost_cocoa(params, log10k_interp_2D)
 
-
       cola_zs = self.emulator.redshift_default_  
       lnpk_total_ = np.zeros((len(cola_zs), len(self.k_interp_2D)))
  
-        
-     
       pk_l = np.exp(PKL.logP(cola_zs, self.k_interp_2D) + np.log(h**3))
       pk_nw = bao_smear.smooth_bao_ver2(self.k_interp_2D/h, pk_l)
       pk_smeared = bao_smear.smear_bao_vec(self.k_interp_2D/h, pk_l, pk_nw)
@@ -552,18 +541,11 @@ class _cosmolike_prototype_base(DataSetLikelihood):
       lnpk_total_[:log_tmp_bt34.shape[0]]= log_tmp_bt34 + np.log(pk_smeared[:log_tmp_bt34.shape[0]])
       lnpk_total_[log_tmp_bt34.shape[0]:]= log_tmp_bt6 + np.log(pk_smeared[log_tmp_bt34.shape[0]:])
  
-        
-
       lnpk_total_interp = interp2d(self.k_interp_2D, cola_zs, lnpk_total_)
       lnpk_total = lnpk_total_interp(self.k_interp_2D, self.z_interp_2D)
       np.savetxt('./projects/lsst_y1/debug_lnpk_total_mine2.txt', lnpk_total)              
   
-      
       lnPNL = lnpk_total.T.flatten() 
-
-
-
-      
     else:
       assert False, "Other emulators not implemented"
 
