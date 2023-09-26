@@ -424,7 +424,7 @@ class _cosmolike_prototype_base(DataSetLikelihood):
       k_r_index2 = self.emulator.find_crossing_index(self.k_interp_2D/h, self.ks_emu[255])
       full_qk = []
       for i in range(len(self.zs_cola)): 
-        num_pts_filter = 3
+        num_pts_filter = 70
         if i < self.emulator.z_cut:
           len_ks_emu = 512
           k_r_index = k_r_index1
@@ -437,20 +437,20 @@ class _cosmolike_prototype_base(DataSetLikelihood):
         filtered_qk_extrap = savgol_filter(last_points, num_pts_filter, 1)  
         #This interp is to get the extrapolated k range
         qk_extrap = interp1d(log10_ks_emu[len_ks_emu - num_pts_filter:], 
-            filtered_qk_extrap,
+            np.exp(filtered_qk_extrap),
             kind = 'linear', 
             fill_value = 'extrapolate', 
             assume_sorted = True)
         #This interp is for the remaining k range
         qk_interp = interp1d(log10_ks_emu,  
-            tmp_qk[i],
+            np.exp(tmp_qk[i]),
             kind = 'linear', 
             fill_value = 'extrapolate', 
             assume_sorted = True
           )
         qk = np.zeros(len(self.k_interp_2D))
-        qk[k_l_index:k_r_index] = qk_interp(log10k_interp_2D[k_l_index:k_r_index])
-        qk[k_r_index:] = qk_extrap(log10k_interp_2D[k_r_index:])
+        qk[k_l_index:k_r_index] = np.log(qk_interp(log10k_interp_2D[k_l_index:k_r_index]))
+        qk[k_r_index:] = np.log(qk_extrap(log10k_interp_2D[k_r_index:]))
         full_qk.append(qk)
 
       pk_nw = bao_smear.smooth_bao_ver1(self.k_interp_2D/h, pk_l)
