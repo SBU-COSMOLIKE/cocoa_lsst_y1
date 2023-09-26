@@ -5,14 +5,14 @@ stop_at_error: True
 likelihood:
   lsst_y1.lsst_cosmic_shear:
     path: ./external_modules/data/lsst_y1
-    data_file: LSST_Y1_M1_EE2_NO_NOISE.dataset 
+    data_file: LSST_Y1_M1_EE2_NO_NOISE2.dataset 
     print_datavector: False
     #print_datavector_file: "./projects/lsst_y1/data/EE2_FIDUCIAL.modelvector"
     accuracyboost: 1.0
     integration_accuracy: 0
     kmax_boltzmann: 5.0
     # 1 EE2, 2 Halofit, 3 COLA GP, 4 COLA NN
-    non_linear_emul: 3
+    non_linear_emul: 1
     # 1 default, 2 high
     cola_precision: 1
     cola_emu_mode: 'wCDM'
@@ -211,4 +211,4 @@ sampler:
       w0pwa: -1.0
       w: -1.0
 
-output: ./projects/lsst_y1/chains/chi2map
+output: ./projects/lsst_y1/chains/TEST_COLA_EMU_SHEAR2

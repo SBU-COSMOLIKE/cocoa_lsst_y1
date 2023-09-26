@@ -236,11 +236,7 @@ class _cosmolike_prototype_base(DataSetLikelihood):
         self.qs_reduced.append(np.loadtxt(f'{emu_path}/data/z{z_str}.txt'))
         self.all_gp_params.append(np.loadtxt(emu_path+f'hyperparameters/hyperparams_z{z_str}.txt'))
       print('[nonlinear] Initializing GP Emulator.')
-      #trick to stop annoying print statements while GP initializes
-      # old_stdout = sys.stdout
-      # sys.stdout = open(os.devnull, "w")
       self.gp_emulator = cola_emulator.initialize_emulator(self.all_gp_params,self.qs_reduced,self.lhs) 
-      #sys.stdout = old_stdout
       print('[nonlinear] GP Emulator initialized.')
       print('[nonlinear] Using COLA GP emulator')
     elif self.non_linear_emul == 4:
@@ -381,18 +377,18 @@ class _cosmolike_prototype_base(DataSetLikelihood):
       lnpk_ee2 = []
       for i in range(self.len_z_interp_2D):    
         interp = interp1d(logkbt, 
-            np.log(tmp_bt[i]), 
+            (tmp_bt[i]), 
             kind = 'linear', 
             fill_value = 'extrapolate', 
             assume_sorted = True
           )
 
-        lnbt = interp(log10k_interp_2D)
+        lnbt = np.log(interp(log10k_interp_2D))
         lnbt[np.power(10,log10k_interp_2D) < 8.73e-3] = 0.0
     
         lnPNL[i::self.len_z_interp_2D]  = lnPL[i::self.len_z_interp_2D] + lnbt
         lnpk_ee2.append(lnPL[i::self.len_z_interp_2D] + lnbt)
-      #np.savetxt('./projects/lsst_y1/debug_ee2.txt', lnpk_ee2)
+      
     elif self.non_linear_emul == 2:
       # Halofit
       for i in range(self.len_z_interp_2D):
@@ -542,8 +538,7 @@ class _cosmolike_prototype_base(DataSetLikelihood):
       lnpk_total_[log_tmp_bt34.shape[0]:]= log_tmp_bt6 + np.log(pk_smeared[log_tmp_bt34.shape[0]:])
  
       lnpk_total_interp = interp2d(self.k_interp_2D, cola_zs, lnpk_total_)
-      lnpk_total = lnpk_total_interp(self.k_interp_2D, self.z_interp_2D)
-      np.savetxt('./projects/lsst_y1/debug_lnpk_total_mine2.txt', lnpk_total)              
+      lnpk_total = lnpk_total_interp(self.k_interp_2D, self.z_interp_2D)            
   
       lnPNL = lnpk_total.T.flatten() 
     else:
