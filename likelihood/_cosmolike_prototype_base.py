@@ -243,9 +243,12 @@ class _cosmolike_prototype_base(DataSetLikelihood):
       # COLA NN Emulator
       print("[nonlinear] Initializing COLA NN emulator...")
       if self.cola_emu_mode == "LCDM":
-        print("[nonlinear] Using LambdaCDM COLA emulator with 1 anchor")
-        from COLA_Emulators.NN import nn_emu_lcdm
-        self.emulator = nn_emu_lcdm
+        if self.num_refs == 1:
+          print("[nonlinear] Using LambdaCDM COLA emulator with 1 anchor")
+          from COLA_Emulators.NN import nn_emu_lcdm
+          self.emulator = nn_emu_lcdm
+        else:
+          raise LoggedError(self.log, f"Invalid number of anchors for NN LCDM COLA emulator {self.num_refs}")
       elif self.cola_emu_mode == "wCDM":
         if self.num_refs == 1:
           print("[nonlinear] Using wCDM emulator with 1 anchor")
@@ -255,6 +258,10 @@ class _cosmolike_prototype_base(DataSetLikelihood):
           print("[nonlinear] Using wCDM emulator with 25 anchors")
           from COLA_Emulators.NN import nn_emu_wcdm_25refs
           self.emulator = nn_emu_wcdm_25refs
+        else:
+          raise LoggedError(self.log, f"Invalid number of anchors for NN wCDM COLA emulator {self.num_refs}")
+      else:
+        raise LoggedError(self.log, f"Invalid model for COLA emulator {self.cola_emu_mode}")
     elif self.non_linear_emul == 5:  
       # COLA NN Emulator
       print("[nonlinear] Initializing COLA PCE emulator...")
