@@ -1,7 +1,7 @@
 timing: False
 debug: False
 stop_at_error: False
-output: ./projects/lsst_y1/chains/MCMC46
+output: ./projects/lsst_y1/chains/MCMC106
 
 likelihood:
   lsst_y1.lsst_cosmic_shear:
