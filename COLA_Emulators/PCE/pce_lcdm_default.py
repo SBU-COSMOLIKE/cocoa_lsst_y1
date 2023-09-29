@@ -145,19 +145,19 @@ class emu_cons_proto(object):
         
         logkbt34,logkbt6 =  np.log10(self.ks_cola),np.log10(self.ks_cola[:256])
         
-        num_of_points= 15  #25
-        num_of_points2= 15  #25
+        num_of_points= 10  #25
+        num_of_points2= 10  #25
             
         interp = scipy.interpolate.interp1d(logkbt6, 
-          (np.concatenate((cosmos_6[:,:256-num_of_points], savgol_filter(cosmos_6, num_of_points2, 1)[:,256-num_of_points: ] ), axis=1)), 
+          np.exp(np.concatenate((cosmos_6[:,:256-num_of_points], savgol_filter(cosmos_6, num_of_points2, 1)[:,256-num_of_points: ] ), axis=1)), 
           kind = 'linear', 
           fill_value = 'extrapolate', 
           assume_sorted = True)
           
-        log_tmp_bt6 = (interp(log10k_interp_2D))
+        log_tmp_bt6 = np.log(interp(log10k_interp_2D))
         
-        num_of_points= 60#30ou 60ou 50 ou 70 
-        num_of_points2= 60   #30 ou60 ou 50 ou 70
+        num_of_points= 67#30ou 60ou 50 ou 70 
+        num_of_points2= 67   #30 ou60 ou 50 ou 70
         interp = scipy.interpolate.interp1d(logkbt34, 
           np.exp(np.concatenate((cosmos_34[:,:512-num_of_points], savgol_filter(cosmos_34, num_of_points2, 1)[:,512-num_of_points: ] ), axis=1)), 
           kind = 'linear', 
