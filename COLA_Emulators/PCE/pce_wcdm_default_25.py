@@ -159,7 +159,7 @@ class emu_cons_proto2(object):
           
         log_tmp_bt6 = np.log(interp(log10k_interp_2D))
         
-        num_of_points= 10#30ou 60ou 50 ou 70 
+        num_of_points= 100#30ou 60ou 50 ou 70 
         num_of_points2= 100   #30 ou60 ou 50 ou 70
         interp = scipy.interpolate.interp1d(logkbt34, 
           np.exp(np.concatenate((cosmos_34[:,:512-num_of_points], savgol_filter(cosmos_34, num_of_points2, 1)[:,512-num_of_points: ] ), axis=1)), 
