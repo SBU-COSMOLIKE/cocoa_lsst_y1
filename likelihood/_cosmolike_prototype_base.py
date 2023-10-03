@@ -381,10 +381,9 @@ class _cosmolike_prototype_base(DataSetLikelihood):
       kbt = np.power(10.0, np.linspace(-2.0589, 0.973, self.len_k_interp_2D))
       kbt, tmp_bt = self.emulator.get_boost(params, self.z_interp_2D, kbt)
       logkbt = np.log10(kbt)
-      lnpk_ee2 = []
       for i in range(self.len_z_interp_2D):    
         interp = interp1d(logkbt, 
-            (tmp_bt[i]), 
+            tmp_bt[i],
             kind = 'linear', 
             fill_value = 'extrapolate', 
             assume_sorted = True
@@ -394,7 +393,6 @@ class _cosmolike_prototype_base(DataSetLikelihood):
         lnbt[np.power(10,log10k_interp_2D) < 8.73e-3] = 0.0
     
         lnPNL[i::self.len_z_interp_2D]  = lnPL[i::self.len_z_interp_2D] + lnbt
-        lnpk_ee2.append(lnPL[i::self.len_z_interp_2D] + lnbt)
       
     elif self.non_linear_emul == 2:
       # Halofit
