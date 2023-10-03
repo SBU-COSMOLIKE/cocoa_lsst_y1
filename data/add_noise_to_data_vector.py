@@ -30,6 +30,7 @@ for line in cov_data:
     cov[j,i] = cov[i,j]
 
 # Generating noise realization
+np.random.seed(1234) # Fix seed for reproducibility
 noise_realization = np.random.multivariate_normal(mean=np.zeros((dv_length)), cov=cov)
 
 # Adding noise realization to data vector

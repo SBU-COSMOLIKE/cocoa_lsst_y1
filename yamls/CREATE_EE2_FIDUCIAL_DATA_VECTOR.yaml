@@ -12,7 +12,7 @@ likelihood:
     #data_file: LSST_Y1_M5_GGL0.05.dataset  
     #data_file: LSST_Y1_M6_GGL0.05.dataset 
     print_datavector: True
-    print_datavector_file: "./projects/lsst_y1/data/EE2_FIDUCIAL.modelvector"
+    print_datavector_file: "./projects/lsst_y1/data/EE2_FIDUCIAL_NO_NOISE.modelvector"
     accuracyboost: 3.0
     integration_accuracy: 10 
     kmax_boltzmann: 20.0
