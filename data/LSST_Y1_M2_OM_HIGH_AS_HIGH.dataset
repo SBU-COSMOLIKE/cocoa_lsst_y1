@@ -1,4 +1,4 @@
-data_file = OMEGAM_LOW_AS_HIGH_NOISED.modelvector
+data_file = OMEGAM_HIGH_AS_HIGH_NOISED.modelvector
 cov_file = cov_lsst_y1
 mask_file = LSST_Y1_M2_GGLOLAP0.05.mask
 nz_lens_file = lens_LSSTY1.nz 
