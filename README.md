@@ -356,6 +356,34 @@ INDEX - Emulator / Mask / Model / Anchors / Fiducial cosmology
 
 907 - Halofit / M1 / LCDM / -- / EE2 ref
 
+908 - COLA GP / M1 / wCDM / 25 anchors / High Omega_m Low As
+
+909 - COLA NN / M1 / wCDM / 25 anchors / High Omega_m Low As
+
+910 - COLA PCE / M1 / wCDM / 25 anchors / High Omega_m Low As
+
+
+### Debug chains
+801
+
+826
+
+890
+
+891
+
+892
+
+893
+
+894
+
+895
+
+896
+
+897
+
 
 ## Running Cosmolike projects <a name="running_cosmolike_projects"></a> 
 
