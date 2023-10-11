@@ -12,7 +12,7 @@ likelihood:
     integration_accuracy: 0
     kmax_boltzmann: 5.0
     # 1 EE2, 2 Halofit, 3 COLA GP, 4 COLA NN
-    non_linear_emul: 1
+    non_linear_emul: 3
     # 1 default, 2 high
     cola_precision: 1
     cola_emu_mode: 'wCDM'

@@ -1,5 +1,8 @@
 import numpy as np
 import GPy
+import logging
+logger = logging.getLogger("GP")
+logger.setLevel(logging.WARNING)
 
 def get_redshifts(z_ini, output_redshifts, timestep_nsteps):
     redshift_endpoints = [z_ini] + output_redshifts

@@ -1,18 +1,17 @@
 timing: False
 debug: False
 stop_at_error: False
-output: ./projects/lsst_y1/chains/MCMC909/MCMC909
+output: ./projects/lsst_y1/chains/MCMC169/MCMC169
 
 likelihood:
   lsst_y1.lsst_cosmic_shear:
     path: ./external_modules/data/lsst_y1
-    data_file: LSST_Y1_M1_OM_HIGH_AS_LOW.dataset
+    data_file: LSST_Y1_M5_OM_LOW_AS_LOW.dataset
     accuracyboost: 1.0
     integration_accuracy: 0
-    kmax_boltzmann: 5.0
+    kmax_boltzmann: 2.0
     # 1 EE2, 2 Halofit
-    non_linear_emul: 4
-    num_refs: 25
+    non_linear_emul: 1
 
 params:
   As_1e9:
@@ -329,12 +328,7 @@ sampler:
         ]
       - [6,
           [
-            LSST_DZ_S1, LSST_DZ_S2, LSST_DZ_S3, LSST_DZ_S4, LSST_DZ_S5, LSST_A1_1, LSST_A1_2
-          ]
-        ]
-      - [25,
-          [
-            LSST_M1, LSST_M2, LSST_M3, LSST_M4, LSST_M5
+            LSST_DZ_S1, LSST_DZ_S2, LSST_DZ_S3, LSST_DZ_S4, LSST_DZ_S5, LSST_A1_1, LSST_A1_2, LSST_M1, LSST_M2, LSST_M3, LSST_M4, LSST_M5
           ]
         ]
     oversample_power: 0.3
