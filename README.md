@@ -340,6 +340,60 @@ INDEX - Emulator / Mask / Model / Anchors / Fiducial cosmology
 
 150 - COLA / M3 / wCDM / 100 anchors / Low Omega_m Low ns
 
+151 - EE2 / M5 / wCDM / -- / EE2 reference
+
+152 - COLA / M5 / wCDM / 1 anchor / EE2 reference
+
+153 - COLA / M5 / wCDM / 25 anchors / EE2 reference
+
+154 - EE2 / M5 / wCDM / -- / High Omega_m High As
+
+155 - COLA / M5 / wCDM / 1 anchor / High Omega_m High As
+
+156 - COLA / M5 / wCDM / 25 anchors / High Omega_m High As
+
+157 - EE2 / M5 / wCDM / -- / Low Omega_m High As
+
+158 - COLA / M5 / wCDM / 1 anchor / Low Omega_m High As
+
+159 - COLA / M5 / wCDM / 25 anchors / Low Omega_m High As
+
+160 - EE2 / M5 / wCDM / -- / High Omega_m High ns
+
+161 - COLA / M5 / wCDM / 1 anchor / High Omega_m High ns
+
+162 - COLA / M5 / wCDM / 25 anchors / High Omega_m High ns
+
+163 - EE2 / M5 / wCDM / -- / Low Omega_m High ns
+
+164 - COLA / M5 / wCDM / 1 anchor / Low Omega_m High ns
+
+165 - COLA / M5 / wCDM / 25 anchors / Low Omega_m High ns
+
+166 - EE2 / M5 / wCDM / -- / High Omega_m Low As
+
+167 - COLA / M5 / wCDM / 1 anchor / High Omega_m Low As
+
+168 - COLA / M5 / wCDM / 25 anchors / High Omega_m Low As
+
+169 - EE2 / M5 / wCDM / -- / Low Omega_m Low As
+
+170 - COLA / M5 / wCDM / 1 anchor / Low Omega_m Low As
+
+171 - COLA / M5 / wCDM / 25 anchors / Low Omega_m Low As
+
+172 - EE2 / M5 / wCDM / -- / High Omega_m Low ns
+
+173 - COLA / M5 / wCDM / 1 anchor / High Omega_m Low ns
+
+174 - COLA / M5 / wCDM / 25 anchors / High Omega_m Low ns
+
+175 - EE2 / M5 / wCDM / -- / Low Omega_m Low ns
+
+176 - COLA / M5 / wCDM / 1 anchor / Low Omega_m Low ns
+
+177 - COLA / M5 / wCDM / 25 anchors / Low Omega_m Low ns
+
 900 - COLA GP / M1 / wCDM / 1 anchor / EE2 ref
 
 901 - COLA NN / M1 / wCDM / 1 anchor / EE2 ref
