@@ -394,6 +394,60 @@ INDEX - Emulator / Mask / Model / Anchors / Fiducial cosmology
 
 177 - COLA / M5 / wCDM / 25 anchors / Low Omega_m Low ns
 
+178 - EE2 / M4 / wCDM / -- / EE2 reference
+
+179 - COLA / M4 / wCDM / 1 anchor / EE2 reference
+
+180 - COLA / M4 / wCDM / 25 anchors / EE2 reference
+
+181 - EE2 / M4 / wCDM / -- / High Omega_m High As
+
+182 - COLA / M4 / wCDM / 1 anchor / High Omega_m High As
+
+183 - COLA / M4 / wCDM / 25 anchors / High Omega_m High As
+
+184 - EE2 / M4 / wCDM / -- / Low Omega_m High As
+
+185 - COLA / M4 / wCDM / 1 anchor / Low Omega_m High As
+
+186 - COLA / M4 / wCDM / 25 anchors / Low Omega_m High As
+
+187 - EE2 / M4 / wCDM / -- / High Omega_m High ns
+
+188 - COLA / M4 / wCDM / 1 anchor / High Omega_m High ns
+
+189 - COLA / M4 / wCDM / 25 anchors / High Omega_m High ns
+
+190 - EE2 / M4 / wCDM / -- / Low Omega_m High ns
+
+191 - COLA / M4 / wCDM / 1 anchor / Low Omega_m High ns
+
+192 - COLA / M4 / wCDM / 25 anchors / Low Omega_m High ns
+
+193 - EE2 / M4 / wCDM / -- / High Omega_m Low As
+
+194 - COLA / M4 / wCDM / 1 anchor / High Omega_m Low As
+
+195 - COLA / M4 / wCDM / 25 anchors / High Omega_m Low As
+
+196 - EE2 / M4 / wCDM / -- / Low Omega_m Low As
+
+197 - COLA / M4 / wCDM / 1 anchor / Low Omega_m Low As
+
+198 - COLA / M4 / wCDM / 25 anchors / Low Omega_m Low As
+
+199 - EE2 / M4 / wCDM / -- / High Omega_m Low ns
+
+200 - COLA / M4 / wCDM / 1 anchor / High Omega_m Low ns
+
+201 - COLA / M4 / wCDM / 25 anchors / High Omega_m Low ns
+
+202 - EE2 / M4 / wCDM / -- / Low Omega_m Low ns
+
+203 - COLA / M4 / wCDM / 1 anchor / Low Omega_m Low ns
+
+204 - COLA / M4 / wCDM / 25 anchors / Low Omega_m Low ns
+
 900 - COLA GP / M1 / wCDM / 1 anchor / EE2 ref
 
 901 - COLA NN / M1 / wCDM / 1 anchor / EE2 ref
@@ -417,26 +471,6 @@ INDEX - Emulator / Mask / Model / Anchors / Fiducial cosmology
 910 - COLA PCE / M1 / wCDM / 25 anchors / High Omega_m Low As
 
 
-### Debug chains
-801
-
-826
-
-890
-
-891
-
-892
-
-893
-
-894
-
-895
-
-896
-
-897
 
 
 ## Running Cosmolike projects <a name="running_cosmolike_projects"></a> 
