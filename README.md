@@ -448,6 +448,173 @@ INDEX - Emulator / Mask / Model / Anchors / Fiducial cosmology
 
 204 - COLA / M4 / wCDM / 25 anchors / Low Omega_m Low ns
 
+## LCDM chains
+
+205 - EE2 / M2 / LCDM / -- / EE2 ref
+
+206 - COLA / M2 / LCDM / 1 anchor / EE2 ref
+
+207 - COLA / M2 / LCDM / 25 anchors / EE2 ref
+
+208 - EE2 / M2 / LCDM / -- / High Omega_m High As
+
+209 - COLA / M2 / LCDM / 1 anchor / High Omega_m High As
+
+210 - COLA / M2 / LCDM / 25 anchors / High Omega_m High As
+
+211 - EE2 / M2 / LCDM / -- / Low Omega_m High As
+
+212 - COLA / M2 / LCDM / 1 anchor / Low Omega_m High As
+
+213 - COLA / M2 / LCDM / 25 anchors / Low Omega_m High As
+
+214 - EE2 / M2 / LCDM / -- / High Omega_m Low As
+
+215 - COLA / M2 / LCDM / 1 anchor / High Omega_m Low As
+
+216 - COLA / M2 / LCDM / 25 anchors / High Omega_m Low As
+
+217 - EE2 / M2 / LCDM / -- / Low Omega_m Low As
+
+218 - COLA / M2 / LCDM / 1 anchor / Low Omega_m Low As
+
+219 - COLA / M2 / LCDM / 25 anchors / Low Omega_m Low As
+
+220 - EE2 / M2 / LCDM / -- / High Omega_m High ns
+
+221 - COLA / M2 / LCDM / 1 anchor / High Omega_m High ns
+
+222 - COLA / M2 / LCDM / 25 anchors / High Omega_m High ns
+
+223 - EE2 / M2 / LCDM / -- / Low Omega_m High ns
+
+224 - COLA / M2 / LCDM / 1 anchor / Low Omega_m High ns
+
+225 - COLA / M2 / LCDM / 25 anchors / Low Omega_m High ns
+
+226 - EE2 / M2 / LCDM / -- / High Omega_m Low ns
+
+227 - COLA / M2 / LCDM / 1 anchor / High Omega_m Low ns
+
+228 - COLA / M2 / LCDM / 25 anchors / High Omega_m Low ns
+
+229 - EE2 / M2 / LCDM / -- / Low Omega_m Low ns
+
+230 - COLA / M2 / LCDM / 1 anchor / Low Omega_m Low ns
+
+231 - COLA / M2 / LCDM / 25 anchors / Low Omega_m Low ns
+
+232 - EE2 / M3 / LCDM / -- / EE2 ref
+
+233 - COLA / M3 / LCDM / 1 anchor / EE2 ref
+
+234 - COLA / M3 / LCDM / 25 anchors / EE2 ref
+
+235 - EE2 / M3 / LCDM / -- / High Omega_m High As
+
+236 - COLA / M3 / LCDM / 1 anchor / High Omega_m High As
+
+237 - COLA / M3 / LCDM / 25 anchors / High Omega_m High As
+
+238 - EE2 / M3 / LCDM / -- / Low Omega_m High As
+
+239 - COLA / M3 / LCDM / 1 anchor / Low Omega_m High As
+
+240 - COLA / M3 / LCDM / 25 anchors / Low Omega_m High As
+
+241 - EE2 / M3 / LCDM / -- / High Omega_m Low As
+
+242 - COLA / M3 / LCDM / 1 anchor / High Omega_m Low As
+
+243 - COLA / M3 / LCDM / 25 anchors / High Omega_m Low As
+
+244 - EE2 / M3 / LCDM / -- / Low Omega_m Low As
+
+245 - COLA / M3 / LCDM / 1 anchor / Low Omega_m Low As
+
+246 - COLA / M3 / LCDM / 25 anchors / Low Omega_m Low As
+
+247 - EE2 / M3 / LCDM / -- / High Omega_m High ns
+
+248 - COLA / M3 / LCDM / 1 anchor / High Omega_m High ns
+
+249 - COLA / M3 / LCDM / 25 anchors / High Omega_m High ns
+
+250 - EE2 / M3 / LCDM / -- / Low Omega_m High ns
+
+251 - COLA / M3 / LCDM / 1 anchor / Low Omega_m High ns
+
+252 - COLA / M3 / LCDM / 25 anchors / Low Omega_m High ns
+
+253 - EE2 / M3 / LCDM / -- / High Omega_m Low ns
+
+254 - COLA / M3 / LCDM / 1 anchor / High Omega_m Low ns
+
+255 - COLA / M3 / LCDM / 25 anchors / High Omega_m Low ns
+
+256 - EE2 / M3 / LCDM / -- / Low Omega_m Low ns
+
+257 - COLA / M3 / LCDM / 1 anchor / Low Omega_m Low ns
+
+258 - COLA / M3 / LCDM / 25 anchors / Low Omega_m Low ns
+
+259 - EE2 / M4 / LCDM / -- / EE2 ref
+
+260 - COLA / M4 / LCDM / 1 anchor / EE2 ref
+
+261 - COLA / M4 / LCDM / 25 anchors / EE2 ref
+
+262 - EE2 / M4 / LCDM / -- / High Omega_m High As
+
+263 - COLA / M4 / LCDM / 1 anchor / High Omega_m High As
+
+264 - COLA / M4 / LCDM / 25 anchors / High Omega_m High As
+
+265 - EE2 / M4 / LCDM / -- / Low Omega_m High As
+
+266 - COLA / M4 / LCDM / 1 anchor / Low Omega_m High As
+
+267 - COLA / M4 / LCDM / 25 anchors / Low Omega_m High As
+
+268 - EE2 / M4 / LCDM / -- / High Omega_m Low As
+
+269 - COLA / M4 / LCDM / 1 anchor / High Omega_m Low As
+
+270 - COLA / M4 / LCDM / 25 anchors / High Omega_m Low As
+
+271 - EE2 / M4 / LCDM / -- / Low Omega_m Low As
+
+272 - COLA / M4 / LCDM / 1 anchor / Low Omega_m Low As
+
+273 - COLA / M4 / LCDM / 25 anchors / Low Omega_m Low As
+
+274 - EE2 / M4 / LCDM / -- / High Omega_m High ns
+
+275 - COLA / M4 / LCDM / 1 anchor / High Omega_m High ns
+
+276 - COLA / M4 / LCDM / 25 anchors / High Omega_m High ns
+
+277 - EE2 / M4 / LCDM / -- / Low Omega_m High ns
+
+278 - COLA / M4 / LCDM / 1 anchor / Low Omega_m High ns
+
+279 - COLA / M4 / LCDM / 25 anchors / Low Omega_m High ns
+
+280 - EE2 / M4 / LCDM / -- / High Omega_m Low ns
+
+281 - COLA / M4 / LCDM / 1 anchor / High Omega_m Low ns
+
+282 - COLA / M4 / LCDM / 25 anchors / High Omega_m Low ns
+
+283 - EE2 / M4 / LCDM / -- / Low Omega_m Low ns
+
+284 - COLA / M4 / LCDM / 1 anchor / Low Omega_m Low ns
+
+285 - COLA / M4 / LCDM / 25 anchors / Low Omega_m Low ns
+
+## Emulator comparison chains
+The following chains were run first to assert equivalence between emulators and how well they perform against Halofit and EE2
+
 900 - COLA GP / M1 / wCDM / 1 anchor / EE2 ref
 
 901 - COLA NN / M1 / wCDM / 1 anchor / EE2 ref
