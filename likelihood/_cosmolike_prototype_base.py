@@ -421,19 +421,19 @@ class _cosmolike_prototype_base(DataSetLikelihood):
       lnpk_total_ = []
       #These are the cocoa k-indices where cola kmin and kmax lie
       k_l_index = self.emulator.find_crossing_index(self.k_interp_2D/h, self.ks_emu[0])
-      k_r_index1 = self.emulator.find_crossing_index(self.k_interp_2D/h, self.ks_emu[-1])
-      k_r_index2 = self.emulator.find_crossing_index(self.k_interp_2D/h, self.ks_emu[255])
+      k_r_index1 = self.emulator.find_crossing_index(self.k_interp_2D/h, self.ks_emu[self.emulator.n_bins_low_z-1])
+      k_r_index2 = self.emulator.find_crossing_index(self.k_interp_2D/h, self.ks_emu[self.emulator.n_bins_high_z-1])
       full_qk = []
       for i in range(len(self.zs_cola)): 
-        num_pts_filter = 70
+        num_pts_filter = self.emulator.n_pts_filter
         if i < self.emulator.z_cut:
-          len_ks_emu = 512
+          len_ks_emu = self.emulator.n_bins_low_z
           k_r_index = k_r_index1
-          log10_ks_emu = np.log10(self.ks_emu)
+          log10_ks_emu = np.log10(self.ks_emu[:self.emulator.n_bins_low_z])
         else:
-          len_ks_emu = 256
+          len_ks_emu = self.emulator.n_bins_high_z
           k_r_index = k_r_index2
-          log10_ks_emu = np.log10(self.ks_emu[:256])
+          log10_ks_emu = np.log10(self.ks_emu[:self.emulator.n_bins_high_z])
         last_points = tmp_qk[i][-num_pts_filter:]
         filtered_qk_extrap = savgol_filter(last_points, num_pts_filter, 1)  
         #This interp is to get the extrapolated k range
