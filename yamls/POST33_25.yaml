@@ -6,10 +6,10 @@ output: ./projects/lsst_y1/chains/MCMC33
 post:
   suffix: POST_25
   skip: 0.7
-  thin: 4000
+  thin: 300
   remove:
-    theory: null
-    likelihood: null
+    theory: camb
+    likelihood: lsst_y1.lsst_cosmic_shear
   add:
     theory:
       camb:
