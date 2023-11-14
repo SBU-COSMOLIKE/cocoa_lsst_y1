@@ -8,8 +8,8 @@ post:
   skip: 0.7
   thin: 4000
   remove:
-    theory: null
-    likelihood: null
+    theory: camb
+    likelihood: lsst_y1.lsst_cosmic_shear
   add:
     theory:
       camb:
