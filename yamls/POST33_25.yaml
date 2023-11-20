@@ -1,0 +1,37 @@
+timing: False
+debug: False
+stop_at_error: False
+output: ./projects/lsst_y1/chains/MCMC33
+
+post:
+  suffix: POST_25
+  skip: 0.7
+  thin: 300
+  remove:
+    theory: camb
+    likelihood: lsst_y1.lsst_cosmic_shear
+  add:
+    theory:
+      camb:
+        path: ./external_modules/code/CAMB
+        stop_at_error: False
+        use_renames: True
+        extra_args:
+          halofit_version: takahashi
+          AccuracyBoost: 1.1
+          lens_potential_accuracy: 1.0
+          num_massive_neutrinos: 1
+          nnu: 3.044
+          dark_energy_model: ppf
+          accurate_massive_neutrino_transfers: false
+          k_per_logint: 20
+    likelihood:
+      lsst_y1.lsst_cosmic_shear:
+        path: ./external_modules/data/lsst_y1
+        data_file: LSST_Y1_M3_OM_HIGH_AS_HIGH.dataset
+        accuracyboost: 1.0
+        integration_accuracy: 0
+        kmax_boltzmann: 5.0
+        # 1 EE2, 2 Halofit
+        non_linear_emul: 5
+        num_refs: 25

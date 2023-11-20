@@ -33,4 +33,4 @@ else
   export OMP_NUM_THREADS=1
 fi
 
-$CONDA_PREFIX/bin/mpirun -n ${SLURM_NTASKS} --report-bindings --mca vader,btl tcp,self --bind-to core --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run $yaml_file -f
+$CONDA_PREFIX/bin/mpirun -n ${SLURM_NTASKS} --report-bindings --mca vader,btl tcp,self --bind-to core --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run $yaml_file -r
