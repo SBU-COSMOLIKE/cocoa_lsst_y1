@@ -8,6 +8,7 @@ with open(template_file, "r") as f:
 # - emulator
 # - num_refs
 # - fiducial and mask
+# - cola precision
 
 with open("yamls.txt", "r") as f:
     lines = f.read().splitlines()
@@ -19,7 +20,7 @@ for line in lines:
 
     if emu == "EE2":
         emu_code = 1
-    elif emu == "COLA":
+    elif emu == "COLA" or emu == "COLA high":
         emu_code = 5
     else:
         print(f"Unknown emulator {emu}")
@@ -65,6 +66,7 @@ for line in lines:
     contents = contents.replace("non_linear_emul: 5", f"non_linear_emul: {emu_code}")
     contents = contents.replace("num_refs: 1", f"num_refs: {num_anchors}")
     contents = contents.replace("LSST_Y1_M1_OM_HIGH_AS_HIGH.dataset", dataset_file)
+    contents = contents.replace("cola_precision: 1", "cola_precision: 2")
 
     with open(f"MCMC{code}.yaml", "w") as f:
         f.write(contents)
