@@ -1,10 +1,10 @@
 timing: False
 debug: False
 stop_at_error: False
-output: ./projects/lsst_y1/chains/MCMC181
+output: ./projects/lsst_y1/chains/MCMC93
 
 post:
-  suffix: COLA1
+  suffix: COLA25
   skip: 0.7
   thin: 150
   remove:
@@ -28,10 +28,10 @@ post:
     likelihood:
       lsst_y1.lsst_cosmic_shear:
         path: ./external_modules/data/lsst_y1
-        data_file: LSST_Y1_M4_OM_HIGH_AS_HIGH.dataset
+        data_file: LSST_Y1_M3_OM_HIGH_AS_LOW.dataset
         accuracyboost: 1.0
         integration_accuracy: 0
         kmax_boltzmann: 5.0
         # 1 EE2, 2 Halofit
         non_linear_emul: 5
-        num_refs: 1
+        num_refs: 25

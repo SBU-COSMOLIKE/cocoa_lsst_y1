@@ -1,7 +1,7 @@
 timing: False
 debug: False
 stop_at_error: False
-output: ./projects/lsst_y1/chains/MCMC181
+output: ./projects/lsst_y1/chains/MCMC193
 
 post:
   suffix: COLA1
@@ -28,7 +28,7 @@ post:
     likelihood:
       lsst_y1.lsst_cosmic_shear:
         path: ./external_modules/data/lsst_y1
-        data_file: LSST_Y1_M4_OM_HIGH_AS_HIGH.dataset
+        data_file: LSST_Y1_M4_OM_HIGH_AS_LOW.dataset
         accuracyboost: 1.0
         integration_accuracy: 0
         kmax_boltzmann: 5.0
