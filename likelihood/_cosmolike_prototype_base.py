@@ -262,7 +262,7 @@ class _cosmolike_prototype_base(DataSetLikelihood):
           raise LoggedError(self.log, f"Invalid number of anchors for NN wCDM COLA emulator {self.num_refs}")
       else:
         raise LoggedError(self.log, f"Invalid model for COLA emulator {self.cola_emu_mode}")
-    elif self.non_linear_emul == 5:  
+    elif self.non_linear_emul == 5 or self.non_linear_emul == 6 :   
       # COLA NN Emulator
       print("[nonlinear] Initializing COLA PCE emulator...")
       if self.cola_emu_mode == "LCDM":
@@ -272,8 +272,12 @@ class _cosmolike_prototype_base(DataSetLikelihood):
       elif self.cola_emu_mode == "wCDM":
         if self.num_refs == 1:
           print("[nonlinear] Using wCDM PCE emulator with 1 anchor")
-          from COLA_Emulators.PCE.pce_wcdm_default import emu_cons_proto2 as emu_wcdm_default_pce 
-
+          if self.non_linear_emul == 5:  
+              from COLA_Emulators.PCE.pce_wcdm_default import emu_cons_proto2 as emu_wcdm_default_pce 
+  #pce_wcdm_high  pce_wcdm_default
+          else:
+              from COLA_Emulators.PCE.NN_pce_wcdm_high import emu_cons_proto2 as emu_wcdm_default_pce 
+                
           self.emulator = emu_wcdm_default_pce()
         elif self.num_refs == 25:
           print("[nonlinear] Using wCDM PCE with 25 anchors ")
@@ -513,7 +517,7 @@ class _cosmolike_prototype_base(DataSetLikelihood):
       for i in range(self.len_z_interp_2D): 
         lnPNL[i::self.len_z_interp_2D] = lnpk_total[i]
 
-    elif self.non_linear_emul == 5:
+    elif self.non_linear_emul == 5 or self.non_linear_emul == 6:
       # COLA PCE
       if self.cola_emu_mode == 'wCDM':  
           params = { 'Omm':np.array([self.provider.get_param("omegam")]),
