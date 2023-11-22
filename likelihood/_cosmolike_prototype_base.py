@@ -265,19 +265,65 @@ class _cosmolike_prototype_base(DataSetLikelihood):
     elif self.non_linear_emul == 5 or self.non_linear_emul == 6 :   
       # COLA NN Emulator
       print("[nonlinear] Initializing COLA PCE emulator...")
+
+
+
+
+        
       if self.cola_emu_mode == "LCDM":
-        print("[nonlinear] Using LambdaCDM COLA PCEemulator with 1 anchor")
-        from COLA_Emulators.PCE.pce_lcdm_default import emu_cons_proto as emu_lcdm_default_pce 
-        self.emulator = emu_lcdm_default_pce()
+
+
+        if self.cola_precision == 1:
+            print("[nonlinear] Using Default Precision LambdaCDM PCE emulator with 1 anchor")
+
+            from COLA_Emulators.PCE.pce_lcdm_default import emu_cons_proto as emu_lcdm_default_pce 
+            self.emulator = emu_lcdm_default_pce()
+     
+        elif self.cola_precision == 2:
+            if  self.non_linear_emul == 6 :  
+            
+                print("[nonlinear] Using High Precision LambdaCDM NEURAL PCE emulator with 1 anchor")
+    
+                
+                from COLA_Emulators.PCE.NN_pce_lcdm_high import emu_cons_proto as emu_lcdm_default_pce 
+                self.emulator = emu_lcdm_default_pce()         
+      
+            else:
+                print("[nonlinear] Using High Precision LambdaCDM PCE emulator with 1 anchor")
+    
+                
+                from COLA_Emulators.PCE.pce_lcdm_high import emu_cons_proto as emu_lcdm_default_pce 
+                self.emulator = emu_lcdm_default_pce()      
+
+
+
+      
+      
       elif self.cola_emu_mode == "wCDM":
         if self.num_refs == 1:
-          print("[nonlinear] Using wCDM PCE emulator with 1 anchor")
-          if self.non_linear_emul == 5:  
+          if self.cola_precision == 1:  
+              print("[nonlinear] Using Default Precision wCDM PCE emulator with 1 anchor")
               from COLA_Emulators.PCE.pce_wcdm_default import emu_cons_proto2 as emu_wcdm_default_pce 
   #pce_wcdm_high  pce_wcdm_default
-          else:
-              from COLA_Emulators.PCE.NN_pce_wcdm_high import emu_cons_proto2 as emu_wcdm_default_pce 
+          elif self.cola_precision == 2:
+ 
+
+              if  self.non_linear_emul == 6 :      
+    
+                  print("[nonlinear] Using High Precision wCDM NEURAL PCE emulator with 1 anchor")
+    
+                  from COLA_Emulators.PCE.NN_pce_wcdm_high import emu_cons_proto2 as emu_wcdm_default_pce 
+    
+              else:
+                  print("[nonlinear] Using High Precision wCDM PCE emulator with 1 anchor")
+    
+                  from COLA_Emulators.PCE.pce_wcdm_high import emu_cons_proto2 as emu_wcdm_default_pce 
+
+                  
                 
+
+            
+            
           self.emulator = emu_wcdm_default_pce()
         elif self.num_refs == 25:
           print("[nonlinear] Using wCDM PCE with 25 anchors ")
