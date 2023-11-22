@@ -1,7 +1,7 @@
 timing: False
 debug: False
 stop_at_error: False
-output: ./projects/lsst_y1/chains/MCMC308
+output: ./projects/lsst_y1/chains/MCMC308/MCMC308
 
 likelihood:
   lsst_y1.lsst_cosmic_shear:
@@ -11,7 +11,7 @@ likelihood:
     integration_accuracy: 0
     kmax_boltzmann: 2.0
     # 1 EE2, 2 Halofit
-    non_linear_emul: 5
+    non_linear_emul: 6
     num_refs: 1
     cola_precision: 2
 
