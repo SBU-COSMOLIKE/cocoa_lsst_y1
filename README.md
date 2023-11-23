@@ -668,6 +668,62 @@ INDEX - Emulator / Mask / Model / Anchors / Fiducial cosmology
 
 312 - COLA high / M4 / wCDM / 1 anchor / Low Omega_m Low ns
 
+## High precision LCDM chains: only M2, M3 and M4 (not written yet)
+
+286 - COLA high / M2 / LCDM / 1 anchor / EE2 ref
+
+287 - COLA high / M2 / LCDM / 1 anchor / High Omega_m High As
+
+288 - COLA high / M2 / LCDM / 1 anchor / High Omega_m Low As
+
+289 - COLA high / M2 / LCDM / 1 anchor / Low Omega_m High As
+
+290 - COLA high / M2 / LCDM / 1 anchor / Low Omega_m Low ns
+
+291 - COLA high / M2 / LCDM / 1 anchor / High Omega_m High ns
+
+292 - COLA high / M2 / LCDM / 1 anchor / High Omega_m Low ns
+
+293 - COLA high / M2 / LCDM / 1 anchor / Low Omega_m High ns
+
+294 - COLA high / M2 / LCDM / 1 anchor / Low Omega_m Low ns
+
+295 - COLA high / M3 / LCDM / 1 anchor / EE2 ref
+
+296 - COLA high / M3 / LCDM / 1 anchor / High Omega_m High As
+
+297 - COLA high / M3 / LCDM / 1 anchor / High Omega_m Low As
+
+298 - COLA high / M3 / LCDM / 1 anchor / Low Omega_m High As
+
+299 - COLA high / M3 / LCDM / 1 anchor / Low Omega_m Low ns
+
+300 - COLA high / M3 / LCDM / 1 anchor / High Omega_m High ns
+
+301 - COLA high / M3 / LCDM / 1 anchor / High Omega_m Low ns
+
+302 - COLA high / M3 / LCDM / 1 anchor / Low Omega_m High ns
+
+303 - COLA high / M3 / LCDM / 1 anchor / Low Omega_m Low ns
+
+304 - COLA high / M4 / LCDM / 1 anchor / EE2 ref
+
+305 - COLA high / M4 / LCDM / 1 anchor / High Omega_m High As
+
+306 - COLA high / M4 / LCDM / 1 anchor / High Omega_m Low As
+
+307 - COLA high / M4 / LCDM / 1 anchor / Low Omega_m High As
+
+308 - COLA high / M4 / LCDM / 1 anchor / Low Omega_m Low ns
+
+309 - COLA high / M4 / LCDM / 1 anchor / High Omega_m High ns
+
+310 - COLA high / M4 / LCDM / 1 anchor / High Omega_m Low ns
+
+311 - COLA high / M4 / LCDM / 1 anchor / Low Omega_m High ns
+
+312 - COLA high / M4 / LCDM / 1 anchor / Low Omega_m Low ns
+
 ## Emulator comparison chains
 The following chains were run first to assert equivalence between emulators and how well they perform against Halofit and EE2
 
@@ -693,11 +749,13 @@ The following chains were run first to assert equivalence between emulators and 
 
 910 - COLA PCE / M1 / wCDM / 25 anchors / High Omega_m Low As
 
-911 - COLA PCE high / M2 / wCDM / 1 anchor / EE2 ref 
+911 - COLA PCE high / M2 / wCDM / 1 anchor / EE2 ref
 
 912 - COLA PCE high / M2 / wCDM / 1 anchor / High Omega_m High As
 
+913 - COLA PCE / M1 / LCDM / 1 anchor / High Omega_m High As
 
+914 - COLA PCE+NN / M1 /  LCDM / 1 anchor / High Omega_m High As
 
 
 ## Running Cosmolike projects <a name="running_cosmolike_projects"></a> 
