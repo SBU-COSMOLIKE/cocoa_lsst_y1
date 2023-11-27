@@ -1,12 +1,12 @@
 timing: False
 debug: False
 stop_at_error: False
-output: ./projects/lsst_y1/chains/MCMC209/MCMC209
+output: ./projects/lsst_y1/chains/MCMC323/MCMC323
 
 likelihood:
   lsst_y1.lsst_cosmic_shear:
     path: ./external_modules/data/lsst_y1
-    data_file: LSST_Y1_M2_OM_HIGH_AS_HIGH.dataset
+    data_file: LSST_Y1_M3_OM_HIGH_AS_HIGH.dataset
     accuracyboost: 1.0
     integration_accuracy: 0
     kmax_boltzmann: 2.0
@@ -14,7 +14,7 @@ likelihood:
     non_linear_emul: 5
     num_refs: 1
     cola_emu_mode: LCDM
-    cola_precision: 1
+    cola_precision: 2
 params:
   w: -1
   wa: 0

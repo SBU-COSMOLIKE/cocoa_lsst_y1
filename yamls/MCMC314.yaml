@@ -1,7 +1,7 @@
 timing: False
 debug: False
 stop_at_error: False
-output: ./projects/lsst_y1/chains/MCMC209/MCMC209
+output: ./projects/lsst_y1/chains/MCMC314/MCMC314
 
 likelihood:
   lsst_y1.lsst_cosmic_shear:
@@ -14,7 +14,7 @@ likelihood:
     non_linear_emul: 5
     num_refs: 1
     cola_emu_mode: LCDM
-    cola_precision: 1
+    cola_precision: 2
 params:
   w: -1
   wa: 0
