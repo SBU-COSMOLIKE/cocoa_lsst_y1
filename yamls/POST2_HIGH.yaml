@@ -4,7 +4,7 @@ stop_at_error: False
 output: ./projects/lsst_y1/chains/MCMC2
 
 post:
-  suffix: COLA1
+  suffix: COLAHIGH
   skip: 0.7
   thin: 150
   remove:
@@ -35,4 +35,4 @@ post:
         # 1 EE2, 2 Halofit
         non_linear_emul: 5
         num_refs: 1
-        cola_precision: 1
+        cola_precision: 2
