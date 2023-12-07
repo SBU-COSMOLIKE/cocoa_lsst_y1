@@ -749,9 +749,9 @@ The following chains were run first to assert equivalence between emulators and 
 
 910 - COLA PCE / M1 / wCDM / 25 anchors / High Omega_m Low As
 
-911 - COLA PCE high / M2 / wCDM / 1 anchor / EE2 ref
+911 - COLA PCE+NN high / M2 / wCDM / 1 anchor / EE2 ref
 
-912 - COLA PCE high / M2 / wCDM / 1 anchor / High Omega_m High As
+912 - COLA PCE+NN high / M2 / wCDM / 1 anchor / High Omega_m High As
 
 913 - COLA PCE / M1 / LCDM / 1 anchor / High Omega_m High As
 
