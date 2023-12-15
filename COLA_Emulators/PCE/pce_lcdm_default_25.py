@@ -110,9 +110,9 @@ class emu_cons_proto(object):
 
            # print('redshift=',redshift)
 
-            self.A_6.append(np.loadtxt(f'{current_dir}/PCE_COLA_LCDM_CB_MINE/PCE_LCDM_z'+str(redshift)+'_A.txt') )
-            self.b_6.append(np.loadtxt(f'{current_dir}/PCE_COLA_LCDM_CB_MINE/PCE_LCDM_z'+str(redshift)+'_b.txt') )
-            self.Wtrans_6.append(np.loadtxt(f'{current_dir}/PCE_COLA_LCDM_CB_MINE/PCE_LCDM_z'+str(redshift)+'_WTRANS.txt') )
+            self.A_6.append(np.loadtxt(f'{current_dir}/PCE_COLA_LCDM_HIGH/PCE_LCDM_z'+str(redshift)+'_A.txt') )
+            self.b_6.append(np.loadtxt(f'{current_dir}/PCE_COLA_LCDM_HIGH/PCE_LCDM_z'+str(redshift)+'_b.txt') )
+            self.Wtrans_6.append(np.loadtxt(f'{current_dir}/PCE_COLA_LCDM_HIGH/PCE_LCDM_z'+str(redshift)+'_WTRANS.txt') )
 
 
         self.A_6=np.array(self.A_6)
