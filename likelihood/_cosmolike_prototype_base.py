@@ -350,6 +350,14 @@ class _cosmolike_prototype_base(DataSetLikelihood):
 
           self.emulator = emu_wcdm_default_pce()       
 
+        elif self.num_refs == 100:
+          print("[nonlinear] Using wCDM PCE with 100 anchors ")
+          from COLA_Emulators.PCE.pce_wcdm_default_100 import emu_cons_proto2 as emu_wcdm_default_pce 
+
+          self.emulator = emu_wcdm_default_pce()     
+
+
+    
     
     else:
       raise LoggedError(self.log, "non_linear_emul = %d is an invalid option", self.non_linear_emul)
