@@ -724,6 +724,40 @@ INDEX - Emulator / Mask / Model / Anchors / Fiducial cosmology
 
 339 - COLA high / M4 / LCDM / 1 anchor / Low Omega_m Low ns
 
+## Exploratory chains for "Solutions" Section
+
+340 - COLA / M2 / wCDM / 100 LCDM anchors / High Omega_m High As
+
+341 - COLA / M3 / wCDM / 100 LCDM anchors / High Omega_m High As
+
+342 - COLA / M2 / wCDM / 100 LCDM anchors / High Omega_m Low As
+
+343 - COLA / M3 / wCDM / 100 LCDM anchors / High Omega_m Low As
+
+344 - COLA / M2 / wCDM / 100 LCDM anchors / High Omega_m High ns
+
+345 - COLA / M3 / wCDM / 100 LCDM anchors / High Omega_m High ns
+
+346 - COLA / M2 / wCDM / 100 LCDM anchors / High Omega_m Low ns
+
+347 - COLA / M3 / wCDM / 100 LCDM anchors / High Omega_m Low ns
+
+348 - COLA / M2 / wCDM / 20 sigma8 anchors / High Omega_m High As
+
+349 - COLA / M3 / wCDM / 20 sigma8 anchors / High Omega_m High As
+
+350 - COLA / M2 / wCDM / 20 sigma8 anchors / High Omega_m Low As
+
+351 - COLA / M3 / wCDM / 20 sigma8 anchors / High Omega_m Low As
+
+352 - COLA / M2 / wCDM / 20 sigma8 anchors / High Omega_m High ns
+
+353 - COLA / M3 / wCDM / 20 sigma8 anchors / High Omega_m High ns
+
+354 - COLA / M2 / wCDM / 20 sigma8 anchors / High Omega_m Low ns
+
+355 - COLA / M3 / wCDM / 20 sigma8 anchors / High Omega_m Low ns
+
 ## Emulator comparison chains
 The following chains were run first to assert equivalence between emulators and how well they perform against Halofit and EE2
 
