@@ -793,9 +793,9 @@ The following chains were run first to assert equivalence between emulators and 
 
 915 - COLA PCE+NN / M2 /  wCDM / 1 anchor / High Omega_m High As / Using Fid. for k>1
 
-915 - COLA PCE+NN / M2 /  wCDM / 1 anchor / High Omega_m High As / Using Fid. for k>2
+916 - COLA PCE+NN / M2 /  wCDM / 1 anchor / High Omega_m High As / Using Fid. for k>2
 
-915 - COLA PCE+NN / M2 /  wCDM / 1 anchor / High Omega_m High As / Using Fid. for k>3
+917 - COLA PCE+NN / M2 /  wCDM / 1 anchor / High Omega_m High As / Using Fid. for k>3
 
 ## Running Cosmolike projects <a name="running_cosmolike_projects"></a> 
 
