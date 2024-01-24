@@ -309,10 +309,15 @@ class _cosmolike_prototype_base(DataSetLikelihood):
       
       
       elif self.cola_emu_mode == "wCDM":
+          
         if self.num_refs == 1:
           if self.cola_precision == 1:  
               print("[nonlinear] Using Default Precision wCDM PCE emulator with 1 anchor")
               from COLA_Emulators.PCE.pce_wcdm_default import emu_cons_proto2 as emu_wcdm_default_pce 
+
+          elif self.cola_precision == 3:  
+              print("[nonlinear] Using Default Precision wCDM PCE emulator with high As/Wm anchor")
+              from COLA_Emulators.PCE.pce_wcdm_default_haw import emu_cons_proto2 as emu_wcdm_default_pce 
   #pce_wcdm_high  pce_wcdm_default
           elif self.cola_precision == 2:
  
