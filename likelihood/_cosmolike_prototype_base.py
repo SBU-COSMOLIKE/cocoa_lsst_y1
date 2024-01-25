@@ -280,14 +280,23 @@ class _cosmolike_prototype_base(DataSetLikelihood):
                 from COLA_Emulators.PCE.pce_lcdm_default_25 import emu_cons_proto as emu_lcdm_default_pce 
                 self.emulator = emu_lcdm_default_pce()
 
+
+            elif self.num_refs == 100:
+
+                print("[nonlinear] Using Default Precision LambdaCDM PCE emulator with 100 anchors")
+        
+                from COLA_Emulators.PCE.pce_lcdm_default_100 import emu_cons_proto as emu_lcdm_default_pce 
+                self.emulator = emu_lcdm_default_pce()
+            
+
             else:
 
                 print("[nonlinear] Using Default Precision LambdaCDM PCE emulator with 1 anchor")
         
                 from COLA_Emulators.PCE.pce_lcdm_default import emu_cons_proto as emu_lcdm_default_pce 
                 self.emulator = emu_lcdm_default_pce()
-          
-     
+
+        
         elif self.cola_precision == 2:
             if  self.non_linear_emul == 6 :  
             
