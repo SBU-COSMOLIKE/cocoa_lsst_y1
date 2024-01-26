@@ -1,7 +1,9 @@
 import numpy as np
-from numpy.linalg import svd
+from numpy.linalg import svd, inv
 
 L = np.loadtxt("./cholesky_L.txt")
+
+L_inv = inv(L)
 
 len_lhs = 30
 diffs = np.zeros((1560//2, 30))
@@ -9,7 +11,7 @@ for i in range(len_lhs):
     cola_dv = np.loadtxt(f"./data_vectors/COLA_{i}.modelvector", max_rows=1560//2, unpack=True, usecols=1)
     ee2_dv = np.loadtxt(f"./data_vectors/EE2_{i}.modelvector", max_rows=1560//2, unpack=True, usecols=1)
     diff = ee2_dv - cola_dv
-    diffs[:, i] = np.matmul(L, diff)
+    diffs[:, i] = np.matmul(L_inv, diff)
 
 U, Sigma, V = svd(diffs)
 
