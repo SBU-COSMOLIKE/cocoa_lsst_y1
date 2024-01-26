@@ -5,14 +5,14 @@ stop_at_error: True
 likelihood:
   lsst_y1.lsst_cosmic_shear:
     path: ./external_modules/data/lsst_y1
-    data_file: LSST_Y1_M1_EE2_NO_NOISE.dataset 
-    print_datavector: False
-    #print_datavector_file: "./projects/lsst_y1/data/EE2_FIDUCIAL.modelvector"
-    accuracyboost: 1.0
-    integration_accuracy: 0
-    kmax_boltzmann: 5.0
+    data_file: LSST_Y1_M6_EE2_NO_NOISE.dataset 
+    print_datavector: True
+    print_datavector_file: "./projects/lsst_y1/PCAs/data_vectors/EE2_0.modelvector"
+    accuracyboost: 3.0
+    integration_accuracy: 10
+    kmax_boltzmann: 20.0
     # 1 EE2, 2 Halofit, 3 COLA GP, 4 COLA NN
-    non_linear_emul: 5
+    non_linear_emul: 1
     # 1 default, 2 high
     cola_precision: 1
     cola_emu_mode: 'LCDM'
@@ -190,11 +190,11 @@ sampler:
   evaluate:
     N: 1
     override:
-      As_1e9: 2.1
-      ns: 0.96
-      H0: 67.0
-      omegab: 0.049
-      omegam: 0.319
+      As_1e9: 2.236138430406617
+      ns: 0.9380142436293538
+      H0: 64.46166891285931
+      omegab: 0.056379738443606546
+      omegam: 0.27396330497379656
       mnu: 0.058
       LSST_DZ_S1: 0.0414632
       LSST_DZ_S2: 0.00147332
