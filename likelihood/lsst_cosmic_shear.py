@@ -20,6 +20,9 @@ class lsst_cosmic_shear(_cosmolike_prototype_base):
             self.force_cache_false = True
 
         self.set_cosmo_related()
+        # COLA begins: read PC amplitudes
+        self.set_cola_related(**params_values)
+        # COLA ends
                 
         self.set_source_related(**params_values)
         
@@ -28,7 +31,8 @@ class lsst_cosmic_shear(_cosmolike_prototype_base):
 
         # datavector C++ returns a list (not numpy array)
         datavector = np.array(ci.compute_data_vector_masked())
-        
+        datavector = self.add_cola_pcs_to_datavector(datavector)
+
         if self.use_baryon_pca:
             self.set_baryon_related(**params_values)
             datavector = self.add_baryon_pcs_to_datavector(datavector)

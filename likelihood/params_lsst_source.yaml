@@ -230,3 +230,14 @@
   LSST_BARYON_Q4:
     value: 0.0
     latex: Q4_\mathrm{LSST}^4
+
+  # COLA PCAs
+  LSST_COLA_Q1:
+    value: 0.0
+    latex: Q1_\mathrm{COLA}^1
+  LSST_COLA_Q2:
+    value: 0.0
+    latex: Q2_\mathrm{COLA}^2
+  LSST_COLA_Q3:
+    value: 0.0
+    latex: Q3_\mathrm{COLA}^3

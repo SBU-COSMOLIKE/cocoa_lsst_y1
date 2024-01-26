@@ -104,6 +104,10 @@ class _cosmolike_prototype_base(DataSetLikelihood):
 
     self.mask_file = ini.relativeFileName('mask_file')
 
+    # COLA begins: load mask
+    self.mask = np.loadtxt(self.mask_file, unpack=True, usecols=1)
+    # COLA ends
+
     self.lens_file = ini.relativeFileName('nz_lens_file')
 
     self.source_file = ini.relativeFileName('nz_source_file')
@@ -134,6 +138,13 @@ class _cosmolike_prototype_base(DataSetLikelihood):
     self.z_interp_2D = np.linspace(0,2.0,95)
     self.z_interp_2D = np.concatenate((self.z_interp_2D, np.linspace(3.0,10.0,5)),axis=0)
     self.z_interp_2D[0] = 0
+    # COLA ends
+
+    # COLA begins: implementing COLA PCAs
+    self.cola_pcs = np.zeros((3, 1560))
+    for i in range(3):
+      PC_path = sys_path + f'PCAs/PCs/PC_{i}.txt'
+      self.cola_pcs[i] = np.concatenate((np.loadtxt(PC_path), np.zeros(780))) * self.mask
     # COLA ends
 
     self.len_z_interp_2D = len(self.z_interp_2D)
@@ -197,6 +208,9 @@ class _cosmolike_prototype_base(DataSetLikelihood):
         self.use_baryon_pca = False
 
     self.baryon_pcs_qs = np.zeros(4)
+    # COLA begins: declare PC amplitudes
+    self.cola_pcs_qs = np.zeros(3)
+    # COLA ends
     # ------------------------------------------------------------------------
 
     self.do_cache_lnPL = np.zeros(
@@ -769,6 +783,18 @@ class _cosmolike_prototype_base(DataSetLikelihood):
       + self.baryon_pcs_qs[1]*self.baryon_pcs[:,1] \
       + self.baryon_pcs_qs[2]*self.baryon_pcs[:,2] \
       + self.baryon_pcs_qs[3]*self.baryon_pcs[:,3]
+
+  # COLA begins: copy-pasting baryonic PCA code
+  def set_cola_related(self, **params_values):
+    self.cola_pcs_qs[0] = params_values.get("LSST_COLA_Q1", 0.0)
+    self.cola_pcs_qs[1] = params_values.get("LSST_COLA_Q2", 0.0)
+    self.cola_pcs_qs[2] = params_values.get("LSST_COLA_Q3", 0.0)
+
+  def add_cola_pcs_to_datavector(self, datavector):
+    return datavector[:] + self.cola_pcs_qs[0]*self.cola_pcs[0] \
+      + self.cola_pcs_qs[1]*self.cola_pcs[1] \
+      + self.cola_pcs_qs[2]*self.cola_pcs[2] \
+  # COLA ends
 
   def compute_dm_datavector_masked_reduced_dim(self, **params_values):
 
