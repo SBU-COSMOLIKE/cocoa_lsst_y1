@@ -742,21 +742,35 @@ INDEX - Emulator / Mask / Model / Anchors / Fiducial cosmology
 
 347 - COLA / M3 / wCDM / 100 LCDM anchors / High Omega_m Low ns
 
-348 - COLA / M2 / wCDM / 20 sigma8 anchors / High Omega_m High As
+348 - COLA / M2 / LCDM / 100 anchors (test set refs) / High Omega_m High As
 
-349 - COLA / M3 / wCDM / 20 sigma8 anchors / High Omega_m High As
+349 - COLA / M3 / LCDM / 100 anchors (test set refs) / High Omega_m High As
 
-350 - COLA / M2 / wCDM / 20 sigma8 anchors / High Omega_m Low As
+350 - COLA / M2 / LCDM / 100 anchors (test set refs) / High Omega_m Low As
 
-351 - COLA / M3 / wCDM / 20 sigma8 anchors / High Omega_m Low As
+351 - COLA / M3 / LCDM / 100 anchors (test set refs) / High Omega_m Low As
 
-352 - COLA / M2 / wCDM / 20 sigma8 anchors / High Omega_m High ns
+352 - COLA / M2 / LCDM / 100 anchors (test set refs) / High Omega_m High ns
 
-353 - COLA / M3 / wCDM / 20 sigma8 anchors / High Omega_m High ns
+353 - COLA / M3 / LCDM / 100 anchors (test set refs) / High Omega_m High ns
 
-354 - COLA / M2 / wCDM / 20 sigma8 anchors / High Omega_m Low ns
+354 - COLA / M2 / LCDM / 100 anchors (test set refs) / High Omega_m Low ns
 
-355 - COLA / M3 / wCDM / 20 sigma8 anchors / High Omega_m Low ns
+355 - COLA / M3 / LCDM / 100 anchors (test set refs) / High Omega_m Low ns
+
+## Marginalizing over COLA PCs chains
+
+356 - COLA / M2 / wCDM / 100 LCDM anchors / High Omega_m High As / 1 PC
+
+357 - COLA / M3 / wCDM / 100 LCDM anchors / High Omega_m High As / 1 PC
+
+356 - COLA / M2 / wCDM / 100 LCDM anchors / High Omega_m High As / 2 PCs
+
+357 - COLA / M3 / wCDM / 100 LCDM anchors / High Omega_m High As / 2 PCs
+
+356 - COLA / M2 / wCDM / 100 LCDM anchors / High Omega_m High As / 3 PCs
+
+357 - COLA / M3 / wCDM / 100 LCDM anchors / High Omega_m High As / 3 PCs
 
 ## Emulator comparison chains
 The following chains were run first to assert equivalence between emulators and how well they perform against Halofit and EE2
