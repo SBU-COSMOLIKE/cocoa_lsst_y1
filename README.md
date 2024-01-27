@@ -764,13 +764,13 @@ INDEX - Emulator / Mask / Model / Anchors / Fiducial cosmology
 
 357 - COLA / M3 / wCDM / 100 LCDM anchors / High Omega_m High As / 1 PC
 
-356 - COLA / M2 / wCDM / 100 LCDM anchors / High Omega_m High As / 2 PCs
+358 - COLA / M2 / wCDM / 100 LCDM anchors / High Omega_m High As / 2 PCs
 
-357 - COLA / M3 / wCDM / 100 LCDM anchors / High Omega_m High As / 2 PCs
+359 - COLA / M3 / wCDM / 100 LCDM anchors / High Omega_m High As / 2 PCs
 
-356 - COLA / M2 / wCDM / 100 LCDM anchors / High Omega_m High As / 3 PCs
+360 - COLA / M2 / wCDM / 100 LCDM anchors / High Omega_m High As / 3 PCs
 
-357 - COLA / M3 / wCDM / 100 LCDM anchors / High Omega_m High As / 3 PCs
+361 - COLA / M3 / wCDM / 100 LCDM anchors / High Omega_m High As / 3 PCs
 
 ## Emulator comparison chains
 The following chains were run first to assert equivalence between emulators and how well they perform against Halofit and EE2
