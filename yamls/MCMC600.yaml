@@ -1,77 +1,26 @@
 timing: False
 debug: False
 stop_at_error: False
-output: ./projects/lsst_y1/chains/MCMC914
+output: ./projects/lsst_y1/chains/MCMC600/MCMC600
 
 likelihood:
   lsst_y1.lsst_cosmic_shear:
     path: ./external_modules/data/lsst_y1
-    data_file: LSST_Y1_M1_OM_HIGH_AS_HIGH.dataset
+    data_file: LSST_Y1_M2_OM_HIGH_NS_LOW.dataset
     accuracyboost: 1.0
     integration_accuracy: 0
     kmax_boltzmann: 2.0
     # 1 EE2, 2 Halofit
-    non_linear_emul: 6
-    cola_precision: 3
-    cola_emu_mode: LCDM
-    num_refs: 1
+    non_linear_emul: 5
+    num_refs: 100
+
 params:
+  As_1e9: 2.1
+  ns: 0.96
+  H0: 67
+  omegab: 0.049
+  omegam: 0.319
   w: -1
-  wa: 0
-  As_1e9:
-    prior:
-      min: 1.7
-      max: 2.5
-    ref:
-      dist: norm
-      loc: 2.1
-      scale: 0.1
-    proposal: 0.1
-    latex: 10^9 A_\mathrm{s}
-    drop: true
-    renames: A
-  ns:
-    prior:
-      min: 0.92
-      max: 1.00
-    ref:
-      dist: norm
-      loc: 0.96
-      scale: 0.005
-    proposal: 0.005
-    latex: n_\mathrm{s}
-  H0:
-    prior:
-      min: 61
-      max: 73
-    ref:
-      dist: norm
-      loc: 67
-      scale: 2
-    proposal: 1
-    latex: H_0
-  omegab:
-    prior:
-      min: 0.04
-      max: 0.06
-    ref:
-      dist: norm
-      loc: 0.049
-      scale: 0.0025
-    proposal: 0.0025
-    latex: \Omega_\mathrm{b}
-    drop: true
-  omegam:
-    prior:
-      min: 0.24
-      max: 0.4
-    ref:
-      dist: norm
-      loc: 0.319
-      scale: 0.01
-    proposal: 0.01
-    latex: \Omega_\mathrm{m}
-    drop: true
   mnu:
     value: 0.058
   tau:
@@ -126,138 +75,120 @@ params:
   LSST_BARYON_Q2:
     value: 0.0
     latex: Q2_\mathrm{LSST}^2
+  LSST_COLA_Q1:
+    prior:
+      min: -100
+      max: 100
+    ref:
+      dist: norm
+      loc: 0
+      scale: 10
+    proposal: 2
+    latex: Q_\mathrm{COLA}^1
+  LSST_COLA_Q2:
+    prior:
+      min: -100
+      max: 100
+    ref:
+      dist: norm
+      loc: 0
+      scale: 10
+    proposal: 2
+    latex: Q_\mathrm{COLA}^2
+  LSST_COLA_Q3:
+    prior:
+      min: -100
+      max: 100
+    ref:
+      dist: norm
+      loc: 0
+      scale: 10
+    proposal: 2
+    latex: Q_\mathrm{COLA}^3
+  LSST_COLA_Q5:
+    prior:
+      min: -100
+      max: 100
+    ref:
+      dist: norm
+      loc: 0
+      scale: 10
+    proposal: 2
+    latex: Q_\mathrm{COLA}^5
+  LSST_COLA_Q10:
+    prior:
+      min: -100
+      max: 100
+    ref:
+      dist: norm
+      loc: 0
+      scale: 10
+    proposal: 2
+    latex: Q_\mathrm{COLA}^{10}
+  LSST_COLA_Q15:
+    prior:
+      min: -100
+      max: 100
+    ref:
+      dist: norm
+      loc: 0
+      scale: 10
+    proposal: 2
+    latex: Q_\mathrm{COLA}^{15}
+  LSST_COLA_Q20:
+    prior:
+      min: -100
+      max: 100
+    ref:
+      dist: norm
+      loc: 0
+      scale: 10
+    proposal: 2
+    latex: Q_\mathrm{COLA}^{20}
+  LSST_COLA_Q25:
+    prior:
+      min: -100
+      max: 100
+    ref:
+      dist: norm
+      loc: 0
+      scale: 10
+    proposal: 2
+    latex: Q_\mathrm{COLA}^{25}
+  LSST_COLA_Q29:
+    prior:
+      min: -100
+      max: 100
+    ref:
+      dist: norm
+      loc: 0
+      scale: 10
+    proposal: 2
+    latex: Q_\mathrm{COLA}^{29}
   # WL photo-z errors
-  LSST_DZ_S1:
-    prior:
-      dist: norm
-      loc: 0.0414632
-      scale: 0.002
-    ref:
-      dist: norm
-      loc: 0.0414632
-      scale: 0.002
-    proposal: 0.002
-    latex: \Delta z_\mathrm{s,LSST}^1
-  LSST_DZ_S2:
-    prior:
-      dist: norm
-      loc: 0.00147332
-      scale: 0.002
-    ref:
-      dist: norm
-      loc: 0.00147332
-      scale: 0.002
-    proposal: 0.002
-    latex: \Delta z_\mathrm{s,LSST}^2
-  LSST_DZ_S3:
-    prior:
-      dist: norm
-      loc: 0.0237035
-      scale: 0.002
-    ref:
-      dist: norm
-      loc: 0.0237035
-      scale: 0.002
-    proposal: 0.002
-    latex: \Delta z_\mathrm{s,LSST}^3
-  LSST_DZ_S4:
-    prior:
-      dist: norm
-      loc: -0.0773436
-      scale: 0.002
-    ref:
-      dist: norm
-      loc: -0.0773436
-      scale: 0.002
-    proposal: 0.002
-    latex: \Delta z_\mathrm{s,LSST}^4
-  LSST_DZ_S5:
-    prior:
-      dist: norm
-      loc: -8.67127e-05
-      scale: 0.002
-    ref:
-      dist: norm
-      loc: -8.67127e-05
-      scale: 0.002
-    proposal: 0.002
-    latex: \Delta z_\mathrm{s,LSST}^5
-  # Intrinsic alignment
-  LSST_A1_1:
-    prior:
-      min: -5
-      max:  5
-    ref:
-      dist: norm
-      loc: 0.7
-      scale: 0.5
-    proposal: 0.5
-    latex: A_\mathrm{1-IA,LSST}^1
-  LSST_A1_2:
-    prior:
-      min: -5
-      max:  5
-    ref:
-      dist: norm
-      loc: -1.7
-      scale: 0.5
-    proposal: 0.5
-  # Shear calibration parameters
-  LSST_M1:
-    prior:
-      dist: norm
-      loc: 0.0191832
-      scale: 0.005
-    ref:
-      dist: norm
-      loc: 0.0191832
-      scale: 0.005
-    proposal: 0.005
-    latex: m_\mathrm{LSST}^1
-  LSST_M2:
-    prior:
-      dist: norm
-      loc: -0.0431752
-      scale: 0.005
-    ref:
-      dist: norm
-      loc: -0.0431752
-      scale: 0.005
-    proposal: 0.005
-    latex: m_\mathrm{LSST}^2
-  LSST_M3:
-    prior:
-      dist: norm
-      loc: -0.034961
-      scale: 0.005
-    ref:
-      dist: norm
-      loc: -0.034961
-      scale: 0.005
-    proposal: 0.005
-    latex: m_\mathrm{LSST}^3
-  LSST_M4:
-    prior:
-      dist: norm
-      loc: -0.0158096
-      scale: 0.005
-    ref:
-      dist: norm
-      loc: -0.0158096
-      scale: 0.005
-    proposal: 0.005
-    latex: m_\mathrm{LSST}^4
-  LSST_M5:
-    prior:
-      dist: norm
-      loc: -0.0158096
-      scale: 0.005
-    ref:
-      dist: norm
-      loc: -0.0158096
-      scale: 0.005
-    proposal: 0.005
-    latex: m_\mathrm{LSST}^5
+  LSST_DZ_S1: 0.0414632
+  LSST_DZ_S1: 0.0414632
+  LSST_DZ_S2: 0.00147332
+  LSST_DZ_S3: 0.0237035
+  LSST_DZ_S4: -0.0773436
+  LSST_DZ_S5: -8.67127e-05
+  LSST_M1: 0.0191832
+  LSST_M2: -0.0431752
+  LSST_M3: -0.034961
+  LSST_M4: -0.0158096
+  LSST_M5: -0.0158096
+  LSST_A1_1: 0.606102
+  LSST_A1_2: -1.51541
+  LSST_DZ_L1: 0.00457604
+  LSST_DZ_L2: 0.000309875
+  LSST_DZ_L3: 0.00855907
+  LSST_DZ_L4: -0.00316269
+  LSST_DZ_L5: -0.0146753 
+  LSST_B1_1: 1.72716
+  LSST_B1_2: 1.65168
+  LSST_B1_3: 1.61423
+  LSST_B1_4: 1.92886
+  LSST_B1_5: 2.11633
 
 theory:
   camb:
@@ -317,7 +248,7 @@ sampler:
     blocking:
       - [1,
           [
-            As_1e9, ns, H0, omegab, omegam
+            As_1e9, ns, H0, omegab, omegam, w 
           ]
         ]
       - [6,

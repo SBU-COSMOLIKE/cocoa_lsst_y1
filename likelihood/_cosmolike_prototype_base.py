@@ -141,8 +141,9 @@ class _cosmolike_prototype_base(DataSetLikelihood):
     # COLA ends
 
     # COLA begins: implementing COLA PCAs
-    self.cola_pcs = np.zeros((3, 1560))
-    for i in range(3):
+    self.num_cola_pcs = 9
+    self.cola_pcs = np.zeros((self.num_cola_pcs, 1560))
+    for i, n in enumerate([0, 1, 2, 5, 10, 15, 20, 25, 29]):
       PC_path = sys_path + f'PCAs/PCs/PC_{i}.txt'
       self.cola_pcs[i] = np.concatenate((np.loadtxt(PC_path), np.zeros(780))) * self.mask
     # COLA ends
@@ -209,7 +210,7 @@ class _cosmolike_prototype_base(DataSetLikelihood):
 
     self.baryon_pcs_qs = np.zeros(4)
     # COLA begins: declare PC amplitudes
-    self.cola_pcs_qs = np.zeros(3)
+    self.cola_pcs_qs = np.zeros(self.num_cola_pcs)
     # COLA ends
     # ------------------------------------------------------------------------
 
@@ -789,11 +790,23 @@ class _cosmolike_prototype_base(DataSetLikelihood):
     self.cola_pcs_qs[0] = params_values.get("LSST_COLA_Q1", 0.0)
     self.cola_pcs_qs[1] = params_values.get("LSST_COLA_Q2", 0.0)
     self.cola_pcs_qs[2] = params_values.get("LSST_COLA_Q3", 0.0)
+    self.cola_pcs_qs[3] = params_values.get("LSST_COLA_Q5", 0.0)
+    self.cola_pcs_qs[4] = params_values.get("LSST_COLA_Q10", 0.0)
+    self.cola_pcs_qs[5] = params_values.get("LSST_COLA_Q15", 0.0)
+    self.cola_pcs_qs[6] = params_values.get("LSST_COLA_Q20", 0.0)
+    self.cola_pcs_qs[7] = params_values.get("LSST_COLA_Q25", 0.0)
+    self.cola_pcs_qs[8] = params_values.get("LSST_COLA_Q29", 0.0)
 
   def add_cola_pcs_to_datavector(self, datavector):
     return datavector[:] + self.cola_pcs_qs[0]*self.cola_pcs[0] \
       + self.cola_pcs_qs[1]*self.cola_pcs[1] \
       + self.cola_pcs_qs[2]*self.cola_pcs[2] \
+      + self.cola_pcs_qs[3]*self.cola_pcs[3] \
+      + self.cola_pcs_qs[4]*self.cola_pcs[4] \
+      + self.cola_pcs_qs[5]*self.cola_pcs[5] \
+      + self.cola_pcs_qs[6]*self.cola_pcs[6] \
+      + self.cola_pcs_qs[7]*self.cola_pcs[7] \
+      + self.cola_pcs_qs[8]*self.cola_pcs[8] \
   # COLA ends
 
   def compute_dm_datavector_masked_reduced_dim(self, **params_values):

@@ -241,3 +241,21 @@
   LSST_COLA_Q3:
     value: 0.0
     latex: Q3_\mathrm{COLA}^3
+  LSST_COLA_Q5:
+    value: 0.0
+    latex: Q5_\mathrm{COLA}^3
+  LSST_COLA_Q10:
+    value: 0.0
+    latex: Q10_\mathrm{COLA}^3
+  LSST_COLA_Q15:
+    value: 0.0
+    latex: Q15_\mathrm{COLA}^3
+  LSST_COLA_Q20:
+    value: 0.0
+    latex: Q20_\mathrm{COLA}^3
+  LSST_COLA_Q25:
+    value: 0.0
+    latex: Q25_\mathrm{COLA}^3
+  LSST_COLA_Q29:
+    value: 0.0
+    latex: Q29_\mathrm{COLA}^3
