@@ -774,7 +774,11 @@ INDEX - Emulator / Mask / Model / Anchors / Fiducial cosmology
 
 ## Debugging PCs
 
-600 - COLA / M2 / wCDM / 100 LCDM anchors / High Omega_m High As / 9 PCs
+600 - COLA / M2 / wCDM / 100 LCDM anchors / High Omega_m High As / 9 PCs - Only varying PCs, fixing cosmo + nuisance params
+
+601 - COLA / M2 / wCDM / 100 LCDM anchors / High Omega_m High As / 1 PC (the last one, PC 29)
+
+602 - COLA / M2 / wCDM / 100 LCDM anchors / High Omega_m High As / 1 PC (the second one, PC 2)
 
 ## Emulator comparison chains
 The following chains were run first to assert equivalence between emulators and how well they perform against Halofit and EE2
