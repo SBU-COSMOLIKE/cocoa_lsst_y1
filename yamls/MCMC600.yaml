@@ -167,7 +167,6 @@ params:
     latex: Q_\mathrm{COLA}^{29}
   # WL photo-z errors
   LSST_DZ_S1: 0.0414632
-  LSST_DZ_S1: 0.0414632
   LSST_DZ_S2: 0.00147332
   LSST_DZ_S3: 0.0237035
   LSST_DZ_S4: -0.0773436
@@ -244,18 +243,6 @@ sampler:
     # --------------------------------------
     measure_speeds: False
     drag: False
-    # Cosmolike Cosmic Shear without Cosmo change is ~0.1seconds (8 cores) @OCelote
-    blocking:
-      - [1,
-          [
-            As_1e9, ns, H0, omegab, omegam, w 
-          ]
-        ]
-      - [6,
-          [
-            LSST_DZ_S1, LSST_DZ_S2, LSST_DZ_S3, LSST_DZ_S4, LSST_DZ_S5, LSST_A1_1, LSST_A1_2, LSST_M1, LSST_M2, LSST_M3, LSST_M4, LSST_M5
-          ]
-        ]
     oversample_power: 0.3
     oversample_thin: True
     # --------------------------------------
