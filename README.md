@@ -772,6 +772,253 @@ INDEX - Emulator / Mask / Model / Anchors / Fiducial cosmology
 
 361 - COLA / M3 / wCDM / 100 LCDM anchors / High Omega_m High As / 3 PCs
 
+## Fiducials at $w = -0.9$ and $w = -1.1$
+
+362 - EE2 / M2 / wCDM / -- / High Omega_m High As Low w
+
+363 - EE2 / M2 / wCDM / -- / High Omega_m Low As Low w
+
+364 - EE2 / M2 / wCDM / -- / High Omega_m High ns Low w
+
+365 - EE2 / M2 / wCDM / -- / High Omega_m Low ns Low w
+
+366 - EE2 / M2 / wCDM / -- / High Omega_m High As High w
+
+367 - EE2 / M2 / wCDM / -- / High Omega_m Low As High w
+
+368 - EE2 / M2 / wCDM / -- / High Omega_m High ns High w
+
+369 - EE2 / M2 / wCDM / -- / High Omega_m Low ns High w
+
+370 - COLA / M2 / wCDM / 1 anchor / High Omega_m High As Low w
+
+371 - COLA / M2 / wCDM / 1 anchor / High Omega_m Low As Low w
+
+372 - COLA / M2 / wCDM / 1 anchor / High Omega_m High ns Low w
+
+373 - COLA / M2 / wCDM / 1 anchor / High Omega_m Low ns Low w
+
+374 - COLA / M2 / wCDM / 1 anchor / High Omega_m High As High w
+
+375 - COLA / M2 / wCDM / 1 anchor / High Omega_m Low As High w
+
+376 - COLA / M2 / wCDM / 1 anchor / High Omega_m High ns High w
+
+377 - COLA / M2 / wCDM / 1 anchor / High Omega_m Low ns High w
+
+378 - COLA / M2 / wCDM / 25 anchors / High Omega_m High As Low w
+
+379 - COLA / M2 / wCDM / 25 anchors / High Omega_m Low As Low w
+
+380 - COLA / M2 / wCDM / 25 anchors / High Omega_m High ns Low w
+
+381 - COLA / M2 / wCDM / 25 anchors / High Omega_m Low ns Low w
+
+382 - COLA / M2 / wCDM / 25 anchors / High Omega_m High As High w
+
+383 - COLA / M2 / wCDM / 25 anchors / High Omega_m Low As High w
+
+384 - COLA / M2 / wCDM / 25 anchors / High Omega_m High ns High w
+
+385 - COLA / M2 / wCDM / 25 anchors / High Omega_m Low ns High w
+
+386 - COLA / M2 / wCDM / 100 LCDM anchors / High Omega_m High As Low w
+
+387 - COLA / M2 / wCDM / 100 LCDM anchors / High Omega_m Low As Low w
+
+388 - COLA / M2 / wCDM / 100 LCDM anchors / High Omega_m High ns Low w
+
+389 - COLA / M2 / wCDM / 100 LCDM anchors / High Omega_m Low ns Low w
+
+390 - COLA / M2 / wCDM / 100 LCDM anchors / High Omega_m High As High w
+
+391 - COLA / M2 / wCDM / 100 LCDM anchors / High Omega_m Low As High w
+
+392 - COLA / M2 / wCDM / 100 LCDM anchors / High Omega_m High ns High w
+
+393 - COLA / M2 / wCDM / 100 LCDM anchors / High Omega_m Low ns High w
+
+394 - COLA high / M2 / wCDM / 1 anchor / High Omega_m High As Low w
+
+395 - COLA high / M2 / wCDM / 1 anchor / High Omega_m Low As Low w
+
+396 - COLA high / M2 / wCDM / 1 anchor / High Omega_m High ns Low w
+
+397 - COLA high / M2 / wCDM / 1 anchor / High Omega_m Low ns Low w
+
+398 - COLA high / M2 / wCDM / 1 anchor / High Omega_m High As High w
+
+399 - COLA high / M2 / wCDM / 1 anchor / High Omega_m Low As High w
+
+400 - COLA high / M2 / wCDM / 1 anchor / High Omega_m High ns High w
+
+401 - COLA high / M2 / wCDM / 1 anchor / High Omega_m Low ns High w
+
+402 - COLA / M2 / wCDM / 100 LCDM anchors / High Omega_m High As Low w / 1 PC
+
+403 - COLA / M2 / wCDM / 100 LCDM anchors / High Omega_m Low As Low w / 1 PC
+
+404 - COLA / M2 / wCDM / 100 LCDM anchors / High Omega_m High ns Low w / 1 PC
+
+405 - COLA / M2 / wCDM / 100 LCDM anchors / High Omega_m Low ns Low w / 1 PC
+
+406 - COLA / M2 / wCDM / 100 LCDM anchors / High Omega_m High As High w / 1 PC
+
+407 - COLA / M2 / wCDM / 100 LCDM anchors / High Omega_m Low As High w / 1 PC
+
+408 - COLA / M2 / wCDM / 100 LCDM anchors / High Omega_m High ns High w / 1 PC
+
+409 - COLA / M2 / wCDM / 100 LCDM anchors / High Omega_m Low ns High w / 1 PC
+
+410 - EE2 / M3 / wCDM / -- / High Omega_m High As Low w
+
+411 - EE2 / M3 / wCDM / -- / High Omega_m Low As Low w
+
+412 - EE2 / M3 / wCDM / -- / High Omega_m High ns Low w
+
+413 - EE2 / M3 / wCDM / -- / High Omega_m Low ns Low w
+
+414 - EE2 / M3 / wCDM / -- / High Omega_m High As High w
+
+415 - EE2 / M3 / wCDM / -- / High Omega_m Low As High w
+
+416 - EE2 / M3 / wCDM / -- / High Omega_m High ns High w
+
+417 - EE2 / M3 / wCDM / -- / High Omega_m Low ns High w
+
+418 - COLA / M3 / wCDM / 1 anchor / High Omega_m High As Low w
+
+419 - COLA / M3 / wCDM / 1 anchor / High Omega_m Low As Low w
+
+420 - COLA / M3 / wCDM / 1 anchor / High Omega_m High ns Low w
+
+421 - COLA / M3 / wCDM / 1 anchor / High Omega_m Low ns Low w
+
+422 - COLA / M3 / wCDM / 1 anchor / High Omega_m High As High w
+
+423 - COLA / M3 / wCDM / 1 anchor / High Omega_m Low As High w
+
+424 - COLA / M3 / wCDM / 1 anchor / High Omega_m High ns High w
+
+425 - COLA / M3 / wCDM / 1 anchor / High Omega_m Low ns High w
+
+426 - COLA / M3 / wCDM / 25 anchors / High Omega_m High As Low w
+
+427 - COLA / M3 / wCDM / 25 anchors / High Omega_m Low As Low w
+
+428 - COLA / M3 / wCDM / 25 anchors / High Omega_m High ns Low w
+
+429 - COLA / M3 / wCDM / 25 anchors / High Omega_m Low ns Low w
+
+430 - COLA / M3 / wCDM / 25 anchors / High Omega_m High As High w
+
+431 - COLA / M3 / wCDM / 25 anchors / High Omega_m Low As High w
+
+432 - COLA / M3 / wCDM / 25 anchors / High Omega_m High ns High w
+
+433 - COLA / M3 / wCDM / 25 anchors / High Omega_m Low ns High w
+
+434 - COLA / M3 / wCDM / 100 LCDM anchors / High Omega_m High As Low w
+
+435 - COLA / M3 / wCDM / 100 LCDM anchors / High Omega_m Low As Low w
+
+436 - COLA / M3 / wCDM / 100 LCDM anchors / High Omega_m High ns Low w
+
+437 - COLA / M3 / wCDM / 100 LCDM anchors / High Omega_m Low ns Low w
+
+438 - COLA / M3 / wCDM / 100 LCDM anchors / High Omega_m High As High w
+
+439 - COLA / M3 / wCDM / 100 LCDM anchors / High Omega_m Low As High w
+
+440 - COLA / M3 / wCDM / 100 LCDM anchors / High Omega_m High ns High w
+
+441 - COLA / M3 / wCDM / 100 LCDM anchors / High Omega_m Low ns High w
+
+442 - COLA high / M3 / wCDM / 1 anchor / High Omega_m High As Low w
+
+443 - COLA high / M3 / wCDM / 1 anchor / High Omega_m Low As Low w
+
+444 - COLA high / M3 / wCDM / 1 anchor / High Omega_m High ns Low w
+
+445 - COLA high / M3 / wCDM / 1 anchor / High Omega_m Low ns Low w
+
+446 - COLA high / M3 / wCDM / 1 anchor / High Omega_m High As High w
+
+447 - COLA high / M3 / wCDM / 1 anchor / High Omega_m Low As High w
+
+448 - COLA high / M3 / wCDM / 1 anchor / High Omega_m High ns High w
+
+449 - COLA high / M3 / wCDM / 1 anchor / High Omega_m Low ns High w
+
+450 - COLA / M3 / wCDM / 100 LCDM anchors / High Omega_m High As Low w / 1 PC
+
+451 - COLA / M3 / wCDM / 100 LCDM anchors / High Omega_m Low As Low w / 1 PC
+
+452 - COLA / M3 / wCDM / 100 LCDM anchors / High Omega_m High ns Low w / 1 PC
+
+453 - COLA / M3 / wCDM / 100 LCDM anchors / High Omega_m Low ns Low w / 1 PC
+
+454 - COLA / M3 / wCDM / 100 LCDM anchors / High Omega_m High As High w / 1 PC
+
+455 - COLA / M3 / wCDM / 100 LCDM anchors / High Omega_m Low As High w / 1 PC
+
+456 - COLA / M3 / wCDM / 100 LCDM anchors / High Omega_m High ns High w / 1 PC
+
+457 - COLA / M3 / wCDM / 100 LCDM anchors / High Omega_m Low ns High w / 1 PC
+
+## Varying PCs for wCDM chains with w = -1
+
+458 - COLA / M2 / wCDM / 100 LCDM anchors / High Omega_m High As / 1 PC
+
+459 - COLA / M2 / wCDM / 100 LCDM anchors / High Omega_m Low As / 1 PC
+
+460 - COLA / M2 / wCDM / 100 LCDM anchors / High Omega_m High ns / 1 PC
+
+461 - COLA / M2 / wCDM / 100 LCDM anchors / High Omega_m Low ns / 1 PC
+
+462 - COLA / M2 / wCDM / 100 LCDM anchors / High Omega_m High As / 1 PC
+
+463 - COLA / M2 / wCDM / 100 LCDM anchors / High Omega_m Low As / 1 PC
+
+464 - COLA / M2 / wCDM / 100 LCDM anchors / High Omega_m High ns / 1 PC
+
+465 - COLA / M2 / wCDM / 100 LCDM anchors / High Omega_m Low ns / 1 PC
+
+466 - COLA / M3 / wCDM / 100 LCDM anchors / High Omega_m High As / 1 PC
+
+467 - COLA / M3 / wCDM / 100 LCDM anchors / High Omega_m Low As / 1 PC
+
+468 - COLA / M3 / wCDM / 100 LCDM anchors / High Omega_m High ns / 1 PC
+
+469 - COLA / M3 / wCDM / 100 LCDM anchors / High Omega_m Low ns / 1 PC
+
+470 - COLA / M3 / wCDM / 100 LCDM anchors / High Omega_m High As / 1 PC
+
+471 - COLA / M3 / wCDM / 100 LCDM anchors / High Omega_m Low As / 1 PC
+
+472 - COLA / M3 / wCDM / 100 LCDM anchors / High Omega_m High ns / 1 PC
+
+473 - COLA / M3 / wCDM / 100 LCDM anchors / High Omega_m Low ns / 1 PC
+
+## Default-precision 1 ref for new fiducials at M4
+
+474 - COLA / M4 / wCDM / 1 anchor / High Omega_m High As Low w
+
+475 - COLA / M4 / wCDM / 1 anchor / High Omega_m Low As Low w
+
+476 - COLA / M4 / wCDM / 1 anchor / High Omega_m High ns Low w
+
+477 - COLA / M4 / wCDM / 1 anchor / High Omega_m Low ns Low w
+
+478 - COLA / M4 / wCDM / 1 anchor / High Omega_m High As High w
+
+479 - COLA / M4 / wCDM / 1 anchor / High Omega_m Low As High w
+
+480 - COLA / M4 / wCDM / 1 anchor / High Omega_m High ns High w
+
+481 - COLA / M4 / wCDM / 1 anchor / High Omega_m Low ns High w
+
+
 ## Debugging PCs
 
 600 - COLA / M2 / wCDM / 100 LCDM anchors / High Omega_m High As / 9 PCs - Only varying PCs, fixing cosmo + nuisance params
