@@ -1,6 +1,6 @@
 params = ["AS", "NS"]
 values = ["HIGH", "LOW"]
-masks = ["M2", "M3"]
+masks = ["M2", "M3", "M4"]
 for param in params:
     for value in values:
         for mask in masks:
