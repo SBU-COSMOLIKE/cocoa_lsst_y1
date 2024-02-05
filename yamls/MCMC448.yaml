@@ -1,19 +1,19 @@
 timing: False
 debug: False
 stop_at_error: False
-output: ./projects/lsst_y1/chains/MCMC356/MCMC356
+output: ./projects/lsst_y1/chains/MCMC448/MCMC448
 
 likelihood:
   lsst_y1.lsst_cosmic_shear:
     path: ./external_modules/data/lsst_y1
-    data_file: LSST_Y1_M2_OM_HIGH_AS_HIGH.dataset
+    data_file: LSST_Y1_M3_OM_HIGH_NS_HIGH_W_HIGH.dataset
     accuracyboost: 1.0
     integration_accuracy: 0
     kmax_boltzmann: 2.0
     # 1 EE2, 2 Halofit
     non_linear_emul: 5
-    cola_precision: 1
-    num_refs: 100
+    cola_precision: 2
+    num_refs: 1
 
 params:
   As_1e9:
@@ -80,12 +80,6 @@ params:
       scale: 0.02
     proposal: 0.02
     latex: w_{0,\mathrm{DE}}
-  LSST_COLA_Q1:
-    prior:
-      min: -100
-      max: 100
-    proposal: 2
-    latex: Q1_\mathrm{COLA}^1
   mnu:
     value: 0.058
   tau:
@@ -336,7 +330,7 @@ sampler:
         ]
       - [6,
           [
-            LSST_DZ_S1, LSST_DZ_S2, LSST_DZ_S3, LSST_DZ_S4, LSST_DZ_S5, LSST_A1_1, LSST_A1_2, LSST_M1, LSST_M2, LSST_M3, LSST_M4, LSST_M5, LSST_COLA_Q1
+            LSST_DZ_S1, LSST_DZ_S2, LSST_DZ_S3, LSST_DZ_S4, LSST_DZ_S5, LSST_A1_1, LSST_A1_2, LSST_M1, LSST_M2, LSST_M3, LSST_M4, LSST_M5
           ]
         ]
     oversample_power: 0.3

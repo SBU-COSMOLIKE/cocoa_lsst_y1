@@ -966,7 +966,7 @@ INDEX - Emulator / Mask / Model / Anchors / Fiducial cosmology
 
 457 - COLA / M3 / wCDM / 100 LCDM anchors / High Omega_m Low ns High w / 1 PC
 
-## Varying PCs for wCDM chains with w = -1
+## Varying PCs for wCDM chains with w = -1, Omega_m high
 
 458 - COLA / M2 / wCDM / 100 LCDM anchors / High Omega_m High As / 1 PC
 
@@ -976,47 +976,31 @@ INDEX - Emulator / Mask / Model / Anchors / Fiducial cosmology
 
 461 - COLA / M2 / wCDM / 100 LCDM anchors / High Omega_m Low ns / 1 PC
 
-462 - COLA / M2 / wCDM / 100 LCDM anchors / High Omega_m High As / 1 PC
+462 - COLA / M3 / wCDM / 100 LCDM anchors / High Omega_m High As / 1 PC
 
-463 - COLA / M2 / wCDM / 100 LCDM anchors / High Omega_m Low As / 1 PC
+463 - COLA / M3 / wCDM / 100 LCDM anchors / High Omega_m Low As / 1 PC
 
-464 - COLA / M2 / wCDM / 100 LCDM anchors / High Omega_m High ns / 1 PC
+464 - COLA / M3 / wCDM / 100 LCDM anchors / High Omega_m High ns / 1 PC
 
-465 - COLA / M2 / wCDM / 100 LCDM anchors / High Omega_m Low ns / 1 PC
-
-466 - COLA / M3 / wCDM / 100 LCDM anchors / High Omega_m High As / 1 PC
-
-467 - COLA / M3 / wCDM / 100 LCDM anchors / High Omega_m Low As / 1 PC
-
-468 - COLA / M3 / wCDM / 100 LCDM anchors / High Omega_m High ns / 1 PC
-
-469 - COLA / M3 / wCDM / 100 LCDM anchors / High Omega_m Low ns / 1 PC
-
-470 - COLA / M3 / wCDM / 100 LCDM anchors / High Omega_m High As / 1 PC
-
-471 - COLA / M3 / wCDM / 100 LCDM anchors / High Omega_m Low As / 1 PC
-
-472 - COLA / M3 / wCDM / 100 LCDM anchors / High Omega_m High ns / 1 PC
-
-473 - COLA / M3 / wCDM / 100 LCDM anchors / High Omega_m Low ns / 1 PC
+465 - COLA / M3 / wCDM / 100 LCDM anchors / High Omega_m Low ns / 1 PC
 
 ## Default-precision 1 ref for new fiducials at M4
 
-474 - COLA / M4 / wCDM / 1 anchor / High Omega_m High As Low w
+466 - COLA / M4 / wCDM / 1 anchor / High Omega_m High As Low w
 
-475 - COLA / M4 / wCDM / 1 anchor / High Omega_m Low As Low w
+467 - COLA / M4 / wCDM / 1 anchor / High Omega_m Low As Low w
 
-476 - COLA / M4 / wCDM / 1 anchor / High Omega_m High ns Low w
+468 - COLA / M4 / wCDM / 1 anchor / High Omega_m High ns Low w
 
-477 - COLA / M4 / wCDM / 1 anchor / High Omega_m Low ns Low w
+469 - COLA / M4 / wCDM / 1 anchor / High Omega_m Low ns Low w
 
-478 - COLA / M4 / wCDM / 1 anchor / High Omega_m High As High w
+470 - COLA / M4 / wCDM / 1 anchor / High Omega_m High As High w
 
-479 - COLA / M4 / wCDM / 1 anchor / High Omega_m Low As High w
+471 - COLA / M4 / wCDM / 1 anchor / High Omega_m Low As High w
 
-480 - COLA / M4 / wCDM / 1 anchor / High Omega_m High ns High w
+472 - COLA / M4 / wCDM / 1 anchor / High Omega_m High ns High w
 
-481 - COLA / M4 / wCDM / 1 anchor / High Omega_m Low ns High w
+473 - COLA / M4 / wCDM / 1 anchor / High Omega_m Low ns High w
 
 
 ## Debugging PCs

@@ -278,13 +278,8 @@ class _cosmolike_prototype_base(DataSetLikelihood):
       else:
         raise LoggedError(self.log, f"Invalid model for COLA emulator {self.cola_emu_mode}")
     elif self.non_linear_emul == 5 or self.non_linear_emul == 6 :   
-      # COLA NN Emulator
-      print("[nonlinear] Initializing COLA PCE emulator...")
-
-
-
-
-        
+      # COLA PCE Emulator
+      print("[nonlinear] Initializing COLA PCE emulator...")        
       if self.cola_emu_mode == "LCDM":
 
         if self.cola_precision == 1:
