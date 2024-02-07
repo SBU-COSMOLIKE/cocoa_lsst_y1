@@ -758,7 +758,7 @@ INDEX - Emulator / Mask / Model / Anchors / Fiducial cosmology
 
 355 - COLA / M3 / LCDM / 100 anchors (test set refs) / High Omega_m Low ns
 
-## Marginalizing over COLA PCs chains
+## Marginalizing over COLA PCs chains, w=-1, Omega_m high
 
 356 - COLA / M2 / wCDM / 100 LCDM anchors / High Omega_m High As / 1 PC
 
@@ -771,6 +771,22 @@ INDEX - Emulator / Mask / Model / Anchors / Fiducial cosmology
 360 - COLA / M2 / wCDM / 100 LCDM anchors / High Omega_m High As / 3 PCs
 
 361 - COLA / M3 / wCDM / 100 LCDM anchors / High Omega_m High As / 3 PCs
+
+458 - COLA / M2 / wCDM / 100 LCDM anchors / High Omega_m High As / 1 PC (same as 356)
+
+459 - COLA / M2 / wCDM / 100 LCDM anchors / High Omega_m Low As / 1 PC
+
+460 - COLA / M2 / wCDM / 100 LCDM anchors / High Omega_m High ns / 1 PC
+
+461 - COLA / M2 / wCDM / 100 LCDM anchors / High Omega_m Low ns / 1 PC
+
+462 - COLA / M3 / wCDM / 100 LCDM anchors / High Omega_m High As / 1 PC (same as 357)
+
+463 - COLA / M3 / wCDM / 100 LCDM anchors / High Omega_m Low As / 1 PC
+
+464 - COLA / M3 / wCDM / 100 LCDM anchors / High Omega_m High ns / 1 PC
+
+465 - COLA / M3 / wCDM / 100 LCDM anchors / High Omega_m Low ns / 1 PC
 
 ## Fiducials at $w = -0.9$ and $w = -1.1$
 
@@ -965,24 +981,6 @@ INDEX - Emulator / Mask / Model / Anchors / Fiducial cosmology
 456 - COLA / M3 / wCDM / 100 LCDM anchors / High Omega_m High ns High w / 1 PC
 
 457 - COLA / M3 / wCDM / 100 LCDM anchors / High Omega_m Low ns High w / 1 PC
-
-## Varying PCs for wCDM chains with w = -1, Omega_m high
-
-458 - COLA / M2 / wCDM / 100 LCDM anchors / High Omega_m High As / 1 PC
-
-459 - COLA / M2 / wCDM / 100 LCDM anchors / High Omega_m Low As / 1 PC
-
-460 - COLA / M2 / wCDM / 100 LCDM anchors / High Omega_m High ns / 1 PC
-
-461 - COLA / M2 / wCDM / 100 LCDM anchors / High Omega_m Low ns / 1 PC
-
-462 - COLA / M3 / wCDM / 100 LCDM anchors / High Omega_m High As / 1 PC
-
-463 - COLA / M3 / wCDM / 100 LCDM anchors / High Omega_m Low As / 1 PC
-
-464 - COLA / M3 / wCDM / 100 LCDM anchors / High Omega_m High ns / 1 PC
-
-465 - COLA / M3 / wCDM / 100 LCDM anchors / High Omega_m Low ns / 1 PC
 
 ## Default-precision 1 ref for new fiducials at M4
 
