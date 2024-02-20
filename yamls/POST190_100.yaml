@@ -1,12 +1,12 @@
 timing: False
 debug: False
 stop_at_error: False
-output: ./projects/lsst_y1/chains/MCMC1
+output: ./projects/lsst_y1/chains/MCMC190
 
 post:
-  suffix: POST
+  suffix: COLA100
   skip: 0.7
-  thin: 300
+  thin: 150
   remove:
     theory: camb
     likelihood: lsst_y1.lsst_cosmic_shear
@@ -28,9 +28,10 @@ post:
     likelihood:
       lsst_y1.lsst_cosmic_shear:
         path: ./external_modules/data/lsst_y1
-        data_file: LSST_Y1_M1_EE2_NOISED.dataset
+        data_file: LSST_Y1_M4_OM_LOW_NS_HIGH.dataset
         accuracyboost: 1.0
         integration_accuracy: 0
         kmax_boltzmann: 5.0
         # 1 EE2, 2 Halofit
         non_linear_emul: 5
+        num_refs: 100
