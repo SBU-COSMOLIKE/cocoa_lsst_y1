@@ -81,21 +81,21 @@ params:
     latex: w_{0,\mathrm{DE}}
   LSST_COLA_Q1:
     prior:
-      min: -4
-      max: 4
-    proposal: 0.2
+      min: -100
+      max: 100
+    proposal: 2
     latex: Q1_\mathrm{COLA}^1
   LSST_COLA_Q2:
     prior:
-      min: -4
-      max: 4
-    proposal: 0.2
+      min: -100
+      max: 100
+    proposal: 2
     latex: Q2_\mathrm{COLA}^1
   LSST_COLA_Q3:
     prior:
-      min: -4
-      max: 4
-    proposal: 0.2
+      min: -100
+      max: 100
+    proposal: 2
     latex: Q3_\mathrm{COLA}^1
   mnu:
     value: 0.058
