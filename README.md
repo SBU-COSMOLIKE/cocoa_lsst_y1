@@ -982,7 +982,7 @@ INDEX - Emulator / Mask / Model / Anchors / Fiducial cosmology
 
 457 - COLA / M3 / wCDM / 100 LCDM anchors / High Omega_m Low ns High w / 1 PC
 
-## Default-precision 1 ref for w!=-1 fiducials at M4
+## Default-precision 1 ref for $w!=-1$ fiducials at M4
 
 466 - COLA / M4 / wCDM / 1 anchor / High Omega_m High As Low w
 
@@ -1016,7 +1016,7 @@ INDEX - Emulator / Mask / Model / Anchors / Fiducial cosmology
 
 481 - EE2 / M4 / wCDM / -- / High Omega_m Low ns High w
 
-## High-precision 100 refs w=-1.1
+## High-precision 100 refs $w=-1.1$
 
 482 - COLA high/ M2 / wCDM / 100 LCDM anchors / High Omega_m High As Low w
 
