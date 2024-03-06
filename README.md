@@ -984,21 +984,21 @@ INDEX - Emulator / Mask / Model / Anchors / Fiducial cosmology
 
 ## Default-precision 1 ref for $w$ != $-1$ fiducials at M4
 
-466 - COLA / M4 / wCDM / 1 anchor / High Omega_m High As Low w
+466 - COLA / M4 / wCDM / 100 LCDM anchors / High Omega_m High As Low w
 
-467 - COLA / M4 / wCDM / 1 anchor / High Omega_m Low As Low w
+467 - COLA / M4 / wCDM / 100 LCDM anchors / High Omega_m Low As Low w
 
-468 - COLA / M4 / wCDM / 1 anchor / High Omega_m High ns Low w
+468 - COLA / M4 / wCDM / 100 LCDM anchors / High Omega_m High ns Low w
 
-469 - COLA / M4 / wCDM / 1 anchor / High Omega_m Low ns Low w
+469 - COLA / M4 / wCDM / 100 LCDM anchors / High Omega_m Low ns Low w
 
-470 - COLA / M4 / wCDM / 1 anchor / High Omega_m High As High w
+470 - COLA / M4 / wCDM / 100 LCDM anchors / High Omega_m High As High w
 
-471 - COLA / M4 / wCDM / 1 anchor / High Omega_m Low As High w
+471 - COLA / M4 / wCDM / 100 LCDM anchors / High Omega_m Low As High w
 
-472 - COLA / M4 / wCDM / 1 anchor / High Omega_m High ns High w
+472 - COLA / M4 / wCDM / 100 LCDM anchors / High Omega_m High ns High w
 
-473 - COLA / M4 / wCDM / 1 anchor / High Omega_m Low ns High w
+473 - COLA / M4 / wCDM / 100 LCDM anchors / High Omega_m Low ns High w
 
 474 - EE2 / M4 / wCDM / -- / High Omega_m High As Low w
 
