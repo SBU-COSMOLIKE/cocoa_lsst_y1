@@ -1042,6 +1042,58 @@ INDEX - Emulator / Mask / Model / Anchors / Fiducial cosmology
 
 493 - COLA high / M4 / wCDM / 100 LCDM anchors / High Omega_m Low ns Low w
 
+## Adding M4 for $w=-1$ fiducials, with 25 and 100 LCDM refs
+
+494 - COLA / M4 / wCDM / 25 anchors / High Omega_m High As
+
+495 - COLA / M4 / wCDM / 25 anchors / High Omega_m Low As
+
+496 - COLA / M4 / wCDM / 25 anchors / High Omega_m High ns
+
+497 - COLA / M4 / wCDM / 25 anchors / High Omega_m Low ns
+
+498 - COLA / M4 / wCDM / 100 LCDM anchors / High Omega_m High As
+
+499 - COLA / M4 / wCDM / 100 LCDM anchors / High Omega_m Low As
+
+500 - COLA / M4 / wCDM / 100 LCDM anchors / High Omega_m High ns
+
+501 - COLA / M4 / wCDM / 100 LCDM anchors / High Omega_m Low ns
+
+## Adding M4 for $w =/= -1$ fiducials, with 25 and 100 LCDM refs
+
+502 - COLA / M4 / wCDM / 25 anchors / High Omega_m High As Low w
+
+503 - COLA / M4 / wCDM / 25 anchors / High Omega_m Low As Low w
+
+504 - COLA / M4 / wCDM / 25 anchors / High Omega_m High ns Low w
+
+505 - COLA / M4 / wCDM / 25 anchors / High Omega_m Low ns Low w
+
+506 - COLA / M4 / wCDM / 25 anchors / High Omega_m High As High w
+
+507 - COLA / M4 / wCDM / 25 anchors / High Omega_m Low As High w
+
+508 - COLA / M4 / wCDM / 25 anchors / High Omega_m High ns high w
+
+509 - COLA / M4 / wCDM / 25 anchors / High Omega_m Low ns High w
+
+510 - COLA / M4 / wCDM / 100 LCDM anchors / High Omega_m High As Low w
+
+511 - COLA / M4 / wCDM / 100 LCDM anchors / High Omega_m Low As Low w
+
+512 - COLA / M4 / wCDM / 100 LCDM anchors / High Omega_m High ns Low w
+
+513 - COLA / M4 / wCDM / 100 LCDM anchors / High Omega_m Low ns Low w
+
+514 - COLA / M4 / wCDM / 100 LCDM anchors / High Omega_m High As High w
+
+515 - COLA / M4 / wCDM / 100 LCDM anchors / High Omega_m Low As High w
+
+516 - COLA / M4 / wCDM / 100 LCDM anchors / High Omega_m High ns High w
+
+517 - COLA / M4 / wCDM / 100 LCDM anchors / High Omega_m Low ns High w
+
 ## Debugging PCs
 
 600 - COLA / M2 / wCDM / 100 LCDM anchors / High Omega_m High As / 9 PCs - Only varying PCs, fixing cosmo + nuisance params
