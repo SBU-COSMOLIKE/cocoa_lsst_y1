@@ -1060,6 +1060,14 @@ INDEX - Emulator / Mask / Model / Anchors / Fiducial cosmology
 
 501 - COLA / M4 / wCDM / 100 LCDM anchors / High Omega_m Low ns
 
+518 - COLA high / M4 / wCDM / 100 LCDM anchors / High Omega_m High As
+
+519 - COLA high / M4 / wCDM / 100 LCDM anchors / High Omega_m Low As
+
+520 - COLA high / M4 / wCDM / 100 LCDM anchors / High Omega_m High ns
+
+521 - COLA high / M4 / wCDM / 100 LCDM anchors / High Omega_m Low ns
+
 ## Adding M4 for $w =/= -1$ fiducials, with 25 and 100 LCDM refs
 
 502 - COLA / M4 / wCDM / 25 anchors / High Omega_m High As Low w
