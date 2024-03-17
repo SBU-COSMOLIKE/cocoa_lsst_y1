@@ -1154,6 +1154,8 @@ INDEX - Emulator / Mask / Model / Anchors / Fiducial cosmology
 
 537 - COLA / M2 / wCDM / inf LCDM anchors / High Omega_m Low ns Low w
 
+546 - COLA / M2 / wCDM / inf LCDM anchors / High Omega_m High As
+
 ## Debugging PCs
 
 600 - COLA / M2 / wCDM / 100 LCDM anchors / High Omega_m High As / 9 PCs - Only varying PCs, fixing cosmo + nuisance params
