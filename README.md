@@ -1104,13 +1104,13 @@ INDEX - Emulator / Mask / Model / Anchors / Fiducial cosmology
 
 ## Testing 500 (emulated) LCDM refs
 
-522 - COLA GP / M3 / wCDM / 500 LCDM anchors / High Omega_m High As Low w
+522 - COLA GP / M4 / wCDM / 500 LCDM anchors / High Omega_m High As Low w
 
-523 - COLA GP / M4 / wCDM / 500 LCDM anchors / High Omega_m High As Low w
+523 - COLA GP / M3 / wCDM / 500 LCDM anchors / High Omega_m High As Low w
 
-524 - COLA GP / M3 / wCDM / 500 LCDM anchors / High Omega_m High ns Low w
+524 - COLA GP / M4 / wCDM / 500 LCDM anchors / High Omega_m High ns Low w
 
-525 - COLA GP / M4 / wCDM / 500 LCDM anchors / High Omega_m High ns Low w
+525 - COLA GP / M3 / wCDM / 500 LCDM anchors / High Omega_m High ns Low w
 
 538 - COLA GP / M2 / wCDM / 500 LCDM anchors / High Omega_m High As Low w
 
@@ -1130,13 +1130,13 @@ INDEX - Emulator / Mask / Model / Anchors / Fiducial cosmology
 
 ## Testing Infinite LCDM refs (on-the-fly refs)
 
-526 - COLA GP / M3 / wCDM / inf LCDM anchors / High Omega_m High As Low w
+526 - COLA GP / M4 / wCDM / inf LCDM anchors / High Omega_m High As Low w
 
-527 - COLA GP / M4 / wCDM / inf LCDM anchors / High Omega_m High As Low w
+527 - COLA GP / M3 / wCDM / inf LCDM anchors / High Omega_m High As Low w
 
-528 - COLA GP / M3 / wCDM / inf LCDM anchors / High Omega_m High ns Low w
+528 - COLA GP / M4 / wCDM / inf LCDM anchors / High Omega_m High ns Low w
 
-529 - COLA GP / M4 / wCDM / inf LCDM anchors / High Omega_m High ns Low w
+529 - COLA GP / M3 / wCDM / inf LCDM anchors / High Omega_m High ns Low w
 
 530 - COLA GP / M2 / wCDM / inf LCDM anchors / High Omega_m High As Low w
 
