@@ -390,8 +390,14 @@ class _cosmolike_prototype_base(DataSetLikelihood):
                 
                 self.emulator = emu_wcdm_default_pce()     
 
+    elif self.non_linear_emul == 8:
+        print("[nonlinear] Using wCDM NEURAL PCE with ? anchors ")
 
-
+        from COLA_Emulators.PCE.NN_pce_wcdm_inf import emu_cons_proto2 as emu_wcdm_default_pce 
+         
+        self.emulator = emu_wcdm_default_pce()                 
+        if self.cola_emu_mode != 'wCDM' : print('USING WRONG EMULATOR!, THIS ONLY WORKS FOR wCDM!')
+        if self.num_refs != 0 : print('USING WRONG EMULATOR!, YOU NEED num_refs = 0 !')    
     
     
     else:
@@ -660,6 +666,67 @@ class _cosmolike_prototype_base(DataSetLikelihood):
       lnpk_total = lnpk_total_interp(self.k_interp_2D, self.z_interp_2D)            
   
       lnPNL = lnpk_total.T.flatten() 
+
+
+
+
+
+    elif self.non_linear_emul == 8:
+
+      if self.cola_emu_mode == 'wCDM':  
+          params = { 'Omm':np.array([self.provider.get_param("omegam")]),
+                       'Omb':np.array([self.provider.get_param("omegab")]) ,
+                       'ns':np.array([self.provider.get_param("ns")]) ,
+                       'As':np.array([self.provider.get_param("As")]),
+                       'h':np.array([h]),
+                       'w':np.array([self.provider.get_param("w")])}
+      else:  
+          params = { 'Omm':np.array([self.provider.get_param("omegam")]),
+                       'Omb':np.array([self.provider.get_param("omegab")]) ,
+                       'ns':np.array([self.provider.get_param("ns")]) ,
+                       'As':np.array([self.provider.get_param("As")]),
+                       'h':np.array([h])}
+
+      params_ee2 = {
+        'Omm'  : self.provider.get_param("omegam"),
+        'As'   : self.provider.get_param("As"),
+        'Omb'  : self.provider.get_param("omegab"),
+        'ns'   : self.provider.get_param("ns"),
+        'h'    : h,
+        'mnu'  : self.provider.get_param("mnu"), 
+        'w'    : -1,
+        'wa'   : 0.0
+      }
+ 
+
+
+        
+
+    
+
+      kbt34, log_tmp_bt34, log_tmp_bt6 = self.emulator.get_boost_cocoa(params, log10k_interp_2D,params_ee2)             
+ 
+        
+  
+      cola_zs = self.emulator.redshift_default_ 
+      lnpk_total_ = np.zeros((len(cola_zs), len(self.k_interp_2D)))
+
+ 
+      log_pk_l = PKL.logP(cola_zs, self.k_interp_2D) + np.log(h**3)
+
+      lnpk_total_[:log_tmp_bt34.shape[0]]= log_tmp_bt34 + log_pk_l[:log_tmp_bt34.shape[0]]
+      lnpk_total_[log_tmp_bt34.shape[0]:]= log_tmp_bt6 + log_pk_l[log_tmp_bt34.shape[0]:]
+ 
+      lnpk_total_interp = interp2d(self.k_interp_2D, cola_zs, lnpk_total_)
+      lnpk_total = lnpk_total_interp(self.k_interp_2D, self.z_interp_2D)            
+  
+      lnPNL = lnpk_total.T.flatten() 
+
+
+      
+
+
+    
     else:
       assert False, "Other emulators not implemented"
 
