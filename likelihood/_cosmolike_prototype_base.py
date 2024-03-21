@@ -388,7 +388,14 @@ class _cosmolike_prototype_base(DataSetLikelihood):
                 print("[nonlinear] Using wCDM PCE with 100 anchors ")
                 from COLA_Emulators.PCE.pce_wcdm_default_100 import emu_cons_proto2 as emu_wcdm_default_pce 
                 
-                self.emulator = emu_wcdm_default_pce()     
+                self.emulator = emu_wcdm_default_pce() 
+
+        elif self.num_refs == 500:
+          print("[nonlinear] Using wCDM NEURAL PCE with 500 anchors ")
+          from COLA_Emulators.PCE.NN_pce_wcdm_def_500 import emu_cons_proto2 as emu_wcdm_default_pce 
+
+          self.emulator = emu_wcdm_default_pce()     
+    
 
     elif self.non_linear_emul == 8:
         print("[nonlinear] Using wCDM NEURAL PCE with ? anchors ")
