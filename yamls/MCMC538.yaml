@@ -11,7 +11,7 @@ likelihood:
     integration_accuracy: 0
     kmax_boltzmann: 2.0
     # 1 EE2, 2 Halofit
-    non_linear_emul: 3
+    non_linear_emul: 6
     cola_precision: 1
     num_refs: 500
 
