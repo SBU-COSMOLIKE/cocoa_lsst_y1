@@ -220,21 +220,35 @@ void cpp_init_cosmo_runmode(const bool is_linear)
   spdlog::debug("\x1b[90m{}\x1b[0m: Ends", "init_cosmo_runmode");
 }
 
-void cpp_init_IA(int N)
+void cpp_init_IA(const int IA_MODEL, const int IA_REDSHIFT_EVOL)
 {
   spdlog::debug("\x1b[90m{}\x1b[0m: Begins", "init_IA");
 
-  spdlog::debug("\x1b[90m{}\x1b[0m: {} = {} selected.", "init_IA", "IA", N);
+  spdlog::debug("\x1b[90m{}\x1b[0m: {} = {} selected.", "init_IA", 
+    "IA MODEL", IA_MODEL, "IA REDSHIFT EVOLUTION", IA_REDSHIFT_EVOL);
 
-  if (N == 3 || N == 4 || N == 5 || N == 6)
+  
+  if (IA_MODEL == 0 || IA_MODEL == 1)
   {
-    like.IA = N;
+    like.IA_MODEL = IA_MODEL;
   }
   else
   {
-    spdlog::critical("{}: {} = {} not supported", "init_IA", "like.IA", N);
+    spdlog::critical("{}: {} = {} not supported", "init_IA", "like.IA_MODEL", IA_MODEL);
     exit(1);
   }
+
+  if (IA_REDSHIFT_EVOL == NO_IA                || IA_REDSHIFT_EVOL == IA_NLA_LF ||
+      IA_REDSHIFT_EVOL == IA_REDSHIFT_BINNING  || IA_REDSHIFT_EVOL == IA_REDSHIFT_EVOLUTION)
+  {
+    like.IA = IA_REDSHIFT_EVOL;
+  }
+  else
+  {
+    spdlog::critical("{}: {} = {} not supported", "init_IA", "like.IA", IA_REDSHIFT_EVOL);
+    exit(1);
+  }
+  
 
   spdlog::debug("\x1b[90m{}\x1b[0m: Ends", "init_IA");
 }
@@ -372,11 +386,6 @@ void cpp_init_lens_sample(std::string multihisto_file, const int Ntomo, const do
       for (int j = 0; j < tomo.shear_Nbin; j++)
       {
         n += test_zoverlap(i, j);
-        if (test_zoverlap(i, j))
-        {
-          spdlog::info("\x1b[90m{}\x1b[0m: ggl({},{}) is a bin w/ efficiency = {:.10f}", 
-            "init_lens_sample", i, j, ggl_efficiency(i, j));
-        }
       }
     }
     tomo.ggl_Npowerspectra = n;
@@ -950,19 +959,19 @@ std::vector<double> B_TA)
   }
 
   nuisance.c1rhocrit_ia = 0.01389;
-  if (like.IA == 3 || like.IA == 5)
+  if (like.IA == 2)
   {
     for (int i=0; i<tomo.shear_Nbin; i++)
     {
-      nuisance.A_z[i] = A1[i];
-      nuisance.A2_z[i] = A2[i];
-      nuisance.b_ta_z[i] = B_TA[i];
+      nuisance.A_z[i]     = A1[i];
+      nuisance.A2_z[i]    = A2[i];
+      nuisance.b_ta_z[i]  = B_TA[i];
     }
   }
-  else if (like.IA == 4 || like.IA == 6)
+  else if (like.IA == 3)
   {
-    nuisance.A_ia = A1[0];
-    nuisance.eta_ia = A1[1];
+    nuisance.A_ia         = A1[0];
+    nuisance.eta_ia       = A1[1];
     nuisance.oneplusz0_ia = 1.62;
 
     nuisance.A2_ia = A2[0];
@@ -971,7 +980,8 @@ std::vector<double> B_TA)
 
     for (int i=2; i<tomo.shear_Nbin; i++)
     {
-      if ( !(ima::almost_equal(A1[i], 0.)) || !(ima::almost_equal(A2[i], 0.)) ||
+      if ( !(ima::almost_equal(A1[i], 0.))    || 
+           !(ima::almost_equal(A2[i], 0.))    ||
            !(ima::almost_equal(B_TA[i], 0.)))
       {
         spdlog::critical(
@@ -2041,7 +2051,8 @@ PYBIND11_MODULE(cosmolike_lsst_y1_interface, m)
   m.def("init_IA",
     &cpp_init_IA,
     "Init IA related options",
-    py::arg("ia_model")
+    py::arg("ia_model"),
+    py::arg("ia_redshift_evolution")
   );
 
   m.def("init_binning",

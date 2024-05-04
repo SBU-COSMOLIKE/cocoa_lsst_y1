@@ -82,8 +82,6 @@ class _cosmolike_prototype_base(DataSetLikelihood):
 
     self.probe = probe
 
-    self.IA_type = ini.int('IA_model')
-
     self.data_vector_file = ini.relativeFileName('data_file')
 
     self.cov_file = ini.relativeFileName('cov_file')
@@ -94,7 +92,7 @@ class _cosmolike_prototype_base(DataSetLikelihood):
 
     self.source_file = ini.relativeFileName('nz_source_file')
 
-    self.ggl_olap_cut = ini.float("lensing_overlap_cut")
+    #self.ggl_olap_cut = ini.float("lensing_overlap_cut")
 
     self.lens_ntomo = ini.int("lens_ntomo") #5
 
@@ -133,6 +131,7 @@ class _cosmolike_prototype_base(DataSetLikelihood):
     # ------------------------------------------------------------------------
 
     ci.initial_setup()
+    
     ci.init_accuracy_boost(self.accuracyboost, self.samplingboost, self.integration_accuracy)
 
     ci.init_probes(possible_probes=self.probe)
@@ -148,11 +147,11 @@ class _cosmolike_prototype_base(DataSetLikelihood):
     # convert chi to Mpc/h
     ci.init_distances(default_z, default_chi*default_hubble/100.0)
 
-    ci.init_IA(self.IA_type)
+    ci.init_IA(ia_model=self.IA_model, ia_redshift_evolution=self.IA_redshift_evolution)
 
     ci.init_source_sample(self.source_file, self.source_ntomo)
 
-    ci.init_lens_sample(self.lens_file, self.lens_ntomo, self.ggl_olap_cut)
+    ci.init_lens_sample(self.lens_file, self.lens_ntomo, 0.0)
 
     ci.init_size_data_vector()
 
@@ -206,6 +205,7 @@ class _cosmolike_prototype_base(DataSetLikelihood):
       "As": None,
       "H0": None,
       "omegam": None,
+      "omegab": None,
       "mnu": None,
       "w": None,
       "Pk_interpolator": {

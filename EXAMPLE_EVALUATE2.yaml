@@ -13,10 +13,12 @@ likelihood:
     #data_file: LSST_Y1_M6_GGL0.05.dataset 
     print_datavector: False
     accuracyboost: 1.0
-    integration_accuracy: 0 
+    integration_accuracy: 10
     kmax_boltzmann: 5.0
     # 1 EE2, 2 Halofit
     non_linear_emul: 2
+    IA_model: 0
+    IA_redshift_evolution: 3
     # ------------------------------------------------------------------------
     # Settings adopted when printing the lsst_y1_theory.modelvector
     # ------------------------------------------------------------------------
