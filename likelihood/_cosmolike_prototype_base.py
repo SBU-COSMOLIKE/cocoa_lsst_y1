@@ -406,6 +406,8 @@ class _cosmolike_prototype_base(DataSetLikelihood):
         if self.cola_emu_mode != 'wCDM' : print('USING WRONG EMULATOR!, THIS ONLY WORKS FOR wCDM!')
         if self.num_refs != 0 : print('USING WRONG EMULATOR!, YOU NEED num_refs = 0 !')    
     
+    elif self.non_linear_emul == 9:
+      print("[nonlinear] Using linear Pk modelling")
     
     else:
       raise LoggedError(self.log, "non_linear_emul = %d is an invalid option", self.non_linear_emul)
@@ -729,10 +731,8 @@ class _cosmolike_prototype_base(DataSetLikelihood):
   
       lnPNL = lnpk_total.T.flatten() 
 
-
-      
-
-
+    elif self.non_linear_emul == 9:
+      lnPNL = lnPL
     
     else:
       assert False, "Other emulators not implemented"
