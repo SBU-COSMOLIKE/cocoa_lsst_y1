@@ -11,20 +11,25 @@
 # python3 add_noise_to_data_vector.py ./OMEGAM_LOW_NS_HIGH_NO_NOISE.modelvector
 # python3 add_noise_to_data_vector.py ./OMEGAM_LOW_NS_LOW_NO_NOISE.modelvector
 
-python3 add_noise_to_data_vector.py ./OMEGAM_HIGH_AS_HIGH_W_HIGH_NO_NOISE.modelvector
-python3 add_noise_to_data_vector.py ./OMEGAM_HIGH_AS_LOW_W_HIGH_NO_NOISE.modelvector
-python3 add_noise_to_data_vector.py ./OMEGAM_LOW_AS_HIGH_W_HIGH_NO_NOISE.modelvector
-python3 add_noise_to_data_vector.py ./OMEGAM_LOW_AS_LOW_W_HIGH_NO_NOISE.modelvector
-python3 add_noise_to_data_vector.py ./OMEGAM_HIGH_NS_HIGH_W_HIGH_NO_NOISE.modelvector
-python3 add_noise_to_data_vector.py ./OMEGAM_HIGH_NS_LOW_W_HIGH_NO_NOISE.modelvector
-python3 add_noise_to_data_vector.py ./OMEGAM_LOW_NS_HIGH_W_HIGH_NO_NOISE.modelvector
-python3 add_noise_to_data_vector.py ./OMEGAM_LOW_NS_LOW_W_HIGH_NO_NOISE.modelvector
+# python3 add_noise_to_data_vector.py ./OMEGAM_HIGH_AS_HIGH_W_HIGH_NO_NOISE.modelvector
+# python3 add_noise_to_data_vector.py ./OMEGAM_HIGH_AS_LOW_W_HIGH_NO_NOISE.modelvector
+# python3 add_noise_to_data_vector.py ./OMEGAM_LOW_AS_HIGH_W_HIGH_NO_NOISE.modelvector
+# python3 add_noise_to_data_vector.py ./OMEGAM_LOW_AS_LOW_W_HIGH_NO_NOISE.modelvector
+# python3 add_noise_to_data_vector.py ./OMEGAM_HIGH_NS_HIGH_W_HIGH_NO_NOISE.modelvector
+# python3 add_noise_to_data_vector.py ./OMEGAM_HIGH_NS_LOW_W_HIGH_NO_NOISE.modelvector
+# python3 add_noise_to_data_vector.py ./OMEGAM_LOW_NS_HIGH_W_HIGH_NO_NOISE.modelvector
+# python3 add_noise_to_data_vector.py ./OMEGAM_LOW_NS_LOW_W_HIGH_NO_NOISE.modelvector
+# 
+# python3 add_noise_to_data_vector.py ./OMEGAM_HIGH_AS_HIGH_W_LOW_NO_NOISE.modelvector
+# python3 add_noise_to_data_vector.py ./OMEGAM_HIGH_AS_LOW_W_LOW_NO_NOISE.modelvector
+# python3 add_noise_to_data_vector.py ./OMEGAM_LOW_AS_HIGH_W_LOW_NO_NOISE.modelvector
+# python3 add_noise_to_data_vector.py ./OMEGAM_LOW_AS_LOW_W_LOW_NO_NOISE.modelvector
+# python3 add_noise_to_data_vector.py ./OMEGAM_HIGH_NS_HIGH_W_LOW_NO_NOISE.modelvector
+# python3 add_noise_to_data_vector.py ./OMEGAM_HIGH_NS_LOW_W_LOW_NO_NOISE.modelvector
+# python3 add_noise_to_data_vector.py ./OMEGAM_LOW_NS_HIGH_W_LOW_NO_NOISE.modelvector
+# python3 add_noise_to_data_vector.py ./OMEGAM_LOW_NS_LOW_W_LOW_NO_NOISE.modelvector
 
-python3 add_noise_to_data_vector.py ./OMEGAM_HIGH_AS_HIGH_W_LOW_NO_NOISE.modelvector
-python3 add_noise_to_data_vector.py ./OMEGAM_HIGH_AS_LOW_W_LOW_NO_NOISE.modelvector
-python3 add_noise_to_data_vector.py ./OMEGAM_LOW_AS_HIGH_W_LOW_NO_NOISE.modelvector
-python3 add_noise_to_data_vector.py ./OMEGAM_LOW_AS_LOW_W_LOW_NO_NOISE.modelvector
-python3 add_noise_to_data_vector.py ./OMEGAM_HIGH_NS_HIGH_W_LOW_NO_NOISE.modelvector
-python3 add_noise_to_data_vector.py ./OMEGAM_HIGH_NS_LOW_W_LOW_NO_NOISE.modelvector
-python3 add_noise_to_data_vector.py ./OMEGAM_LOW_NS_HIGH_W_LOW_NO_NOISE.modelvector
-python3 add_noise_to_data_vector.py ./OMEGAM_LOW_NS_LOW_W_LOW_NO_NOISE.modelvector
+python3 add_noise_to_data_vector.py ./OMEGAM_HIGH_AS_HIGH_W_LOW_BACCO_NO_NOISE.modelvector
+python3 add_noise_to_data_vector.py ./OMEGAM_HIGH_AS_LOW_W_LOW_BACCO_NO_NOISE.modelvector
+python3 add_noise_to_data_vector.py ./OMEGAM_HIGH_NS_HIGH_W_LOW_BACCO_NO_NOISE.modelvector
+python3 add_noise_to_data_vector.py ./OMEGAM_HIGH_NS_LOW_W_LOW_BACCO_NO_NOISE.modelvector
