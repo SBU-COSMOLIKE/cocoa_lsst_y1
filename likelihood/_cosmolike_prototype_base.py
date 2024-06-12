@@ -534,6 +534,25 @@ class _cosmolike_prototype_base(DataSetLikelihood):
 
     elif self.non_linear_emul == 10:
       # BACCO
+      # EE2 for z > 1.5
+      params_ee2 = {
+        'Omm'  : self.provider.get_param("omegam"),
+        'As'   : self.provider.get_param("As"),
+        'Omb'  : self.provider.get_param("omegab"),
+        'ns'   : self.provider.get_param("ns"),
+        'h'    : h,
+        'mnu'  : self.provider.get_param("mnu"), 
+        'w'    : self.provider.get_param("w"),
+        'wa'   : 0.0
+      }
+
+      kbt_ee2 = np.power(10.0, np.linspace(-2.0589, 0.973, self.len_k_interp_2D))
+      try:
+        kbt_ee2, tmp_bt_ee2 = euclidemu2.PyEuclidEmulator().get_boost(params_ee2, self.z_interp_2D, kbt_ee2)
+      except Exception:
+        kbt_ee2, tmp_bt_ee2 = euclidemu2.get_boost(params_ee2, self.z_interp_2D, kbt_ee2)
+
+      logkbt_ee2 = np.log10(kbt_ee2)
       scales = [1/(1 + z) for z in self.z_interp_2D if z < 1.5]
       params = {
         'omega_cold'    :  self.provider.get_param("omegach2")/h**2,
@@ -565,7 +584,18 @@ class _cosmolike_prototype_base(DataSetLikelihood):
       
           lnPNL[i::self.len_z_interp_2D]  = lnPL[i::self.len_z_interp_2D] + lnbt
         else:
-          lnPNL[i::self.len_z_interp_2D]  = lnPL[i::self.len_z_interp_2D]
+          # BACCO only goes up to z = 1.5
+          interp = interp1d(logkbt_ee2, 
+              tmp_bt_ee2[i],
+              kind = 'linear', 
+              fill_value = 'extrapolate', 
+              assume_sorted = True
+            )
+
+          lnbt = np.log(interp(log10k_interp_2D))
+          lnbt[np.power(10,log10k_interp_2D) < 8.73e-3] = 0.0
+      
+          lnPNL[i::self.len_z_interp_2D]  = lnPL[i::self.len_z_interp_2D] + lnbt
     elif self.non_linear_emul == 3:
       # COLA 
       w_ = (-1 if self.cola_emu_mode == 'LCDM' else self.provider.get_param("w"))
