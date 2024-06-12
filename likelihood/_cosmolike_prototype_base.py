@@ -555,7 +555,7 @@ class _cosmolike_prototype_base(DataSetLikelihood):
       logkbt_ee2 = np.log10(kbt_ee2)
       scales = [1/(1 + z) for z in self.z_interp_2D if z < 1.5]
       params = {
-        'omega_cold'    :  self.provider.get_param("omegach2")/h**2,
+        'omega_matter'  :  self.provider.get_param("omegam"),
         'A_s'           :  self.provider.get_param("As"),
         'omega_baryon'  :  self.provider.get_param("omegab"),
         'ns'            :  self.provider.get_param("ns"),

@@ -205,7 +205,7 @@ sampler:
       ns: 0.96
       H0: 67.0
       omegab: 0.049
-      omegam: 0.36
+      omegam: 0.33
       mnu: 0.058
       LSST_DZ_S1: 0.0414632
       LSST_DZ_S2: 0.00147332
