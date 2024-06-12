@@ -1,5 +1,5 @@
-indices = range(526, 532)
-new_indices = range(706, 712)
+indices = range(526, 538)
+new_indices = range(712, 724)
 for i, j in zip(indices, new_indices):
     with open(f"MCMC{i}.yaml", "r") as f:
         contents = f.read()
@@ -12,6 +12,6 @@ for i, j in zip(indices, new_indices):
             break
     new_dataset_file = dataset_file.split(".")[0] + "_BACCO.dataset"
     contents = contents.replace(dataset_file, new_dataset_file)
-    contents = contents.replace("non_linear_emul: 7", "non_linear_emul: 1")
+    # contents = contents.replace("non_linear_emul: 7", "non_linear_emul: 1")
     with open(f"MCMC{j}.yaml", "w") as f:
         f.write(contents)

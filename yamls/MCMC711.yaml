@@ -6,7 +6,7 @@ output: ./projects/lsst_y1/chains/MCMC711/MCMC711
 likelihood:
   lsst_y1.lsst_cosmic_shear:
     path: ./external_modules/data/lsst_y1
-    data_file: LSST_Y1_M2_OM_HIGH_NS_HIGH_W_LOW_BACCO.dataset
+    data_file: LSST_Y1_M2_OM_HIGH_NS_LOW_W_LOW_BACCO.dataset
     accuracyboost: 1.0
     integration_accuracy: 0
     kmax_boltzmann: 2.0
