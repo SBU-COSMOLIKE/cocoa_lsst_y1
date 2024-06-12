@@ -1157,6 +1157,7 @@ INDEX - Emulator / Mask / Model / Anchors / Fiducial cosmology
 546 - COLA / M2 / wCDM / inf LCDM anchors / High Omega_m High As
 
 ## BACCO DV chains
+
 700 - EE2 / M4 / wCDM / -- / High Omega_m High As Low w (BACCO)
 
 701 - EE2 / M3 / wCDM / -- / High Omega_m High As Low w (BACCO)
@@ -1204,6 +1205,30 @@ INDEX - Emulator / Mask / Model / Anchors / Fiducial cosmology
 722 - COLA / M2 / wCDM / inf LCDM anchors / High Omega_m Low As Low w (BACCO)
 
 723 - COLA / M2 / wCDM / inf LCDM anchors / High Omega_m Low ns Low w (BACCO)
+
+724 - COLA / M4 / wCDM / inf LCDM anchors / High Omega_m High As Low w (BACCO)
+
+725 - COLA / M3 / wCDM / inf LCDM anchors / High Omega_m High As Low w (BACCO)
+
+726 - COLA / M4 / wCDM / inf LCDM anchors / High Omega_m High ns Low w (BACCO)
+
+727 - COLA / M3 / wCDM / inf LCDM anchors / High Omega_m High ns Low w (BACCO)
+
+728 - COLA / M2 / wCDM / inf LCDM anchors / High Omega_m High As Low w (BACCO)
+
+729 - COLA / M2 / wCDM / inf LCDM anchors / High Omega_m High ns Low w (BACCO)
+
+730 - COLA / M4 / wCDM / inf LCDM anchors / High Omega_m Low As Low w (BACCO)
+
+731 - COLA / M4 / wCDM / inf LCDM anchors / High Omega_m Low ns Low w (BACCO)
+
+732 - COLA / M3 / wCDM / inf LCDM anchors / High Omega_m Low As Low w (BACCO)
+
+733 - COLA / M3 / wCDM / inf LCDM anchors / High Omega_m Low ns Low w (BACCO)
+
+734 - COLA / M2 / wCDM / inf LCDM anchors / High Omega_m Low As Low w (BACCO)
+
+735 - COLA / M2 / wCDM / inf LCDM anchors / High Omega_m Low ns Low w (BACCO)
 
 ## Debugging PCs
 
