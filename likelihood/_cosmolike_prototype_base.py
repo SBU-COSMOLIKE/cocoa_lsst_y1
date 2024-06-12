@@ -277,6 +277,10 @@ class _cosmolike_prototype_base(DataSetLikelihood):
           raise LoggedError(self.log, f"Invalid number of anchors for NN wCDM COLA emulator {self.num_refs}")
       else:
         raise LoggedError(self.log, f"Invalid model for COLA emulator {self.cola_emu_mode}")
+    elif self.non_linear_emul == 10:
+      print("[nonlinear] Using BACCO emulator")
+      import baccoemu
+      self.emulator = baccoemu.Matter_powerspectrum()
     elif self.non_linear_emul == 5 or self.non_linear_emul == 6 :   
       # COLA PCE Emulator
       print("[nonlinear] Initializing COLA PCE emulator...")        
@@ -522,13 +526,46 @@ class _cosmolike_prototype_base(DataSetLikelihood):
         lnbt[np.power(10,log10k_interp_2D) < 8.73e-3] = 0.0
     
         lnPNL[i::self.len_z_interp_2D]  = lnPL[i::self.len_z_interp_2D] + lnbt
-      
     elif self.non_linear_emul == 2:
       # Halofit
       for i in range(self.len_z_interp_2D):
         lnPNL[i::self.len_z_interp_2D]  = t1[i*self.len_k_interp_2D:(i+1)*self.len_k_interp_2D]  
       lnPNL += np.log((h**3))   
 
+    elif self.non_linear_emul == 10:
+      # BACCO
+      scales = [1/(1 + z) for z in self.z_interp_2D if z < 1.5]
+      params = {
+        'omega_cold'    :  self.provider.get_param("omegach2")/h**2,
+        'A_s'           :  self.provider.get_param("As"),
+        'omega_baryon'  :  self.provider.get_param("omegab"),
+        'ns'            :  self.provider.get_param("ns"),
+        'hubble'        :  h,
+        'neutrino_mass' :  self.provider.get_param("mnu"),
+        'w0'            :  self.provider.get_param("w"),
+        'wa'            :  0.0,
+        'expfactor'     :  scales
+      }
+
+      kbt = self.emulator.emulator['nonlinear']['k']
+      kbt, tmp_bt = self.emulator.get_nonlinear_boost(k=kbt, cold=False, **params)
+      logkbt = np.log10(kbt)
+      for i in range(self.len_z_interp_2D):  
+        if self.z_interp_2D[i] < 1.5:
+          # BACCO only goes up to z = 1.5
+          interp = interp1d(logkbt, 
+              tmp_bt[i],
+              kind = 'linear', 
+              fill_value = 'extrapolate', 
+              assume_sorted = True
+            )
+
+          lnbt = np.log(interp(log10k_interp_2D))
+          lnbt[np.power(10,log10k_interp_2D) < 8.73e-3] = 0.0
+      
+          lnPNL[i::self.len_z_interp_2D]  = lnPL[i::self.len_z_interp_2D] + lnbt
+        else:
+          lnPNL[i::self.len_z_interp_2D]  = lnPL[i::self.len_z_interp_2D]
     elif self.non_linear_emul == 3:
       # COLA 
       w_ = (-1 if self.cola_emu_mode == 'LCDM' else self.provider.get_param("w"))
