@@ -1230,6 +1230,30 @@ INDEX - Emulator / Mask / Model / Anchors / Fiducial cosmology
 
 735 - COLA / M2 / wCDM / inf LCDM anchors / High Omega_m Low ns Low w (BACCO)
 
+736 - BACCO / M4 / wCDM / -- / High Omega_m High As Low w (BACCO)
+
+737 - BACCO / M3 / wCDM / -- / High Omega_m High As Low w (BACCO)
+
+738 - BACCO / M4 / wCDM / -- / High Omega_m High ns Low w (BACCO)
+
+739 - BACCO / M3 / wCDM / -- / High Omega_m High ns Low w (BACCO)
+
+740 - BACCO / M2 / wCDM / -- / High Omega_m High As Low w (BACCO)
+
+741 - BACCO / M2 / wCDM / -- / High Omega_m High ns Low w (BACCO)
+
+742 - BACCO / M4 / wCDM / -- / High Omega_m Low As Low w (BACCO)
+
+743 - BACCO / M4 / wCDM / -- / High Omega_m Low ns Low w (BACCO)
+
+744 - BACCO / M3 / wCDM / -- / High Omega_m Low As Low w (BACCO)
+
+745 - BACCO / M3 / wCDM / -- / High Omega_m Low ns Low w (BACCO)
+
+746 - BACCO / M2 / wCDM / -- / High Omega_m Low As Low w (BACCO)
+
+747 - BACCO / M2 / wCDM / -- / High Omega_m Low ns Low w (BACCO)
+
 ## Debugging PCs
 
 600 - COLA / M2 / wCDM / 100 LCDM anchors / High Omega_m High As / 9 PCs - Only varying PCs, fixing cosmo + nuisance params
