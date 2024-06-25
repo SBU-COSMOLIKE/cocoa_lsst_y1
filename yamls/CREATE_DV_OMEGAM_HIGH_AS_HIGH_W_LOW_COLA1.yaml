@@ -12,13 +12,13 @@ likelihood:
     #data_file: LSST_Y1_M5_GGL0.05.dataset  
     #data_file: LSST_Y1_M6_GGL0.05.dataset 
     print_datavector: True
-    print_datavector_file: "./projects/lsst_y1/data/OMEGAM_HIGH_AS_HIGH_W_LOW_NO_NOISE_COLAINF.modelvector"
+    print_datavector_file: "./projects/lsst_y1/data/OMEGAM_HIGH_AS_HIGH_W_LOW_NO_NOISE_COLA1.modelvector"
     accuracyboost: 3.0
     integration_accuracy: 10 
     kmax_boltzmann: 20.0
     # 1 EE2, 2 Halofit
-    non_linear_emul: 8
-    num_refs: 0
+    non_linear_emul: 5
+    num_refs: 1
     cola_precision: 1
     # ------------------------------------------------------------------------
     # Settings adopted when printing the lsst_y1_theory.modelvector

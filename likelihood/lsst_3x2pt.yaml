@@ -6,6 +6,9 @@ integration_accuracy: 0
 kmax_boltzmann: 5.0
 speed: 1
 non_linear_emul: 2
+num_refs: 1
+cola_precision: 1
+cola_emu_mode: wCDM
 
 print_intermediate_products: False
 
