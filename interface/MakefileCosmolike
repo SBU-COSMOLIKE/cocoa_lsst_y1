@@ -48,8 +48,8 @@ ifdef IGNORE_CPP_SPDLOG_INSTALLATION
 endif
 
 ifdef ARMA
-	CXXFLAGS += -DARMA
-	LDFLAGS += -llapack
+	CXXFLAGS += -DARMA -DARMA_DONT_PRINT_FAST_MATH_WARNING
+	LDFLAGS += -llapack -lopenblas -larpack
 endif
 
 ifdef GSL
