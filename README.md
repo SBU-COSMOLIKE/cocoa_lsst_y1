@@ -6,24 +6,26 @@ In this tutorial, we assume the user installed Cocoa via the *Conda installation
     
       conda activate cocoa
       cd ./cocoa/Cocoa/projects
-      git clone --depth 1 https://github.com/CosmoLike/cocoa_lsst_y1.git lsst_y1 
+      ${CONDA_PREFIX}/bin/git clone --depth 1 https://github.com/CosmoLike/cocoa_lsst_y1.git --branch v4.0-beta3 lsst_y1 
 
-By convention, the Cosmolike Organization hosts a Cobaya-Cosmolike project named XXX at `CosmoLike/cocoa_XXX`. However, our scripts and YAML files assume the removal of the `cocoa_` prefix when cloning the repository.
+:warning: Cocoa scripts and YAML files assume the removal of the `cocoa_` prefix when cloning the repository.
 
-📚📚 *Additional Information for experts and developers* 📚📚: Cocoa developers should drop the shallow clone option `--depth 1`, which prevents git from downloading the entire repository history. Developers should also authenticate to GitHub via SSH keys:
+:interrobang: If the user is a developer, then type the following instead *(at your own risk!)*
 
-      $CONDA_PREFIX/bin/git clone git@github.com:CosmoLike/cocoa_lsst_y1.git lsst_y1
+      ${CONDA_PREFIX}/bin/git clone git@github.com:CosmoLike/cocoa_lsst_y1.git lsst_y1
       
  **Step :two:**: go back to the Cocoa main folder and activate the private Python environment
     
       cd ../
-      source start_cocoa
+      source start_cocoa.sh
  
-:warning::warning: Remember to run the start_cocoa script only **after cloning** the project repository. 
+:warning: Remember to run the `start_cocoa.sh` shell script only **after cloning** the project repository (or if you already in the `(.local)` environment, run `start_cocoa.sh` again). 
 
 **Step :three:**: compile the project
  
       source ./projects/lsst_y1/scripts/compile_lsst_y1
+
+:interrobang: The script `compile_cocoa.sh` also compiles every Cosmolike project on the `${ROOTDIR}/projects/` folder.
 
 **Step :four:**: select the number of OpenMP cores (below, we set it to 4), and run a template YAML file
     
@@ -47,7 +49,7 @@ Do not delete the `lsst_y1` folder from the project folder without running `stop
     
 The script `stop_cocoa` deletes them. 
 
-Why does Cocoa behave like this? The script `start_cocoa` creates symbolic links so Cobaya can see the likelihood and data files. Cocoa also adds the Cobaya-Cosmolike interface of all cosmolike-related projects to the `LD_LIBRARY_PATH` and `PYTHONPATH` environmental paths.
+:interrobang: Why does Cocoa behave like this? The script `start_cocoa` creates symbolic links so Cobaya can see the likelihood and data files. Cocoa also adds the Cobaya-Cosmolike interface of all cosmolike-related projects to the `LD_LIBRARY_PATH` and `PYTHONPATH` environmental variables.
 
 ## MCMC Convergence Criteria <a name="running_cosmolike_projects"></a>
 
@@ -57,4 +59,4 @@ Why does Cocoa behave like this? The script `start_cocoa` creates symbolic links
     # Gelman-Rubin R-1 on std deviations
     Rminus1_cl_stop: 0.15
     
-For most applications, these settings are overkill, except when computing some tension and goodness of fit metrics. Please adjust these settings to your needs. 
+These settings are overkill for most applications, except when computing some tension and goodness of fit metrics. Please adjust these settings to your needs. 
