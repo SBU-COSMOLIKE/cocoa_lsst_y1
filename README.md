@@ -41,14 +41,14 @@ MCMC:
 
 ## Deleting Cosmolike projects <a name="running_cosmolike_projects"></a>
 
-Do not delete the `lsst_y1` folder from the project folder without running `stop_cocoa` first; otherwise, Cocoa will have ill-defined soft links. Where the ill-defined soft links will be located? 
+Do not delete the `lsst_y1` folder from the project folder without running the shell script `stop_cocoa.sh` first. Otherwise, Cocoa will have ill-defined soft links. 
+
+:interrobang: Where the ill-defined soft links will be located? 
      
      Cocoa/cobaya/cobaya/likelihoods/
      Cocoa/external_modules/code/
      Cocoa/external_modules/data/ 
     
-The script `stop_cocoa` deletes them. 
-
 :interrobang: Why does Cocoa behave like this? The script `start_cocoa` creates symbolic links so Cobaya can see the likelihood and data files. Cocoa also adds the Cobaya-Cosmolike interface of all cosmolike-related projects to the `LD_LIBRARY_PATH` and `PYTHONPATH` environmental variables.
 
 ## MCMC Convergence Criteria <a name="running_cosmolike_projects"></a>
