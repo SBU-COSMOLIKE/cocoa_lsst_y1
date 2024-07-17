@@ -2,7 +2,7 @@
 
 In this tutorial, we assume the user installed Cocoa via the *Conda installation* method, and the name of the Conda environment is `cocoa`. We also presume the user's terminal is in the folder where Cocoa was cloned.
 
- **Step :one:**: activate the cocoa Conda environment, go to the `projects` folder, and clone the Cosmolike LSST-Y1 project:
+ **Step :one:**: activate the cocoa Conda environment, go to the `cocoa/Cocoa/projects` folder, and clone the Cosmolike LSST-Y1 project:
     
       conda activate cocoa
       cd ./cocoa/Cocoa/projects
@@ -25,7 +25,7 @@ In this tutorial, we assume the user installed Cocoa via the *Conda installation
  
       source ./projects/lsst_y1/scripts/compile_lsst_y1
 
-:interrobang: The script `compile_cocoa.sh` also compiles every Cosmolike project on the `${ROOTDIR}/projects/` folder.
+:interrobang: The script `compile_cocoa.sh` also compiles every Cosmolike project on the `cocoa/Cocoa/projects/` folder.
 
 **Step :four:**: select the number of OpenMP cores (below, we set it to 4), and run a template YAML file
     
@@ -41,7 +41,7 @@ MCMC:
 
 ## Deleting Cosmolike projects <a name="running_cosmolike_projects"></a>
 
-Do not delete the `lsst_y1` folder from the project folder without running the shell script `stop_cocoa.sh` first. Otherwise, Cocoa will have ill-defined soft links. 
+Do not delete the `lsst_y1` folder from the project folder without first running the shell script `stop_cocoa.sh`. Otherwise, Cocoa will have ill-defined soft links. 
 
 :interrobang: Where the ill-defined soft links will be located? 
      
@@ -49,7 +49,7 @@ Do not delete the `lsst_y1` folder from the project folder without running the s
      Cocoa/external_modules/code/
      Cocoa/external_modules/data/ 
     
-:interrobang: Why does Cocoa behave like this? The script `start_cocoa` creates symbolic links so Cobaya can see the likelihood and data files. Cocoa also adds the Cobaya-Cosmolike interface of all cosmolike-related projects to the `LD_LIBRARY_PATH` and `PYTHONPATH` environmental variables.
+:interrobang: Why does Cocoa behave like this? The shell script `start_cocoa.sh` creates symbolic links so Cobaya can see the likelihood and data files. Cocoa also adds the Cobaya-Cosmolike interface of all cosmolike-related projects to the `LD_LIBRARY_PATH` and `PYTHONPATH` environmental variables.
 
 ## MCMC Convergence Criteria <a name="running_cosmolike_projects"></a>
 
