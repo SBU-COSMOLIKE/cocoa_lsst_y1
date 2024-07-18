@@ -1,1 +1,1 @@
-unset SPDLOG_LEVEL
+unset -v SPDLOG_LEVEL
