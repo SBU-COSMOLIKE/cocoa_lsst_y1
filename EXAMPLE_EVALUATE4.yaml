@@ -11,7 +11,9 @@ likelihood:
     kmax_boltzmann: 5.0
     # 1 EE2, 2 Halofit
     non_linear_emul: 2
-    
+    IA_model: 0
+    IA_redshift_evolution: 3
+        
 params:
   As_1e9:
     prior:
