@@ -6,7 +6,7 @@ In this tutorial, we assume the user installed Cocoa via the *Conda installation
     
       conda activate cocoa
       cd ./cocoa/Cocoa/projects
-      ${CONDA_PREFIX}/bin/git clone --depth 1 https://github.com/CosmoLike/cocoa_lsst_y1.git --branch v4.0-beta3 lsst_y1 
+      ${CONDA_PREFIX}/bin/git clone --depth 1 https://github.com/CosmoLike/cocoa_lsst_y1.git --branch v4.0-beta5 lsst_y1 
 
 :warning: Cocoa scripts and YAML files assume the removal of the `cocoa_` prefix when cloning the repository.
 
