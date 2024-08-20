@@ -609,7 +609,7 @@ PYBIND11_MODULE(cosmolike_lsst_y1_interface, m)
       " tomographic bin and ell value",
       py::arg("l").none(false).noconvert(),
       py::arg("ni").none(false).noconvert(),
-      py::arg("ni").none(false).noconvert()
+      py::arg("nj").none(false).noconvert()
     );
 
   m.def("C_ss_tomo_limber",
