@@ -213,6 +213,64 @@ void set_cosmological_parameters(
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 
+void set_cosmology(
+    const double omega_matter,
+    const double hubble,
+    std::vector<double> io_log10k_2D,
+    std::vector<double> io_z_2D, 
+    std::vector<double> io_lnP_linear,
+    std::vector<double> io_lnP_nonlinear,
+    std::vector<double> io_G,
+    std::vector<double> io_z_1D,
+    std::vector<double> io_chi
+  )
+{
+  spdlog::debug("\x1b[90m{}\x1b[0m: Begins", "set_cosmology");
+
+  cosmology.Omega_m = omega_matter;
+  cosmology.Omega_v = 1.0-omega_matter;
+
+  // Cosmolike only needs to know that there are massive neutrinos (>0)
+  cosmology.Omega_nu = 0.1;
+  cosmology.h0 = hubble/100.0; // assuming H0 in km/s/Mpc
+  cosmology.MGSigma = 0.0;
+  cosmology.MGmu = 0.0;
+
+  // Technical Problem: we want Cosmolike to calculate new data vector when
+  // we update distances / matter power spectrum / Growth factor.
+  // To avoid cache, we use a random number generator to set cosmology.random
+  cosmology.random = cosmolike_interface::RandomNumber::get_instance().get();
+  cosmology.is_cached = 0;
+
+  cosmolike_interface::init_linear_power_spectrum(
+    arma::conv_to<vector>::from(io_log10k_2D),
+    arma::conv_to<vector>::from(io_z_2D),
+    arma::conv_to<vector>::from(io_lnP_linear)
+  );
+
+  cosmolike_interface::init_non_linear_power_spectrum(
+    arma::conv_to<vector>::from(io_log10k_2D),
+    arma::conv_to<vector>::from(io_z_2D),
+    arma::conv_to<vector>::from(io_lnP_nonlinear)
+  );
+
+  cosmolike_interface::init_growth(
+      arma::conv_to<vector>::from(io_z_2D),
+      arma::conv_to<vector>::from(io_G)
+    );
+
+  cosmolike_interface::init_distances(
+      arma::conv_to<vector>::from(io_z_1D),
+      arma::conv_to<vector>::from(io_chi)
+    );
+
+  spdlog::debug("\x1b[90m{}\x1b[0m: Ends", "set_cosmology");
+}
+
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+
 void set_nuisance_IA(
     std::vector<double> A1, 
     std::vector<double> A2,
@@ -357,6 +415,17 @@ std::vector<double> compute_theory_data_vector_masked_with_baryon_pcs(
 }
 
 // ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+
+std::vector<double> get_binning_real_space()
+{  
+  return arma::conv_to<std::vector<double>>::from(
+      cosmolike_interface::get_binning_real_space()
+    );
+}
+
+// ---------------------------------------------------------------------------
 // ---------------------------- PYTHON WRAPPER -------------------------------
 // ---------------------------------------------------------------------------
 
@@ -483,6 +552,20 @@ PYBIND11_MODULE(cosmolike_lsst_y1_interface, m)
   // --------------------------------------------------------------------
   // --------------------------------------------------------------------
 
+  m.def("set_cosmology",
+      &set_cosmology,
+      "Set Cosmological Paramters, Distance, Matter Power Spectrum, Growth Factor",
+       py::arg("omegam").none(false),
+       py::arg("H0").none(false),
+       py::arg("log10k_2D").none(false),
+       py::arg("z_2D").none(false),
+       py::arg("lnP_linear").none(false),
+       py::arg("lnP_nonlinear").none(false),
+       py::arg("G").none(false),
+       py::arg("z_1D").none(false),
+       py::arg("chi").none(false)
+    );
+
   m.def("set_baryon_pcs",
       &set_baryon_pcs,
       "Load baryonic principal components from numpy array",
@@ -577,6 +660,11 @@ PYBIND11_MODULE(cosmolike_lsst_y1_interface, m)
   // Theoretical Cosmolike Functions
   // --------------------------------------------------------------------
   // --------------------------------------------------------------------
+
+  m.def("get_binning_real_space",
+      &get_binning_real_space,
+      "Get real space binning (theta bins)"
+    );
 
   m.def("xi_pm_tomo",
       &cosmolike_interface::xi_pm_tomo_cpp,
