@@ -28,8 +28,9 @@ In this tutorial, we assume the user installed Cocoa via the *Conda installation
 :interrobang: The script `compile_cocoa.sh` also compiles every Cosmolike project on the `cocoa/Cocoa/projects/` folder.
 
 **Step :four:**: select the number of OpenMP cores (below, we set it to 4), and run a template YAML file
+
     
-      export OMP_PROC_BIND=close; export OMP_NUM_THREADS=4
+      export OMP_PROC_BIND=close; export OMP_NUM_THREADS=8
       
 One model evaluation:
       
