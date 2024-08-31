@@ -128,12 +128,12 @@ def get_camb_cosmology(omegam, omegab, H0, ns, As_1e9 , w, w0pwa, mnu,
 
 def chi2(omegam=0.3, As_1e9=2.1, ns=0.96605, H0=67, 
          w0pwa=-0.9, mnu=0.06, w=-0.9, omegab=0.04, 
-         LSST_DZ_S1=0.0414632, LSST_DZ_S2=0.00147332,
-         LSST_DZ_S3=0.0237035, LSST_DZ_S4=-0.0773436,
-         LSST_DZ_S5=-8.67127e-05, LSST_M1=0.0191832,
-         LSST_M2=-0.0431752, LSST_M3=-0.034961,
-         LSST_M4=-0.0158096, LSST_M5 = -0.0158096,
-         LSST_A1_1=0.606102, LSST_A1_2=-1.51541,
+         DZ_S1=0.0414632, DZ_S2=0.00147332,
+         DZ_S3=0.0237035, DZ_S4=-0.0773436,
+         DZ_S5=-8.67127e-05, M1=0.0191832,
+         M2=-0.0431752, M3=-0.034961,
+         M4=-0.0158096, M5 = -0.0158096,
+         A1_1=0.606102, A1_2=-1.51541,
          AccuracyBoost=1.0, non_linear_emul=2):
 
     (log10k_interp_2D, z_interp_2D, lnPL, lnPNL, 
@@ -162,11 +162,11 @@ def chi2(omegam=0.3, As_1e9=2.1, ns=0.96605, H0=67,
                      z_1D=z_interp_1D,
                      chi=chi)
     
-    ci.set_nuisance_shear_calib(M = [LSST_M1, LSST_M2, LSST_M3, LSST_M4, LSST_M5])
+    ci.set_nuisance_shear_calib(M=[M1, M2, M3, M4, M5])
     
-    ci.set_nuisance_shear_photoz(bias = [LSST_DZ_S1, LSST_DZ_S2, LSST_DZ_S3, LSST_DZ_S4, LSST_DZ_S5])
+    ci.set_nuisance_shear_photoz(bias=[DZ_S1, DZ_S2, DZ_S3, DZ_S4, DZ_S5])
     
-    ci.set_nuisance_ia(A1 = [LSST_A1_1, LSST_A1_2, 0, 0, 0], 
+    ci.set_nuisance_ia(A1 = [A1_1, A1_2, 0, 0, 0], 
                        A2 = [0, 0, 0, 0, 0], 
                        B_TA = [0, 0, 0, 0, 0])
 
@@ -175,25 +175,25 @@ def chi2(omegam=0.3, As_1e9=2.1, ns=0.96605, H0=67,
     return ci.compute_chi2(datavector)
 
 def foo_ns(params, *args):
-        omegam = params[0]
-        H0     = params[1]
-        omegab = params[2]
-        As_1e9 = params[3]
-        LSST_A1_1 = params[4] 
-        LSST_A1_2 = params[5]
-        ns, AccuracyBoost, non_linear_emul = args
-        return chi2(omegam=omegam, 
-                    H0=H0, 
-                    omegab=omegab,
-                    As_1e9=As_1e9,
-                    ns=ns,
-                    LSST_A1_1=LSST_A1_1,
-                    LSST_A1_2=LSST_A1_2,
-                    AccuracyBoost=AccuracyBoost,
-                    non_linear_emul=non_linear_emul)
+    omegam = params[0]
+    H0     = params[1]
+    omegab = params[2]
+    As_1e9 = params[3]
+    A1_1 = params[4] 
+    A1_2 = params[5]
+    ns, AccuracyBoost, non_linear_emul = args
+    return chi2(omegam=omegam, 
+                H0=H0, 
+                omegab=omegab,
+                As_1e9=As_1e9,
+                ns=ns,
+                A1_1=A1_1,
+                A1_2=A1_2,
+                AccuracyBoost=AccuracyBoost,
+                non_linear_emul=non_linear_emul)
 
 def min_chi2(ns, func, x0, bounds, min_method, AccuracyBoost=1.0, 
-             tol=0.01, maxfev=300000, non_linear_emul=2):
+             tol=0.01, maxfev=300000, non_linear_emul=2, maxiter=10):
 
     args = (ns, AccuracyBoost, non_linear_emul)
     
@@ -202,7 +202,7 @@ def min_chi2(ns, func, x0, bounds, min_method, AccuracyBoost=1.0,
                                           x0, 
                                           T=0.45, 
                                           target_accept_rate=0.3, 
-                                          niter=10, 
+                                          niter=maxiter, 
                                           stepsize=0.1,
                                           minimizer_kwargs={"method": 'Nelder-Mead', 
                                                             "args": args, 
@@ -218,7 +218,7 @@ def min_chi2(ns, func, x0, bounds, min_method, AccuracyBoost=1.0,
                                             bounds=bounds, 
                                             maxfun=maxfev,
                                             no_local_search=True, 
-                                            maxiter=10, 
+                                            maxiter=maxiter, 
                                             visit=1.01, 
                                             accept=1, 
                                             initial_temp=5230.0, 
@@ -240,6 +240,7 @@ if __name__ == '__main__':
     tol=0.01
     maxfev=400000
 
+    maxiter=10
     min_method = 1
 
     CLprobe="xi"
@@ -290,7 +291,8 @@ if __name__ == '__main__':
                                                           maxfev=maxfev,
                                                           non_linear_emul=non_linear_emul,
                                                           min_method=min_method, 
-                                                          tol=tol), 
+                                                          tol=tol,
+                                                          maxiter=maxiter), 
                                         ns)))
     executor.shutdown()
 
