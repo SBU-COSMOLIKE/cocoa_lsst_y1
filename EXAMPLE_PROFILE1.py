@@ -15,6 +15,7 @@ import iminuit
 from mpi4py.futures import MPIPoolExecutor
 import camb
 import cosmolike_lsst_y1_interface as ci
+import copy
 
 CLprobe="xi"
 path= os.environ['ROOTDIR'] + "/external_modules/data/lsst_y1"
@@ -65,8 +66,11 @@ def get_camb_cosmology(omegam, omegab, H0, ns, As_1e9 , w, w0pwa, mnu,
     omegamh2 = lambda omegam, H0: omegam*(H0/100)**2
 
     CAMBAccuracyBoost = CAMBAccuracyBoost*AccuracyBoost
+    
     kmax = max(kmax/2.0, kmax*(1.0 + 3*(AccuracyBoost-1)))
+    
     k_per_logint = max(k_per_logint/2.0, int(k_per_logint) + int(3*(AccuracyBoost-1)))
+    
     extrap_kmax = max(max(2.5e2, 3*kmax), max(2.5e2, 3*kmax) * AccuracyBoost)
 
     z_interp_1D = np.concatenate( (np.concatenate((np.linspace(0,2.0,1000),
@@ -97,13 +101,14 @@ def get_camb_cosmology(omegam, omegab, H0, ns, As_1e9 , w, w0pwa, mnu,
                            nnu=3.046,
                            accurate_massive_neutrino_transfers=False,
                            k_per_logint=k_per_logint,
-                           kmax = kmax);
+                           kmax=kmax);
     
     pars.set_dark_energy(w=w, wa=wa(w0pwa, w), dark_energy_model='ppf');    
     
     pars.NonLinear = camb.model.NonLinear_both
     
     pars.set_matter_power(redshifts = z_interp_2D, kmax = kmax, silent = True);
+    
     results = camb.get_results(pars)
     
     PKL  = results.get_matter_power_interpolator(var1="delta_tot", 
@@ -137,9 +142,12 @@ def get_camb_cosmology(omegam, omegab, H0, ns, As_1e9 , w, w0pwa, mnu,
                    'w'    : w, 
                    'wa'   : wa(w0pwa, w)
                  }
-        kbt, bt = euclidemu2.get_boost( params, 
-                                        z_interp_2D, 
-                                        np.power(10.0, np.linspace(-2.0589, 0.973, len(log10k_interp_2D)))
+        kbt, bt = euclidemu2.get_boost(params, 
+                                       z_interp_2D, 
+                                       np.power(10.0, 
+                                                np.linspace(-2.0589, 
+                                                            0.973, 
+                                                            len(log10k_interp_2D)))
                                       )
         log10k_interp_2D = log10k_interp_2D - np.log10(H0/100.)
         
@@ -165,15 +173,32 @@ def get_camb_cosmology(omegam, omegab, H0, ns, As_1e9 , w, w0pwa, mnu,
 
     return (log10k_interp_2D, z_interp_2D, lnPL, lnPNL, G_growth, z_interp_1D, chi)
 
-def chi2(omegam=0.3, As_1e9=2.1, ns=0.96605, H0=67, 
-         w0pwa=-0.9, mnu=0.06, w=-0.9, omegab=0.04, 
-         DZ_S1=0.0414632, DZ_S2=0.00147332,
-         DZ_S3=0.0237035, DZ_S4=-0.0773436,
-         DZ_S5=-8.67127e-05, M1=0.0191832,
-         M2=-0.0431752, M3=-0.034961,
-         M4=-0.0158096, M5 = -0.0158096,
-         A1_1=0.606102, A1_2=-1.51541,
-         AccuracyBoost=1.0, non_linear_emul=2):
+def chi2(params, AccuracyBoost=1.0, non_linear_emul=2):
+
+    omegam = params[0]
+    H0     = params[1]
+    omegab = params[2]
+    As_1e9 = params[3]
+    ns     = params[4]
+    
+    A1_1   = params[5] 
+    A1_2   = params[6]
+    
+    DZ_S1  = params[7]
+    DZ_S2  = params[8]
+    DZ_S3  = params[9]
+    DZ_S4  = params[10]
+    DZ_S5  = params[11]
+
+    M1     = params[12]
+    M2     = params[13]
+    M3     = params[14]
+    M4     = params[15]
+    M5     = params[16]
+
+    w      = -0.9 
+    w0pwa  = -0.9
+    mnu    =  0.06
 
     (log10k_interp_2D, z_interp_2D, lnPL, lnPNL, 
         G_growth, z_interp_1D, chi) = get_camb_cosmology(omegam=omegam, 
@@ -205,44 +230,41 @@ def chi2(omegam=0.3, As_1e9=2.1, ns=0.96605, H0=67,
     
     ci.set_nuisance_shear_photoz(bias=[DZ_S1, DZ_S2, DZ_S3, DZ_S4, DZ_S5])
     
-    ci.set_nuisance_ia(A1 = [A1_1, A1_2, 0, 0, 0], 
-                       A2 = [0, 0, 0, 0, 0], 
+    ci.set_nuisance_ia(A1   = [A1_1, A1_2, 0, 0, 0], 
+                       A2   = [0, 0, 0, 0, 0], 
                        B_TA = [0, 0, 0, 0, 0])
 
     datavector = np.array(ci.compute_data_vector_masked())
     
     return ci.compute_chi2(datavector)
 
-def foo_ns(params, *args):
-    omegam = params[0]
-    H0     = params[1]
-    omegab = params[2]
-    As_1e9 = params[3]
-    A1_1 = params[4] 
-    A1_2 = params[5]
-    ns, AccuracyBoost, non_linear_emul = args
-    return chi2(omegam=omegam, 
-                H0=H0, 
-                omegab=omegab,
-                As_1e9=As_1e9,
-                ns=ns,
-                A1_1=A1_1,
-                A1_2=A1_2,
-                AccuracyBoost=AccuracyBoost,
-                non_linear_emul=non_linear_emul)
-
-def min_chi2(ns, func, x0, bounds, min_method, AccuracyBoost=1.0, 
+def min_chi2(x0, bounds, min_method, fixed=-1, AccuracyBoost=1.0, 
              tol=0.01, maxfev=300000, non_linear_emul=2, maxiter=10):
 
-    args = (ns, AccuracyBoost, non_linear_emul)
+    def mychi2(params, *args):  
+        z, fixed = args
+        params = np.array(params)
+        if fixed > -1:
+            params = np.insert(params, fixed, z)
+        return chi2(params=params, 
+                    AccuracyBoost=AccuracyBoost, 
+                    non_linear_emul=non_linear_emul)
     
+    if fixed > -1:
+        z      = x0[fixed]
+        x0     = np.delete(x0, (fixed))
+        bounds = np.delete(bounds, (fixed), axis=0)
+        args = (z, fixed)
+    else:
+        args = (0.0, -2)
+
     if min_method == 1:
-        tmp = scipy.optimize.basinhopping(func, 
-                                          x0, 
+        tmp = scipy.optimize.basinhopping(func=mychi2, 
+                                          x0=x0, 
                                           T=0.45, 
                                           target_accept_rate=0.3, 
                                           niter=maxiter, 
-                                          stepsize=0.1,
+                                          stepsize=0.02,
                                           minimizer_kwargs={"method": 'Nelder-Mead', 
                                                             "args": args, 
                                                             "bounds": bounds, 
@@ -251,7 +273,7 @@ def min_chi2(ns, func, x0, bounds, min_method, AccuracyBoost=1.0,
                                                                         'maxfev' : maxfev}})
     elif min_method == 2:
         # https://stats.stackexchange.com/a/456073
-        tmp = scipy.optimize.dual_annealing(func=func, 
+        tmp = scipy.optimize.dual_annealing(func=mychi2, 
                                             x0=x0, 
                                             args=args, 
                                             bounds=bounds, 
@@ -264,37 +286,84 @@ def min_chi2(ns, func, x0, bounds, min_method, AccuracyBoost=1.0,
                                             restart_temp_ratio=0.0002)    
     return tmp.fun
 
-# TO RUN THIS SCRIPT
-# mpirun -n 6 --oversubscribe --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by core --map-by numa:pe=${OMP_NUM_THREADS} python -m mpi4py.futures EXAMPLE_PROFILE1.py
-
 if __name__ == '__main__':
-    # profile likelihood on ns
-    ns = np.arange(0.90, 1.02, 0.01)
-    x0 = [0.35, 70, 0.04, 2.12, 0.7, -1.5] 
-    bounds = [[0.2,0.4], [50, 90], 
-              [0.03, 0.07], [2.00, 2.35],
-              [-5, 5], [-5, 5]]
+    
+    x =  np.array([
+                    0.30,         # omegam
+                    67.0,         # H0
+                    0.04,         # omegab
+                    2.1,         # As
+                    0.96,         # ns
+                    0.7,          # A1
+                    -1.5,         # A2
+                    0.04,         # S1
+                    0.0016,       # S2
+                    0.03,         # S3
+                    -0.08,        # S4
+                    -8.67127e-05, # S5
+                    0.001,        # M1
+                    0.002,        # M2
+                    0.003,        # M3
+                    0.004,        # M4
+                    0.001         # M5
+                   ])
+    
+    bounds = np.array([
+                        [0.2,0.4],     # omegam
+                        [50.0, 90.0],  # H0
+                        [0.027, 0.07], # omegab
+                        [1.9, 2.5],    # As
+                        [0.89, 1.05],  # ns
+                        [-5.0, 5.0],   # A1
+                        [-5.0, 5.0],   # A2
+                        [-0.12, 0.12], # S1
+                        [-0.12, 0.12], # S2
+                        [-0.12, 0.12], # S3
+                        [-0.12, 0.12], # S4
+                        [-0.12, 0.12], # S5
+                        [-0.12, 0.12], # M1
+                        [-0.12, 0.12], # M2
+                        [-0.12, 0.12], # M3
+                        [-0.12, 0.12], # M4
+                        [-0.12, 0.12]  # M5
+                      ])
+
     non_linear_emul=2
+
     AccuracyBoost=1.1
+    
     tol=0.01
-    maxfev=400000
+    
+    maxfev=1000000
 
     maxiter=10
+    
     min_method = 1
-
+    
     executor = MPIPoolExecutor()
-    result = np.array(list(executor.map(functools.partial(min_chi2, 
-                                                          func=foo_ns,
-                                                          x0=x0, 
-                                                          bounds=bounds,
-                                                          AccuracyBoost=AccuracyBoost,
-                                                          maxfev=maxfev,
-                                                          non_linear_emul=non_linear_emul,
-                                                          min_method=min_method, 
-                                                          tol=tol,
-                                                          maxiter=maxiter), 
-                                        ns,
-                                        chunksize=1)))
-    executor.shutdown()
 
-    np.savetxt("file1.txt", result)
+    # --------------------------------------------------------------------
+    # profile likelihood on ns
+    profile = 4 # which parameter to profile
+    def profile_ns(ns):
+        x0 = copy.deepcopy(x)
+        x0[profile] = ns
+        return min_chi2(x0=x0, 
+                        bounds=bounds, 
+                        min_method=min_method, 
+                        fixed=profile, 
+                        AccuracyBoost=AccuracyBoost, 
+                        tol=tol, 
+                        maxfev=maxfev, 
+                        non_linear_emul=non_linear_emul, 
+                        maxiter=maxiter)
+
+    res = np.array(list(executor.map(profile_ns, np.arange(0.90, 1.02, 0.01))))
+    np.savetxt("file_ns_min.txt", res)
+    # --------------------------------------------------------------------
+    
+    #executor.shutdown()
+
+# TO RUN THIS SCRIPT
+# mpirun -n 13 --oversubscribe --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by core 
+# --map-by numa:pe=${OMP_NUM_THREADS} python -m mpi4py.futures EXAMPLE_PROFILE1.py
