@@ -179,12 +179,16 @@ def foo_ns(params, *args):
         H0     = params[1]
         omegab = params[2]
         As_1e9 = params[3]
+        LSST_A1_1 = params[4] 
+        LSST_A1_2 = params[5]
         ns, AccuracyBoost, non_linear_emul = args
         return chi2(omegam=omegam, 
                     H0=H0, 
                     omegab=omegab,
                     As_1e9=As_1e9,
                     ns=ns,
+                    LSST_A1_1=LSST_A1_1,
+                    LSST_A1_2=LSST_A1_2,
                     AccuracyBoost=AccuracyBoost,
                     non_linear_emul=non_linear_emul)
 
@@ -207,32 +211,6 @@ def min_chi2(ns, func, x0, bounds, min_method, AccuracyBoost=1.0,
                                                                         'fatol' : tol, 
                                                                         'maxfev' : maxfev}})
     elif min_method == 2:
-        tmp = iminuit.minimize(func, 
-                               x0, 
-                               args=args, 
-                               bounds=bounds, 
-                               method="migrad", 
-                               tol=tol,
-                               options = {'stra' : 1, 'maxfun': maxfev})
-    elif min_method == 3:
-        tmp = scipy.optimize.minimize(func, 
-                                      x0, 
-                                      args=args, 
-                                      method='Nelder-Mead', 
-                                      bounds=bounds, 
-                                      options = {'adaptive' : True, 
-                                                 'fatol' : tol, 
-                                                 'maxfev' : maxfev})
-    elif min_method == 4:
-        tmp = scipy.optimize.minimize(func, 
-                                      x0, 
-                                      args=args, 
-                                      method='Powell', 
-                                      bounds = bounds, 
-                                      options = {'xtol' : tol/2, 
-                                                 'ftol' : tol, 
-                                                 'maxfev' : maxfev})
-    elif min_method == 5:
         # https://stats.stackexchange.com/a/456073
         tmp = scipy.optimize.dual_annealing(func=func, 
                                             x0=x0, 
@@ -253,17 +231,19 @@ def min_chi2(ns, func, x0, bounds, min_method, AccuracyBoost=1.0,
 if __name__ == '__main__':
     # profile likelihood on ns
     ns = np.arange(0.90, 1.02, 0.01)
-    x0 = [0.35, 70, 0.04, 2.12] 
-    bounds = [[0.2,0.4], [50, 90], [0.03, 0.07], [2.00, 2.35]]
+    x0 = [0.35, 70, 0.04, 2.12, 0.7, -1.5] 
+    bounds = [[0.2,0.4], [50, 90], 
+              [0.03, 0.07], [2.00, 2.35],
+              [-5, 5], [-5, 5]]
     non_linear_emul=2
     AccuracyBoost=1.0
     tol=0.01
-    maxfev=200000
+    maxfev=400000
 
-    min_method = 4
+    min_method = 1
 
     CLprobe="xi"
-    path= os.environ['ROOTDIR'] + "external_modules/data/lsst_y1"
+    path= os.environ['ROOTDIR'] + "/external_modules/data/lsst_y1"
     data_file="LSST_Y1_M1_GGL0.05.dataset"
 
     IA_model = 0
@@ -288,37 +268,31 @@ if __name__ == '__main__':
 
     ci.initial_setup()
 
-    ci.init_cosmo_runmode(is_linear = False)
+    ci.init_cosmo_runmode(is_linear=False)
 
-    ci.init_source_sample( filename = source_file, 
-                           ntomo_bins = int(source_ntomo))
+    ci.init_source_sample(filename=source_file, ntomo_bins=int(source_ntomo))
 
-    ci.init_lens_sample( filename=lens_file, 
-                         ntomo_bins=int(lens_ntomo))
+    ci.init_lens_sample(filename=lens_file, ntomo_bins=int(lens_ntomo))
 
-    ci.init_IA( ia_model = int(IA_model), 
-                ia_redshift_evolution = int(IA_redshift_evolution))
+    ci.init_IA(ia_model=int(IA_model), ia_redshift_evolution=int(IA_redshift_evolution))
 
     # Init Cosmolike
-    ci.init_probes(possible_probes = CLprobe)
+    ci.init_probes(possible_probes=CLprobe)
     ci.init_binning(int(ntheta), theta_min_arcmin, theta_max_arcmin)
     ci.init_data_real(cov_file, mask_file, data_vector_file)
-
-    print("OK")
-
-    #print(foo_ns([0.3, 67.32, 0.04, 2.1], 0.96605, AccuracyBoost, non_linear_emul))
-    #executor = MPIPoolExecutor()
-    #result = np.array(list(executor.map(functools.partial(min_chi2, 
-    #                                                      func=foo_ns,
-    #                                                      x0=x0, 
-    #                                                      bounds=bounds,
-    #                                                      AccuracyBoost=AccuracyBoost,
-    #                                                      maxfev=maxfev,
-    #                                                      non_linear_emul=non_linear_emul,
-    #                                                      min_method=min_method, 
-    #                                                      tol=tol), 
-    #                                    ns)))
-    #executor.shutdown()
+    
+    executor = MPIPoolExecutor()
+    result = np.array(list(executor.map(functools.partial(min_chi2, 
+                                                          func=foo_ns,
+                                                          x0=x0, 
+                                                          bounds=bounds,
+                                                          AccuracyBoost=AccuracyBoost,
+                                                          maxfev=maxfev,
+                                                          non_linear_emul=non_linear_emul,
+                                                          min_method=min_method, 
+                                                          tol=tol), 
+                                        ns)))
+    executor.shutdown()
 
 
-    #np.savetxt("file1.txt", result)
+    np.savetxt("file1.txt", result)
