@@ -337,6 +337,7 @@ maxfev=1000000
 maxiter=10
 min_method = 1
 
+# for each param need to a small function like this
 def profile_ns(ns):
   profile = 4 # which parameter to profile
   x0 = copy.deepcopy(x)
