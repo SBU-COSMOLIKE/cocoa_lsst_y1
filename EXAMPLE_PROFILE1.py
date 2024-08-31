@@ -286,83 +286,86 @@ def min_chi2(x0, bounds, min_method, fixed=-1, AccuracyBoost=1.0,
                                             restart_temp_ratio=0.0002)    
     return tmp.fun
 
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+
+x =  np.array([
+                0.30,         # omegam
+                67.0,         # H0
+                0.04,         # omegab
+                2.1,         # As
+                0.96,         # ns
+                0.7,          # A1
+                -1.5,         # A2
+                0.04,         # S1
+                0.0016,       # S2
+                0.03,         # S3
+                -0.08,        # S4
+                -8.67127e-05, # S5
+                0.001,        # M1
+                0.002,        # M2
+                0.003,        # M3
+                0.004,        # M4
+                0.001         # M5
+               ])
+
+bounds = np.array([
+                    [0.2,0.4],     # omegam
+                    [50.0, 90.0],  # H0
+                    [0.027, 0.07], # omegab
+                    [1.9, 2.5],    # As
+                    [0.89, 1.05],  # ns
+                    [-5.0, 5.0],   # A1
+                    [-5.0, 5.0],   # A2
+                    [-0.12, 0.12], # S1
+                    [-0.12, 0.12], # S2
+                    [-0.12, 0.12], # S3
+                    [-0.12, 0.12], # S4
+                    [-0.12, 0.12], # S5
+                    [-0.12, 0.12], # M1
+                    [-0.12, 0.12], # M2
+                    [-0.12, 0.12], # M3
+                    [-0.12, 0.12], # M4
+                    [-0.12, 0.12]  # M5
+                  ])
+
+non_linear_emul=2
+AccuracyBoost=1.1
+tol=0.01
+maxfev=1000000
+maxiter=10
+min_method = 1
+
+def profile_ns(ns):
+  profile = 4 # which parameter to profile
+  x0 = copy.deepcopy(x)
+  x0[profile] = ns
+  return min_chi2(x0=x0, 
+                  bounds=bounds, 
+                  min_method=min_method, 
+                  fixed=profile, 
+                  AccuracyBoost=AccuracyBoost, 
+                  tol=tol, 
+                  maxfev=maxfev, 
+                  non_linear_emul=non_linear_emul, 
+                  maxiter=maxiter)
+
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+
 if __name__ == '__main__':
-    
-    x =  np.array([
-                    0.30,         # omegam
-                    67.0,         # H0
-                    0.04,         # omegab
-                    2.1,         # As
-                    0.96,         # ns
-                    0.7,          # A1
-                    -1.5,         # A2
-                    0.04,         # S1
-                    0.0016,       # S2
-                    0.03,         # S3
-                    -0.08,        # S4
-                    -8.67127e-05, # S5
-                    0.001,        # M1
-                    0.002,        # M2
-                    0.003,        # M3
-                    0.004,        # M4
-                    0.001         # M5
-                   ])
-    
-    bounds = np.array([
-                        [0.2,0.4],     # omegam
-                        [50.0, 90.0],  # H0
-                        [0.027, 0.07], # omegab
-                        [1.9, 2.5],    # As
-                        [0.89, 1.05],  # ns
-                        [-5.0, 5.0],   # A1
-                        [-5.0, 5.0],   # A2
-                        [-0.12, 0.12], # S1
-                        [-0.12, 0.12], # S2
-                        [-0.12, 0.12], # S3
-                        [-0.12, 0.12], # S4
-                        [-0.12, 0.12], # S5
-                        [-0.12, 0.12], # M1
-                        [-0.12, 0.12], # M2
-                        [-0.12, 0.12], # M3
-                        [-0.12, 0.12], # M4
-                        [-0.12, 0.12]  # M5
-                      ])
-
-    non_linear_emul=2
-
-    AccuracyBoost=1.1
-    
-    tol=0.01
-    
-    maxfev=1000000
-
-    maxiter=10
-    
-    min_method = 1
     
     executor = MPIPoolExecutor()
 
     # --------------------------------------------------------------------
     # profile likelihood on ns
-    profile = 4 # which parameter to profile
-    def profile_ns(ns):
-        x0 = copy.deepcopy(x)
-        x0[profile] = ns
-        return min_chi2(x0=x0, 
-                        bounds=bounds, 
-                        min_method=min_method, 
-                        fixed=profile, 
-                        AccuracyBoost=AccuracyBoost, 
-                        tol=tol, 
-                        maxfev=maxfev, 
-                        non_linear_emul=non_linear_emul, 
-                        maxiter=maxiter)
-
     res = np.array(list(executor.map(profile_ns, np.arange(0.90, 1.02, 0.01))))
     np.savetxt("file_ns_min.txt", res)
     # --------------------------------------------------------------------
     
-    #executor.shutdown()
+    executor.shutdown()
 
 # TO RUN THIS SCRIPT
 # mpirun -n 13 --oversubscribe --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by core 
