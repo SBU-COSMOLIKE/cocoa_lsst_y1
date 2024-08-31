@@ -236,7 +236,7 @@ if __name__ == '__main__':
               [0.03, 0.07], [2.00, 2.35],
               [-5, 5], [-5, 5]]
     non_linear_emul=2
-    AccuracyBoost=1.0
+    AccuracyBoost=1.1
     tol=0.01
     maxfev=400000
 
