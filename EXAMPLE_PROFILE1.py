@@ -16,6 +16,45 @@ from mpi4py.futures import MPIPoolExecutor
 import camb
 import cosmolike_lsst_y1_interface as ci
 
+CLprobe="xi"
+path= os.environ['ROOTDIR'] + "/external_modules/data/lsst_y1"
+data_file="LSST_Y1_M1_GGL0.05.dataset"
+
+IA_model = 0
+IA_redshift_evolution = 3
+
+# Init Cosmolike & Read LSST-Y1 data file
+ini = IniFile(os.path.normpath(os.path.join(path, data_file)))
+data_vector_file = ini.relativeFileName('data_file')
+cov_file = ini.relativeFileName('cov_file')
+mask_file = ini.relativeFileName('mask_file')
+ntheta = ini.int("n_theta")
+theta_min_arcmin = ini.float("theta_min_arcmin")
+theta_max_arcmin = ini.float("theta_max_arcmin")
+
+lens_file = ini.relativeFileName('nz_lens_file')
+
+source_file = ini.relativeFileName('nz_source_file')
+
+lens_ntomo = ini.int("lens_ntomo")
+
+source_ntomo = ini.int("source_ntomo")
+
+ci.initial_setup()
+
+ci.init_cosmo_runmode(is_linear=False)
+
+ci.init_source_sample(filename=source_file, ntomo_bins=int(source_ntomo))
+
+ci.init_lens_sample(filename=lens_file, ntomo_bins=int(lens_ntomo))
+
+ci.init_IA(ia_model=int(IA_model), ia_redshift_evolution=int(IA_redshift_evolution))
+
+# Init Cosmolike
+ci.init_probes(possible_probes=CLprobe)
+ci.init_binning(int(ntheta), theta_min_arcmin, theta_max_arcmin)
+ci.init_data_real(cov_file, mask_file, data_vector_file)
+
 def get_camb_cosmology(omegam, omegab, H0, ns, As_1e9 , w, w0pwa, mnu,
                        AccuracyBoost=1.0, kmax=10, k_per_logint=20, 
                        CAMBAccuracyBoost=1.1, non_linear_emul=2):
@@ -226,7 +265,7 @@ def min_chi2(ns, func, x0, bounds, min_method, AccuracyBoost=1.0,
     return tmp.fun
 
 # TO RUN THIS SCRIPT
-# mpirun -n 12 --oversubscribe --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by core --map-by numa:pe=${OMP_NUM_THREADS} python -m mpi4py.futures EXAMPLE_PROFILE1.py
+# mpirun -n 6 --oversubscribe --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by core --map-by numa:pe=${OMP_NUM_THREADS} python -m mpi4py.futures EXAMPLE_PROFILE1.py
 
 if __name__ == '__main__':
     # profile likelihood on ns
@@ -243,45 +282,6 @@ if __name__ == '__main__':
     maxiter=10
     min_method = 1
 
-    CLprobe="xi"
-    path= os.environ['ROOTDIR'] + "/external_modules/data/lsst_y1"
-    data_file="LSST_Y1_M1_GGL0.05.dataset"
-
-    IA_model = 0
-    IA_redshift_evolution = 3
-
-    # Init Cosmolike & Read LSST-Y1 data file
-    ini = IniFile(os.path.normpath(os.path.join(path, data_file)))
-    data_vector_file = ini.relativeFileName('data_file')
-    cov_file = ini.relativeFileName('cov_file')
-    mask_file = ini.relativeFileName('mask_file')
-    ntheta = ini.int("n_theta")
-    theta_min_arcmin = ini.float("theta_min_arcmin")
-    theta_max_arcmin = ini.float("theta_max_arcmin")
-
-    lens_file = ini.relativeFileName('nz_lens_file')
-
-    source_file = ini.relativeFileName('nz_source_file')
-
-    lens_ntomo = ini.int("lens_ntomo")
-
-    source_ntomo = ini.int("source_ntomo")
-
-    ci.initial_setup()
-
-    ci.init_cosmo_runmode(is_linear=False)
-
-    ci.init_source_sample(filename=source_file, ntomo_bins=int(source_ntomo))
-
-    ci.init_lens_sample(filename=lens_file, ntomo_bins=int(lens_ntomo))
-
-    ci.init_IA(ia_model=int(IA_model), ia_redshift_evolution=int(IA_redshift_evolution))
-
-    # Init Cosmolike
-    ci.init_probes(possible_probes=CLprobe)
-    ci.init_binning(int(ntheta), theta_min_arcmin, theta_max_arcmin)
-    ci.init_data_real(cov_file, mask_file, data_vector_file)
-    
     executor = MPIPoolExecutor()
     result = np.array(list(executor.map(functools.partial(min_chi2, 
                                                           func=foo_ns,
@@ -293,8 +293,8 @@ if __name__ == '__main__':
                                                           min_method=min_method, 
                                                           tol=tol,
                                                           maxiter=maxiter), 
-                                        ns)))
+                                        ns,
+                                        chunksize=1)))
     executor.shutdown()
-
 
     np.savetxt("file1.txt", result)
