@@ -16,6 +16,8 @@ from mpi4py.futures import MPIPoolExecutor
 import camb
 import cosmolike_lsst_y1_interface as ci
 import copy
+import argparse
+import random
 
 CLprobe="xi"
 path= os.environ['ROOTDIR'] + "/external_modules/data/lsst_y1"
@@ -290,25 +292,24 @@ def min_chi2(x0, bounds, min_method, fixed=-1, AccuracyBoost=1.0,
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 
-x =  np.array([
-                0.30,         # omegam
-                67.0,         # H0
-                0.04,         # omegab
-                2.1,         # As
-                0.96,         # ns
-                0.7,          # A1
-                -1.5,         # A2
-                0.04,         # S1
-                0.0016,       # S2
-                0.03,         # S3
-                -0.08,        # S4
-                -8.67127e-05, # S5
-                0.001,        # M1
-                0.002,        # M2
-                0.003,        # M3
-                0.004,        # M4
-                0.001         # M5
-               ])
+x = np.array([ 0.30,         # omegam
+               67.0,         # H0
+               0.04,         # omegab
+               2.1,          # As
+               0.96,         # ns
+               0.7,          # A11
+              -1.5,          # A12
+               0.04,         # S1
+               0.0016,       # S2
+               0.03,         # S3
+              -0.08,         # S4
+              -8.67127e-05,  # S5
+               0.001,        # M1
+               0.002,        # M2
+               0.003,        # M3
+               0.004,        # M4
+               0.001         # M5
+              ])
 
 bounds = np.array([
                     [0.2,0.4],     # omegam
@@ -316,8 +317,8 @@ bounds = np.array([
                     [0.027, 0.07], # omegab
                     [1.9, 2.5],    # As
                     [0.89, 1.05],  # ns
-                    [-5.0, 5.0],   # A1
-                    [-5.0, 5.0],   # A2
+                    [-5.0, 5.0],   # A11
+                    [-5.0, 5.0],   # A12
                     [-0.12, 0.12], # S1
                     [-0.12, 0.12], # S2
                     [-0.12, 0.12], # S3
@@ -330,25 +331,132 @@ bounds = np.array([
                     [-0.12, 0.12]  # M5
                   ])
 
-non_linear_emul=2
-AccuracyBoost=1.1
-tol=0.01
-maxfev=1000000
-maxiter=10
-min_method = 1
+start = np.array([ 0.20,         # omegam
+                   60.0,         # H0
+                   0.028,        # omegab
+                   1.90,         # As
+                   0.90,         # ns
+                  -3.00,         # A11
+                  -3.00,         # A12
+                  -0.20,         # S1
+                  -0.20,         # S2
+                  -0.20,         # S3
+                  -0.20,         # S4
+                  -0.20,         # S5
+                  -0.20,         # M1
+                  -0.20,         # M2
+                  -0.20,         # M3
+                  -0.20,         # M4
+                  -0.20          # M5
+                ])
 
-# for each param need to a small function like this
-def profile_ns(ns):
-  profile = 4 # which parameter to profile
+stop  = np.array([ 0.40,         # omegam
+                   80.0,         # H0
+                   0.05,        # omegab
+                   2.50,         # As
+                   1.04,         # ns
+                   3.00,         # A11
+                   3.00,         # A12
+                   0.20,         # S1
+                   0.20,         # S2
+                   0.20,         # S3
+                   0.20,         # S4
+                   0.20,         # S5
+                   0.20,         # M1
+                   0.20,         # M2
+                   0.20,         # M3
+                   0.20,         # M4
+                   0.20          # M5
+                 ])
+
+name  = [ "_omm.txt",      # omegam
+          "_h0.txt",       # H0
+          "_omegab.txt",   # omegab
+          "_As.txt",       # As
+          "_ns.txt",       # ns
+          "_A11.txt",      # A11
+          "_A12.txt",      # A12
+          "_S1.txt",       # S1
+          "_S2.txt",       # S2
+          "_S3.txt",       # S3
+          "_S4.txt",       # S4
+          "_S5.txt",       # S5
+          "_M1.txt",       # M1
+          "_M2.txt",       # M2
+          "_M3.txt",       # M3
+          "_M4.txt",       # M4
+          "_M5.txt"        # M5
+        ]
+
+"_ns_min.txt"
+# ---------------------------------------------------------------------
+# INPUT
+parser = argparse.ArgumentParser()
+
+parser.add_argument("AccuracyBoost",
+                    help="Accuracy Boost of CAMB/Cosmolike calculation",
+                    type=float,
+                    nargs='?',
+                    default=1.1)
+
+parser.add_argument("tolerance",
+                    help="Minimizer Tolerance",
+                    type=float,
+                    nargs=1,
+                    default=0.01)
+
+parser.add_argument("maxfeval",
+                    help="Minimizer: maximum number of likelihood evaluations",
+                    type=int,
+                    nargs=1,
+                    default=50000)
+
+parser.add_argument("maxiter",
+                    help="Minimizer: maximum number of minimizer iterations",
+                    type=int,
+                    nargs=1,
+                    default=5)
+
+parser.add_argument("minmethod",
+                    help="Minimizer: minimizer method",
+                    type=int,
+                    nargs=1,
+                    default=1)
+
+parser.add_argument("outroot",
+                    help="Name of the Output File",
+                    type=int,
+                    nargs='?',
+                    const=1)
+
+parser.add_argument("profile",
+                    help="Which Parameter to Profile",
+                    type=int,
+                    nargs=1)
+
+# ---------------------------------------------------------------------
+
+args = parser.parse_args()
+
+non_linear_emul = 2
+AccuracyBoost   = args.AccuracyBoost
+tol             = args.tolerance
+maxfeval        = args.maxfeval
+maxiter         = args.maxiter
+min_method      = args.minmethod
+outroot         = args.outroot
+index           = args.profile
+
+def profile(val, index):
   x0 = copy.deepcopy(x)
-  x0[profile] = ns
+  x0[index] = val
   return min_chi2(x0=x0, 
                   bounds=bounds, 
                   min_method=min_method, 
-                  fixed=profile, 
+                  fixed=index, 
                   AccuracyBoost=AccuracyBoost, 
                   tol=tol, 
-                  maxfev=maxfev, 
+                  maxfev=maxfeval, 
                   non_linear_emul=non_linear_emul, 
                   maxiter=maxiter)
 
@@ -360,14 +468,23 @@ if __name__ == '__main__':
     
     executor = MPIPoolExecutor()
 
-    # --------------------------------------------------------------------
-    # profile likelihood on ns
-    res = np.array(list(executor.map(profile_ns, np.arange(0.90, 1.02, 0.01))))
-    np.savetxt("file_ns_min.txt", res)
-    # --------------------------------------------------------------------
+    res = np.array(list(executor.map(functools.partial(profile, 
+                                                       index=index
+                                                      ), 
+                                     np.linspace(start = start[index], 
+                                                 stop  = stop[index],
+                                                 num   = 12
+                                                )
+                                    )
+                        )
+                  )
+    print("Profile = ", res)
+    print("Minimum = ", res)
+    out = outroot + random.randint(0, 100) + name[index]
+    print("Output file = ", out)
+    np.savetxt(out, res)
     
     executor.shutdown()
-
+    
 # TO RUN THIS SCRIPT
-# mpirun -n 13 --oversubscribe --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by core 
-# --map-by numa:pe=${OMP_NUM_THREADS} python -m mpi4py.futures EXAMPLE_PROFILE1.py
+# mpirun -n 13 --oversubscribe --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by core --map-by numa:pe=${OMP_NUM_THREADS} python -m mpi4py.futures EXAMPLE_PROFILE1.py --maxiter 5 --maxfeval 50000 --tolerance 0.02 --profile 4
