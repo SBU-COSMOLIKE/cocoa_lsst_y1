@@ -12,7 +12,6 @@ import scipy
 from getdist import IniFile
 import itertools
 import iminuit
-#from mpi4py.futures import MPIPoolExecutor
 import camb
 import cosmolike_lsst_y1_interface as ci
 import copy
@@ -407,7 +406,7 @@ name  = [ "omm",      # omegam
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
-parser = argparse.ArgumentParser()
+parser = argparse.ArgumentParser(prog='EXAMPLE_PROFILE1')
 
 parser.add_argument("--AB",
                     dest="AccuracyBoost",
@@ -469,22 +468,19 @@ parser.add_argument("--mpi",
                     nargs='?',
                     const=1)
 
-args = parser.parse_args()
+# need to use parse_known_args because of mpifuture 
+args, unknown = parser.parse_known_args()
 
 non_linear_emul = 2
 AccuracyBoost   = args.AccuracyBoost
 tol             = args.tolerance
-maxfeval        = int(args.maxfeval)
-maxiter         = int(args.maxiter)
-min_method      = int(args.minmethod)
+maxfeval        = args.maxfeval
+maxiter         = args.maxiter
+min_method      = args.minmethod
 outroot         = args.outroot
-index           = int(args.profile)
-nummpi          = int(args.mpi)
+index           = args.profile
+nummpi          = args.mpi
 
-print(maxiter)
-print(maxfeval)
-print(nummpi)
-print(index)
 
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
@@ -502,13 +498,13 @@ def prf(val, index):
                   maxfev=maxfeval, 
                   non_linear_emul=non_linear_emul, 
                   maxiter=maxiter)
-    print("param = ", val, " minimum = ", res)
     return res
 
 
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
+from mpi4py.futures import MPIPoolExecutor
 
 if __name__ == '__main__':
     
@@ -517,6 +513,8 @@ if __name__ == '__main__':
     param = np.linspace(start=start[index], stop=stop[index], num=nummpi)
 
     res = np.array(list(executor.map(functools.partial(prf,index=index),param)))
+
+    res = np.array(list(map(functools.partial(prf,index=index),param)))
 
     print("Profile = ", res)
     
@@ -528,4 +526,4 @@ if __name__ == '__main__':
     executor.shutdown()
     
 # TO RUN THIS SCRIPT
-# mpirun -n 13 --oversubscribe --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by core --map-by numa:pe=${OMP_NUM_THREADS} python -m mpi4py.futures EXAMPLE_PROFILE1.py --maxiter 3 --maxfeval 10000 --tolerance 0.02 --profile 4 --mpi 13 --outroot "monday"
+# mpirun -n 13 --oversubscribe --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by core --map-by numa:pe=${OMP_NUM_THREADS} python -m mpi4py.futures EXAMPLE_PROFILE1.py --AB 1.1 --tol 0.03 --maxiter 3 --maxfeval 10000 --profile 4 --mpi 12 --outroot "monday" --tol 0.02
