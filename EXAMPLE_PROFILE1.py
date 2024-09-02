@@ -301,6 +301,18 @@ def min_chi2(x0, bounds, min_method, fixed=-1, AccuracyBoost=1.0,
                                             accept=1, 
                                             initial_temp=5230.0, 
                                             restart_temp_ratio=0.0002)    
+    elif min_method == 3:
+        tmp = scipy.optimize.shgo(func=mychi2, 
+                                  args=args, 
+                                  bounds=bounds,
+                                  n=100,
+                                  iters=maxiter,
+                                  minimizer_kwargs={"method": 'Nelder-Mead', 
+                                                              "args": args, 
+                                                              "bounds": bounds, 
+                                                              "options": {'adaptive' : True, 
+                                                                          'fatol' : tol, 
+                                                                          'maxfev' : maxfev}})  
     return tmp.fun
 
 # ------------------------------------------------------------------------------
@@ -422,7 +434,7 @@ parser.add_argument("--tol",
                     type=float,
                     nargs='?',
                     const=1,
-                    default=0.01)
+                    default=0.02)
 
 parser.add_argument("--maxfeval",
                     dest="maxfeval",
@@ -518,7 +530,7 @@ if __name__ == '__main__':
 
     print("Profile = ", res)
     
-    out = outroot + "_" + str(random.randint(0,300)) + "_" + name[index] + ".txt"
+    out = outroot + "_" + str(random.randint(0,1000)) + "_" + name[index] + ".txt"
     print("Output file = ", out)
 
     np.savetxt(out, np.c_[param, res])
@@ -526,4 +538,12 @@ if __name__ == '__main__':
     executor.shutdown()
     
 # TO RUN THIS SCRIPT
-# mpirun -n 13 --oversubscribe --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by core --map-by numa:pe=${OMP_NUM_THREADS} python -m mpi4py.futures EXAMPLE_PROFILE1.py --AB 1.1 --tol 0.03 --maxiter 3 --maxfeval 10000 --profile 4 --mpi 12 --outroot "monday" --tol 0.02
+# method = 1
+# mpirun -n 13 --oversubscribe --mca btl vader,tcp,self --bind-to core:overload-allowed 
+# --rank-by core --map-by numa:pe=${OMP_NUM_THREADS} python -m mpi4py.futures EXAMPLE_PROFILE1.py 
+# --AB 1.1 --tol 0.02 --maxiter 5 --maxfeval 100000 --profile 4 --mpi 12 --outroot "monday" --minmethod 1
+
+# method = 2
+# mpirun -n 13 --oversubscribe --mca btl vader,tcp,self --bind-to core:overload-allowed 
+# --rank-by core --map-by numa:pe=${OMP_NUM_THREADS} python -m mpi4py.futures EXAMPLE_PROFILE1.py 
+# --AB 1.1 --tol 0.03 --maxiter 3 --maxfeval 10000 --profile 4 --mpi 12 --outroot "monday" --minmethod 3
