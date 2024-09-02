@@ -313,6 +313,38 @@ def min_chi2(x0, bounds, min_method, fixed=-1, AccuracyBoost=1.0,
                                                               "options": {'adaptive' : True, 
                                                                           'fatol' : tol, 
                                                                           'maxfev' : maxfev}})  
+    elif min_method == 4:
+        x = copy.deepcopy(x0)
+        for i in range(maxiter):
+            tmp = scipy.optimize.minimize(fun=mychi2, 
+                                          x0=x, 
+                                          args=args, 
+                                          method='Nelder-Mead', 
+                                          bounds=bounds, 
+                                          options = {'adaptive' : True, 
+                                                     'fatol' : tol, 
+                                                     'maxfev' : maxfev})
+            x = copy.deepcopy(tmp.x)
+
+            tmp = scipy.optimize.minimize(fun=mychi2, 
+                                          x0=x,
+                                          args=args, 
+                                          method='Powell', 
+                                          bounds = bounds, 
+                                          options = {'xtol' : tol, 
+                                                     'ftol' : tol, 
+                                                     'maxfev' : maxfev})
+            x = copy.deepcopy(tmp.x)
+
+            tmp = iminuit.minimize(fun=mychi2, 
+                                   x0=x, 
+                                   args=args, 
+                                   bounds=bounds, 
+                                   method="migrad", 
+                                   tol=tol,
+                                   options = {'stra' : 2, 'maxfun': maxfev})
+            x = copy.deepcopy(tmp.x)
+
     return tmp.fun
 
 # ------------------------------------------------------------------------------
@@ -493,7 +525,6 @@ outroot         = args.outroot
 index           = args.profile
 nummpi          = args.mpi
 
-
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
@@ -526,11 +557,10 @@ if __name__ == '__main__':
 
     res = np.array(list(executor.map(functools.partial(prf,index=index),param)))
 
-    res = np.array(list(map(functools.partial(prf,index=index),param)))
-
     print("Profile = ", res)
     
-    out = outroot + "_" + str(random.randint(0,1000)) + "_" + name[index] + ".txt"
+    out = outroot + "_" + str(random.randint(0,1000)) + 
+        "_minmethod_" + str(min_method) + _ + name[index] + ".txt"
     print("Output file = ", out)
 
     np.savetxt(out, np.c_[param, res])
@@ -543,7 +573,17 @@ if __name__ == '__main__':
 # --rank-by core --map-by numa:pe=${OMP_NUM_THREADS} python -m mpi4py.futures EXAMPLE_PROFILE1.py 
 # --AB 1.1 --tol 0.02 --maxiter 5 --maxfeval 100000 --profile 4 --mpi 12 --outroot "monday" --minmethod 1
 
-# method = 2
+# method = 3
 # mpirun -n 13 --oversubscribe --mca btl vader,tcp,self --bind-to core:overload-allowed 
 # --rank-by core --map-by numa:pe=${OMP_NUM_THREADS} python -m mpi4py.futures EXAMPLE_PROFILE1.py 
 # --AB 1.1 --tol 0.03 --maxiter 3 --maxfeval 10000 --profile 4 --mpi 12 --outroot "monday" --minmethod 3
+
+# method = 2
+# mpirun -n 13 --oversubscribe --mca btl vader,tcp,self --bind-to core:overload-allowed 
+# --rank-by core --map-by numa:pe=${OMP_NUM_THREADS} python -m mpi4py.futures EXAMPLE_PROFILE1.py 
+# --AB 1.1 --tol 0.03 --maxiter 3 --maxfeval 10000 --profile 4 --mpi 12 --outroot "monday" --minmethod 2
+
+# method = 4
+# mpirun -n 13 --oversubscribe --mca btl vader,tcp,self --bind-to core:overload-allowed 
+# --rank-by core --map-by numa:pe=${OMP_NUM_THREADS} python -m mpi4py.futures EXAMPLE_PROFILE1.py 
+# --AB 1.1 --tol 0.03 --maxiter 3 --maxfeval 4000 --profile 4 --mpi 12 --outroot "monday" --minmethod 4
