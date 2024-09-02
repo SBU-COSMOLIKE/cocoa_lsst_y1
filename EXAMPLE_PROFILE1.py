@@ -369,23 +369,23 @@ stop  = np.array([ 0.40,         # omegam
                    0.20          # M5
                  ])
 
-name  = [ "_omm.txt",      # omegam
-          "_h0.txt",       # H0
-          "_omegab.txt",   # omegab
-          "_As.txt",       # As
-          "_ns.txt",       # ns
-          "_A11.txt",      # A11
-          "_A12.txt",      # A12
-          "_S1.txt",       # S1
-          "_S2.txt",       # S2
-          "_S3.txt",       # S3
-          "_S4.txt",       # S4
-          "_S5.txt",       # S5
-          "_M1.txt",       # M1
-          "_M2.txt",       # M2
-          "_M3.txt",       # M3
-          "_M4.txt",       # M4
-          "_M5.txt"        # M5
+name  = [ "omm",      # omegam
+          "H0",       # H0
+          "omegab",   # omegab
+          "As",       # As
+          "ns",       # ns
+          "A11",      # A11
+          "A12",      # A12
+          "S1",       # S1
+          "S2",       # S2
+          "S3",       # S3
+          "S4",       # S4
+          "S5",       # S5
+          "M1",       # M1
+          "M2",       # M2
+          "M3",       # M3
+          "M4",       # M4
+          "M5"        # M5
         ]
 
 "_ns_min.txt"
@@ -480,8 +480,11 @@ if __name__ == '__main__':
                   )
     print("Profile = ", res)
     print("Minimum = ", res)
-    out = outroot + random.randint(0, 100) + name[index]
+    
+    out = outroot + "_" + str(random.randint(0,300)) + "_" + name[index] + ".txt"
+    
     print("Output file = ", out)
+    
     np.savetxt(out, res)
     
     executor.shutdown()
