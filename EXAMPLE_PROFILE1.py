@@ -12,12 +12,16 @@ import scipy
 from getdist import IniFile
 import itertools
 import iminuit
-from mpi4py.futures import MPIPoolExecutor
+#from mpi4py.futures import MPIPoolExecutor
 import camb
 import cosmolike_lsst_y1_interface as ci
 import copy
 import argparse
 import random
+
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 CLprobe="xi"
 path= os.environ['ROOTDIR'] + "/external_modules/data/lsst_y1"
@@ -57,6 +61,10 @@ ci.init_IA(ia_model=int(IA_model), ia_redshift_evolution=int(IA_redshift_evoluti
 ci.init_probes(possible_probes=CLprobe)
 ci.init_binning(int(ntheta), theta_min_arcmin, theta_max_arcmin)
 ci.init_data_real(cov_file, mask_file, data_vector_file)
+
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 def get_camb_cosmology(omegam, omegab, H0, ns, As_1e9 , w, w0pwa, mnu,
                        AccuracyBoost=1.0, kmax=10, k_per_logint=20, 
@@ -175,6 +183,10 @@ def get_camb_cosmology(omegam, omegab, H0, ns, As_1e9 , w, w0pwa, mnu,
 
     return (log10k_interp_2D, z_interp_2D, lnPL, lnPNL, G_growth, z_interp_1D, chi)
 
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+
 def chi2(params, AccuracyBoost=1.0, non_linear_emul=2):
 
     omegam = params[0]
@@ -239,6 +251,10 @@ def chi2(params, AccuracyBoost=1.0, non_linear_emul=2):
     datavector = np.array(ci.compute_data_vector_masked())
     
     return ci.compute_chi2(datavector)
+
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 def min_chi2(x0, bounds, min_method, fixed=-1, AccuracyBoost=1.0, 
              tol=0.01, maxfev=300000, non_linear_emul=2, maxiter=10):
@@ -388,69 +404,96 @@ name  = [ "omm",      # omegam
           "M5"        # M5
         ]
 
-"_ns_min.txt"
-# ---------------------------------------------------------------------
-# INPUT
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 parser = argparse.ArgumentParser()
 
-parser.add_argument("AccuracyBoost",
+parser.add_argument("--AB",
+                    dest="AccuracyBoost",
                     help="Accuracy Boost of CAMB/Cosmolike calculation",
                     type=float,
                     nargs='?',
+                    const=1,
                     default=1.1)
 
-parser.add_argument("tolerance",
+parser.add_argument("--tol",
+                    dest="tolerance",
                     help="Minimizer Tolerance",
                     type=float,
-                    nargs=1,
+                    nargs='?',
+                    const=1,
                     default=0.01)
 
-parser.add_argument("maxfeval",
+parser.add_argument("--maxfeval",
+                    dest="maxfeval",
                     help="Minimizer: maximum number of likelihood evaluations",
                     type=int,
-                    nargs=1,
+                    nargs='?',
+                    const=1,
                     default=50000)
 
-parser.add_argument("maxiter",
+parser.add_argument("--maxiter",
+                    dest="maxiter",
                     help="Minimizer: maximum number of minimizer iterations",
                     type=int,
-                    nargs=1,
+                    nargs='?',
+                    const=1,
                     default=5)
 
-parser.add_argument("minmethod",
+parser.add_argument("--minmethod",
+                    dest="minmethod",
                     help="Minimizer: minimizer method",
                     type=int,
-                    nargs=1,
+                    nargs='?',
+                    const=1,
                     default=1)
 
-parser.add_argument("outroot",
+parser.add_argument("--outroot",
+                    dest="outroot",
                     help="Name of the Output File",
+                    nargs='?',
+                    const=1)
+
+parser.add_argument("--profile",
+                    dest="profile",
+                    help="Which Parameter to Profile",
                     type=int,
                     nargs='?',
                     const=1)
 
-parser.add_argument("profile",
-                    help="Which Parameter to Profile",
+parser.add_argument("--mpi",
+                    dest="mpi",
+                    help="Number of MPI cores",
                     type=int,
-                    nargs=1)
-
-# ---------------------------------------------------------------------
+                    nargs='?',
+                    const=1)
 
 args = parser.parse_args()
 
 non_linear_emul = 2
 AccuracyBoost   = args.AccuracyBoost
 tol             = args.tolerance
-maxfeval        = args.maxfeval
-maxiter         = args.maxiter
-min_method      = args.minmethod
+maxfeval        = int(args.maxfeval)
+maxiter         = int(args.maxiter)
+min_method      = int(args.minmethod)
 outroot         = args.outroot
-index           = args.profile
+index           = int(args.profile)
+nummpi          = int(args.mpi)
+
+print(maxiter)
+print(maxfeval)
+print(nummpi)
+print(index)
+
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 def prf(val, index):
-  x0 = copy.deepcopy(x)
-  x0[index] = val
-  return min_chi2(x0=x0, 
+    x0 = copy.deepcopy(x)
+    x0[index] = val
+    res =  min_chi2(x0=x0, 
                   bounds=bounds, 
                   min_method=min_method, 
                   fixed=index, 
@@ -459,6 +502,9 @@ def prf(val, index):
                   maxfev=maxfeval, 
                   non_linear_emul=non_linear_emul, 
                   maxiter=maxiter)
+    print("param = ", val, " minimum = ", res)
+    return res
+
 
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
@@ -468,12 +514,11 @@ if __name__ == '__main__':
     
     executor = MPIPoolExecutor()
 
-    param = np.linspace(start=start[index], stop=stop[index], num=12)
+    param = np.linspace(start=start[index], stop=stop[index], num=nummpi)
 
     res = np.array(list(executor.map(functools.partial(prf,index=index),param)))
 
     print("Profile = ", res)
-    print("Minimum = ", res)
     
     out = outroot + "_" + str(random.randint(0,300)) + "_" + name[index] + ".txt"
     print("Output file = ", out)
@@ -483,4 +528,4 @@ if __name__ == '__main__':
     executor.shutdown()
     
 # TO RUN THIS SCRIPT
-# mpirun -n 13 --oversubscribe --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by core --map-by numa:pe=${OMP_NUM_THREADS} python -m mpi4py.futures EXAMPLE_PROFILE1.py --maxiter 5 --maxfeval 50000 --tolerance 0.02 --profile 4
+# mpirun -n 13 --oversubscribe --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by core --map-by numa:pe=${OMP_NUM_THREADS} python -m mpi4py.futures EXAMPLE_PROFILE1.py --maxiter 3 --maxfeval 10000 --tolerance 0.02 --profile 4 --mpi 13 --outroot "monday"
