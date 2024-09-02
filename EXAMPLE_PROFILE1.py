@@ -447,7 +447,7 @@ min_method      = args.minmethod
 outroot         = args.outroot
 index           = args.profile
 
-def profile(val, index):
+def prf(val, index):
   x0 = copy.deepcopy(x)
   x0[index] = val
   return min_chi2(x0=x0, 
@@ -468,24 +468,17 @@ if __name__ == '__main__':
     
     executor = MPIPoolExecutor()
 
-    res = np.array(list(executor.map(functools.partial(profile, 
-                                                       index=index
-                                                      ), 
-                                     np.linspace(start = start[index], 
-                                                 stop  = stop[index],
-                                                 num   = 12
-                                                )
-                                    )
-                        )
-                  )
+    param = np.linspace(start=start[index], stop=stop[index], num=12)
+
+    res = np.array(list(executor.map(functools.partial(prf,index=index),param)))
+
     print("Profile = ", res)
     print("Minimum = ", res)
     
     out = outroot + "_" + str(random.randint(0,300)) + "_" + name[index] + ".txt"
-    
     print("Output file = ", out)
-    
-    np.savetxt(out, res)
+
+    np.savetxt(out, np.c_[param, res])
     
     executor.shutdown()
     
