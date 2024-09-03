@@ -587,19 +587,19 @@ if __name__ == '__main__':
 # method = 1
 # mpirun -n 13 --oversubscribe --mca btl vader,tcp,self --bind-to core:overload-allowed 
 # --rank-by core --map-by numa:pe=${OMP_NUM_THREADS} python -m mpi4py.futures EXAMPLE_PROFILE1.py 
-# --AB 1.1 --tol 0.03 --maxiter 5 --maxfeval 5000 --profile 4 --mpi 12 --outroot "monday" --minmethod 1
+# --AB 1.1 --tol 0.03 --maxiter 4 --maxfeval 10000 --profile 4 --mpi 12 --outroot "monday" --minmethod 1
 
 # method = 3
 # mpirun -n 13 --oversubscribe --mca btl vader,tcp,self --bind-to core:overload-allowed 
 # --rank-by core --map-by numa:pe=${OMP_NUM_THREADS} python -m mpi4py.futures EXAMPLE_PROFILE1.py 
-# --AB 1.1 --tol 0.03 --maxiter 3 --maxfeval 5000 --profile 4 --mpi 12 --outroot "monday" --minmethod 3
+# --AB 1.1 --tol 0.03 --maxiter 4 --maxfeval 10000 --profile 4 --mpi 12 --outroot "monday" --minmethod 3
 
 # method = 2
 # mpirun -n 13 --oversubscribe --mca btl vader,tcp,self --bind-to core:overload-allowed 
 # --rank-by core --map-by numa:pe=${OMP_NUM_THREADS} python -m mpi4py.futures EXAMPLE_PROFILE1.py 
-# --AB 1.1 --tol 0.03 --maxiter 3 --maxfeval 5000 --profile 4 --mpi 12 --outroot "monday" --minmethod 2
+# --AB 1.1 --tol 0.03 --maxiter 4 --maxfeval 10000 --profile 4 --mpi 12 --outroot "monday" --minmethod 2
 
 # method = 4
 # mpirun -n 13 --oversubscribe --mca btl vader,tcp,self --bind-to core:overload-allowed 
 # --rank-by core --map-by numa:pe=${OMP_NUM_THREADS} python -m mpi4py.futures EXAMPLE_PROFILE1.py 
-# --AB 1.1 --tol 0.03 --maxiter 3 --maxfeval 5000 --profile 4 --mpi 12 --outroot "monday" --minmethod 4
+# --AB 1.1 --tol 0.03 --maxiter 4 --maxfeval 10000 --profile 4 --mpi 12 --outroot "monday" --minmethod 4
