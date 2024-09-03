@@ -276,10 +276,22 @@ def min_chi2(x0, bounds, min_method, fixed=-1, AccuracyBoost=1.0,
         args = (0.0, -2)
 
     if min_method == 1:
+        x = copy.deepcopy(x0)
+        tmp = scipy.optimize.minimize(fun=mychi2, 
+                                      x0=x, 
+                                      args=args, 
+                                      method='Nelder-Mead', 
+                                      bounds=bounds, 
+                                      options = {'adaptive' : True, 
+                                                 'xatol'   : tol,
+                                                 'fatol'   : tol, 
+                                                 'maxfev'  : maxfev,
+                                                 'maxiter' : maxiter})
+        x = copy.deepcopy(tmp.x)
         tmp = scipy.optimize.basinhopping(func=mychi2, 
-                                          x0=x0, 
-                                          T=0.45, 
-                                          target_accept_rate=0.3, 
+                                          x0=x, 
+                                          T=0.5, 
+                                          target_accept_rate=0.25, 
                                           niter=maxiter, 
                                           stepsize=0.02,
                                           minimizer_kwargs={"method": 'Nelder-Mead', 
@@ -292,9 +304,21 @@ def min_chi2(x0, bounds, min_method, fixed=-1, AccuracyBoost=1.0,
                                                                         'maxiter'  : maxiter}})
         result = tmp.fun
     elif min_method == 2:
+        x = copy.deepcopy(x0)
+        tmp = scipy.optimize.minimize(fun=mychi2, 
+                                      x0=x, 
+                                      args=args, 
+                                      method='Nelder-Mead', 
+                                      bounds=bounds, 
+                                      options = {'adaptive' : True, 
+                                                 'xatol'   : tol,
+                                                 'fatol'   : tol, 
+                                                 'maxfev'  : maxfev,
+                                                 'maxiter' : maxiter})
+        x = copy.deepcopy(tmp.x) 
         # https://stats.stackexchange.com/a/456073
         tmp = scipy.optimize.dual_annealing(func=mychi2, 
-                                            x0=x0, 
+                                            x0=x, 
                                             args=args, 
                                             bounds=bounds, 
                                             maxfun=maxfev,
@@ -309,8 +333,11 @@ def min_chi2(x0, bounds, min_method, fixed=-1, AccuracyBoost=1.0,
         tmp = scipy.optimize.shgo(func=mychi2, 
                                   args=args, 
                                   bounds=bounds,
-                                  n=100,
+                                  n=50,
                                   iters=maxiter,
+                                  options={'f_tol'    : tol, 
+                                           'maxfev'   : maxfev,
+                                           'maxiter'  : maxiter},
                                   minimizer_kwargs={"method": 'Nelder-Mead', 
                                                               "args": args, 
                                                               "bounds": bounds, 
