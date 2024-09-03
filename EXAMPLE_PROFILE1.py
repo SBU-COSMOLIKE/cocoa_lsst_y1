@@ -286,9 +286,10 @@ def min_chi2(x0, bounds, min_method, fixed=-1, AccuracyBoost=1.0,
                                                             "args": args, 
                                                             "bounds": bounds, 
                                                             "options": {'adaptive' : True, 
-                                                                        'xatol' : tol,
-                                                                        'fatol' : tol, 
-                                                                        'maxfev' : maxfev}})
+                                                                        'xatol'    : tol,
+                                                                        'fatol'    : tol, 
+                                                                        'maxfev'   : maxfev,
+                                                                        'maxiter'  : maxiter}})
         result = tmp.fun
     elif min_method == 2:
         # https://stats.stackexchange.com/a/456073
@@ -314,9 +315,10 @@ def min_chi2(x0, bounds, min_method, fixed=-1, AccuracyBoost=1.0,
                                                               "args": args, 
                                                               "bounds": bounds, 
                                                               "options": {'adaptive' : True, 
-                                                                          'xatol' : tol,
-                                                                          'fatol' : tol, 
-                                                                          'maxfev' : maxfev}})
+                                                                          'xatol'    : tol,
+                                                                          'fatol'    : tol, 
+                                                                          'maxfev'   : maxfev,
+                                                                          'maxiter'  : maxiter}})
         result = tmp.fun
     elif min_method == 4:
         x = copy.deepcopy(x0)
@@ -328,9 +330,10 @@ def min_chi2(x0, bounds, min_method, fixed=-1, AccuracyBoost=1.0,
                                           method='Nelder-Mead', 
                                           bounds=bounds, 
                                           options = {'adaptive' : True, 
-                                                     'xatol' : tol,
-                                                     'fatol' : tol, 
-                                                     'maxfev' : maxfev})
+                                                     'xatol'   : tol,
+                                                     'fatol'   : tol, 
+                                                     'maxfev'  : maxfev,
+                                                     'maxiter' : maxiter})
             x = copy.deepcopy(tmp.x)
             partial.append(tmp.fun)
             print(f"i = {i}, chi2 = {tmp.fun}, ns = {args[0]}")
@@ -340,9 +343,10 @@ def min_chi2(x0, bounds, min_method, fixed=-1, AccuracyBoost=1.0,
                                           args=args, 
                                           method='Powell', 
                                           bounds = bounds, 
-                                          options = {'xtol' : tol, 
-                                                     'ftol' : tol, 
-                                                     'maxfev' : maxfev})
+                                          options = {'xtol'    : tol, 
+                                                     'ftol'    : tol, 
+                                                     'maxfev'  : maxfev,
+                                                     'maxiter' : maxiter})
             x = copy.deepcopy(tmp.x)
             partial.append(tmp.fun)
             print(f"i = {i}, chi2 = {tmp.fun}, ns = {args[0]}")
@@ -572,7 +576,7 @@ if __name__ == '__main__':
 
     print("Profile = ", res)
     
-    out = outroot + "_" + str(random.randint(0,1000)) + "_minmethod_" + str(min_method) + _ + name[index] + ".txt"
+    out = outroot + "_" + str(random.randint(0,1000)) + "_minmethod_" + str(min_method) + "_" + name[index] + ".txt"
     print("Output file = ", out)
 
     np.savetxt(out, np.c_[param, res])
@@ -588,14 +592,14 @@ if __name__ == '__main__':
 # method = 3
 # mpirun -n 13 --oversubscribe --mca btl vader,tcp,self --bind-to core:overload-allowed 
 # --rank-by core --map-by numa:pe=${OMP_NUM_THREADS} python -m mpi4py.futures EXAMPLE_PROFILE1.py 
-# --AB 1.1 --tol 0.03 --maxiter 3 --maxfeval 10000 --profile 4 --mpi 12 --outroot "monday" --minmethod 3
+# --AB 1.1 --tol 0.03 --maxiter 3 --maxfeval 5000 --profile 4 --mpi 12 --outroot "monday" --minmethod 3
 
 # method = 2
 # mpirun -n 13 --oversubscribe --mca btl vader,tcp,self --bind-to core:overload-allowed 
 # --rank-by core --map-by numa:pe=${OMP_NUM_THREADS} python -m mpi4py.futures EXAMPLE_PROFILE1.py 
-# --AB 1.1 --tol 0.03 --maxiter 3 --maxfeval 10000 --profile 4 --mpi 12 --outroot "monday" --minmethod 2
+# --AB 1.1 --tol 0.03 --maxiter 3 --maxfeval 5000 --profile 4 --mpi 12 --outroot "monday" --minmethod 2
 
 # method = 4
 # mpirun -n 13 --oversubscribe --mca btl vader,tcp,self --bind-to core:overload-allowed 
 # --rank-by core --map-by numa:pe=${OMP_NUM_THREADS} python -m mpi4py.futures EXAMPLE_PROFILE1.py 
-# --AB 1.1 --tol 0.03 --maxiter 3 --maxfeval 4000 --profile 4 --mpi 12 --outroot "monday" --minmethod 4
+# --AB 1.1 --tol 0.03 --maxiter 3 --maxfeval 5000 --profile 4 --mpi 12 --outroot "monday" --minmethod 4
