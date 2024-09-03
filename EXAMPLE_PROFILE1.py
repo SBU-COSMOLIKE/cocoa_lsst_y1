@@ -288,6 +288,7 @@ def min_chi2(x0, bounds, min_method, fixed=-1, AccuracyBoost=1.0,
                                                             "options": {'adaptive' : True, 
                                                                         'fatol' : tol, 
                                                                         'maxfev' : maxfev}})
+        result = tmp.fun
     elif min_method == 2:
         # https://stats.stackexchange.com/a/456073
         tmp = scipy.optimize.dual_annealing(func=mychi2, 
@@ -300,7 +301,8 @@ def min_chi2(x0, bounds, min_method, fixed=-1, AccuracyBoost=1.0,
                                             visit=1.01, 
                                             accept=1, 
                                             initial_temp=5230.0, 
-                                            restart_temp_ratio=0.0002)    
+                                            restart_temp_ratio=0.0002) 
+        result = tmp.fun   
     elif min_method == 3:
         tmp = scipy.optimize.shgo(func=mychi2, 
                                   args=args, 
@@ -312,9 +314,11 @@ def min_chi2(x0, bounds, min_method, fixed=-1, AccuracyBoost=1.0,
                                                               "bounds": bounds, 
                                                               "options": {'adaptive' : True, 
                                                                           'fatol' : tol, 
-                                                                          'maxfev' : maxfev}})  
+                                                                          'maxfev' : maxfev}})
+        result = tmp.fun
     elif min_method == 4:
         x = copy.deepcopy(x0)
+        partial = []
         for i in range(maxiter):
             tmp = scipy.optimize.minimize(fun=mychi2, 
                                           x0=x, 
@@ -325,6 +329,7 @@ def min_chi2(x0, bounds, min_method, fixed=-1, AccuracyBoost=1.0,
                                                      'fatol' : tol, 
                                                      'maxfev' : maxfev})
             x = copy.deepcopy(tmp.x)
+            partial.append(tmp.fun)
 
             tmp = scipy.optimize.minimize(fun=mychi2, 
                                           x0=x,
@@ -335,7 +340,8 @@ def min_chi2(x0, bounds, min_method, fixed=-1, AccuracyBoost=1.0,
                                                      'ftol' : tol, 
                                                      'maxfev' : maxfev})
             x = copy.deepcopy(tmp.x)
-
+            partial.append(tmp.fun)
+            
             tmp = iminuit.minimize(fun=mychi2, 
                                    x0=x, 
                                    args=args, 
@@ -344,8 +350,9 @@ def min_chi2(x0, bounds, min_method, fixed=-1, AccuracyBoost=1.0,
                                    tol=tol,
                                    options = {'stra' : 2, 'maxfun': maxfev})
             x = copy.deepcopy(tmp.x)
-
-    return tmp.fun
+            partial.append(tmp.fun)
+            result = min(partial)
+    return result
 
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
