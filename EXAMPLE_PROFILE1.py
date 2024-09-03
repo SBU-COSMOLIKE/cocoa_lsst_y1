@@ -188,21 +188,21 @@ def get_camb_cosmology(omegam, omegab, H0, ns, As_1e9 , w, w0pwa, mnu,
 
 def chi2(params, AccuracyBoost=1.0, non_linear_emul=2):
 
-    omegam = params[0]
-    H0     = params[1]
-    omegab = params[2]
-    As_1e9 = params[3]
-    ns     = params[4]
+    As_1e9 = params[0]
+    ns     = params[1]
+    H0     = params[2]
+    omegab = params[3]
+    omegam = params[4]
     
-    A1_1   = params[5] 
-    A1_2   = params[6]
+    DZ_S1  = params[5]
+    DZ_S2  = params[6]
+    DZ_S3  = params[7]
+    DZ_S4  = params[8]
+    DZ_S5  = params[9]    
     
-    DZ_S1  = params[7]
-    DZ_S2  = params[8]
-    DZ_S3  = params[9]
-    DZ_S4  = params[10]
-    DZ_S5  = params[11]
-
+    A1_1   = params[10] 
+    A1_2   = params[11]
+    
     M1     = params[12]
     M2     = params[13]
     M3     = params[14]
@@ -255,178 +255,39 @@ def chi2(params, AccuracyBoost=1.0, non_linear_emul=2):
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 
-def min_chi2(x0, bounds, min_method, fixed=-1, AccuracyBoost=1.0, 
-             tol=0.01, maxfev=300000, non_linear_emul=2, maxiter=10):
-
-    def mychi2(params, *args):  
-        z, fixed = args
-        params = np.array(params)
-        if fixed > -1:
-            params = np.insert(params, fixed, z)
-        return chi2(params=params, 
-                    AccuracyBoost=AccuracyBoost, 
-                    non_linear_emul=non_linear_emul)
-    
-    if fixed > -1:
-        z      = x0[fixed]
-        x0     = np.delete(x0, (fixed))
-        bounds = np.delete(bounds, (fixed), axis=0)
-        args = (z, fixed)
-    else:
-        args = (0.0, -2)
-
-    if min_method == 1:
-        x = copy.deepcopy(x0)
-        tmp = scipy.optimize.minimize(fun=mychi2, 
-                                      x0=x, 
-                                      args=args, 
-                                      method='Nelder-Mead', 
-                                      bounds=bounds, 
-                                      options = {'adaptive' : True, 
-                                                 'xatol'   : tol,
-                                                 'fatol'   : tol, 
-                                                 'maxfev'  : maxfev,
-                                                 'maxiter' : maxiter})
-        x = copy.deepcopy(tmp.x)
-        tmp = scipy.optimize.basinhopping(func=mychi2, 
-                                          x0=x, 
-                                          T=0.5, 
-                                          target_accept_rate=0.25, 
-                                          niter=maxiter, 
-                                          stepsize=0.02,
-                                          minimizer_kwargs={"method": 'Nelder-Mead', 
-                                                            "args": args, 
-                                                            "bounds": bounds, 
-                                                            "options": {'adaptive' : True, 
-                                                                        'xatol'    : tol,
-                                                                        'fatol'    : tol, 
-                                                                        'maxfev'   : maxfev,
-                                                                        'maxiter'  : maxiter}})
-        result = tmp.fun
-    elif min_method == 2:
-        x = copy.deepcopy(x0)
-        tmp = scipy.optimize.minimize(fun=mychi2, 
-                                      x0=x, 
-                                      args=args, 
-                                      method='Nelder-Mead', 
-                                      bounds=bounds, 
-                                      options = {'adaptive' : True, 
-                                                 'xatol'   : tol,
-                                                 'fatol'   : tol, 
-                                                 'maxfev'  : maxfev,
-                                                 'maxiter' : maxiter})
-        x = copy.deepcopy(tmp.x) 
-        # https://stats.stackexchange.com/a/456073
-        tmp = scipy.optimize.dual_annealing(func=mychi2, 
-                                            x0=x, 
-                                            args=args, 
-                                            bounds=bounds, 
-                                            maxfun=maxfev,
-                                            no_local_search=True, 
-                                            maxiter=maxiter, 
-                                            visit=1.01, 
-                                            accept=1, 
-                                            initial_temp=5230.0, 
-                                            restart_temp_ratio=0.0002) 
-        result = tmp.fun   
-    elif min_method == 3:
-        tmp = scipy.optimize.shgo(func=mychi2, 
-                                  args=args, 
-                                  bounds=bounds,
-                                  n=50,
-                                  iters=maxiter,
-                                  options={'f_tol'    : tol, 
-                                           'maxfev'   : maxfev,
-                                           'maxiter'  : maxiter},
-                                  minimizer_kwargs={"method": 'Nelder-Mead', 
-                                                              "args": args, 
-                                                              "bounds": bounds, 
-                                                              "options": {'adaptive' : True, 
-                                                                          'xatol'    : tol,
-                                                                          'fatol'    : tol, 
-                                                                          'maxfev'   : maxfev,
-                                                                          'maxiter'  : maxiter}})
-        result = tmp.fun
-    elif min_method == 4:
-        x = copy.deepcopy(x0)
-        partial = []
-        for i in range(maxiter):
-            tmp = scipy.optimize.minimize(fun=mychi2, 
-                                          x0=x, 
-                                          args=args, 
-                                          method='Nelder-Mead', 
-                                          bounds=bounds, 
-                                          options = {'adaptive' : True, 
-                                                     'xatol'   : tol,
-                                                     'fatol'   : tol, 
-                                                     'maxfev'  : maxfev,
-                                                     'maxiter' : maxiter})
-            x = copy.deepcopy(tmp.x)
-            partial.append(tmp.fun)
-            print(f"i = {i}, chi2 = {tmp.fun}, ns = {args[0]}")
-
-            tmp = scipy.optimize.minimize(fun=mychi2, 
-                                          x0=x,
-                                          args=args, 
-                                          method='Powell', 
-                                          bounds = bounds, 
-                                          options = {'xtol'    : tol, 
-                                                     'ftol'    : tol, 
-                                                     'maxfev'  : maxfev,
-                                                     'maxiter' : maxiter})
-            x = copy.deepcopy(tmp.x)
-            partial.append(tmp.fun)
-            print(f"i = {i}, chi2 = {tmp.fun}, ns = {args[0]}")
-            
-            tmp = iminuit.minimize(fun=mychi2, 
-                                   x0=x, 
-                                   args=args, 
-                                   bounds=bounds, 
-                                   method="migrad", 
-                                   tol=tol,
-                                   options = {'stra' : 2, 'maxfun': maxfev})
-            x = copy.deepcopy(tmp.x)
-            partial.append(tmp.fun)
-            result = min(partial)
-            print(f"i = {i}, chi2 = {tmp.fun}, ns = {args[0]}")
-    return result
-
-# ------------------------------------------------------------------------------
-# ------------------------------------------------------------------------------
-# ------------------------------------------------------------------------------
-
-x = np.array([ 0.30,         # omegam
-               67.0,         # H0
-               0.04,         # omegab
-               2.1,          # As
-               0.96,         # ns
-               0.7,          # A11
-              -1.5,          # A12
-               0.04,         # S1
-               0.0016,       # S2
-               0.03,         # S3
-              -0.08,         # S4
-              -8.67127e-05,  # S5
-               0.001,        # M1
-               0.002,        # M2
-               0.003,        # M3
-               0.004,        # M4
-               0.001         # M5
+x = np.array([
+                2.1,          # As
+                0.96,         # ns
+                67.0,         # H0
+                0.04,         # omegab
+                0.30,         # omegam
+                0.04,         # S1
+                0.0016,       # S2
+                0.03,         # S3
+                -0.08,        # S4
+                -8.67127e-05, # S5
+                0.7,          # A11
+                -1.5,         # A12
+                0.001,        # M1
+                0.002,        # M2
+                0.003,        # M3
+                0.004,        # M4
+                0.001         # M5
               ])
 
 bounds = np.array([
-                    [0.2,0.4],     # omegam
+                    [1.9, 2.5],    # As
+                    [0.89, 1.05],  # ns 
                     [50.0, 90.0],  # H0
                     [0.027, 0.07], # omegab
-                    [1.9, 2.5],    # As
-                    [0.89, 1.05],  # ns
-                    [-5.0, 5.0],   # A11
-                    [-5.0, 5.0],   # A12
+                    [0.2,0.4],     # omegam
                     [-0.12, 0.12], # S1
                     [-0.12, 0.12], # S2
                     [-0.12, 0.12], # S3
                     [-0.12, 0.12], # S4
                     [-0.12, 0.12], # S5
+                    [-5.0, 5.0],   # A11
+                    [-5.0, 5.0],   # A12
                     [-0.12, 0.12], # M1
                     [-0.12, 0.12], # M2
                     [-0.12, 0.12], # M3
@@ -434,61 +295,64 @@ bounds = np.array([
                     [-0.12, 0.12]  # M5
                   ])
 
-start = np.array([ 0.20,         # omegam
-                   60.0,         # H0
-                   0.028,        # omegab
-                   1.90,         # As
-                   0.90,         # ns
-                  -3.00,         # A11
-                  -3.00,         # A12
-                  -0.20,         # S1
-                  -0.20,         # S2
-                  -0.20,         # S3
-                  -0.20,         # S4
-                  -0.20,         # S5
-                  -0.20,         # M1
-                  -0.20,         # M2
-                  -0.20,         # M3
-                  -0.20,         # M4
-                  -0.20          # M5
+start = np.array([ 
+                    1.90,         # As
+                    0.90,         # ns 
+                    60.0,         # H0
+                    0.028,        # omegab
+                    0.20,         # omegam
+                    -0.20,        # S1
+                    -0.20,        # S2
+                    -0.20,        # S3
+                    -0.20,        # S4
+                    -0.20,        # S5                   
+                    -3.00,        # A11
+                    -3.00,        # A12
+                    -0.20,        # M1
+                    -0.20,        # M2
+                    -0.20,        # M3
+                    -0.20,        # M4
+                    -0.20         # M5
                 ])
 
-stop  = np.array([ 0.40,         # omegam
-                   80.0,         # H0
-                   0.05,        # omegab
-                   2.50,         # As
-                   1.04,         # ns
-                   3.00,         # A11
-                   3.00,         # A12
-                   0.20,         # S1
-                   0.20,         # S2
-                   0.20,         # S3
-                   0.20,         # S4
-                   0.20,         # S5
-                   0.20,         # M1
-                   0.20,         # M2
-                   0.20,         # M3
-                   0.20,         # M4
-                   0.20          # M5
+stop  = np.array([ 
+                    2.50,         # As
+                    1.04,         # ns
+                    80.0,         # H0
+                    0.05,         # omegab
+                    0.40,         # omegam
+                    0.20,         # S1
+                    0.20,         # S2
+                    0.20,         # S3
+                    0.20,         # S4                    
+                    0.20,         # S5                    
+                    3.00,         # A11
+                    3.00,         # A12
+                    0.20,         # M1
+                    0.20,         # M2
+                    0.20,         # M3
+                    0.20,         # M4
+                    0.20          # M5
                  ])
 
-name  = [ "omm",      # omegam
-          "H0",       # H0
-          "omegab",   # omegab
-          "As",       # As
-          "ns",       # ns
-          "A11",      # A11
-          "A12",      # A12
-          "S1",       # S1
-          "S2",       # S2
-          "S3",       # S3
-          "S4",       # S4
-          "S5",       # S5
-          "M1",       # M1
-          "M2",       # M2
-          "M3",       # M3
-          "M4",       # M4
-          "M5"        # M5
+name  = [ 
+            "As",       # As
+            "ns",       # ns
+            "H0",       # H0
+            "omegab",   # omegab
+            "omm",      # omegam
+            "S1",       # S1
+            "S2",       # S2
+            "S3",       # S3
+            "S4",       # S4
+            "S5",       # S5          
+            "A11",      # A11
+            "A12",      # A12
+            "M1",       # M1
+            "M2",       # M2
+            "M3",       # M3
+            "M4",       # M4
+            "M5"        # M5
         ]
 
 # ------------------------------------------------------------------------------
@@ -569,6 +433,153 @@ outroot         = args.outroot
 index           = args.profile
 nummpi          = args.mpi
 
+cov_file = 'EXAMPLE_MCMC1.covmat'
+cov      = np.loadtxt(cov_file)
+# need to delete the w line
+cov = np.delete(cov, (5), axis=0)
+cov = np.delete(cov, (5), axis=1)
+
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+
+def min_chi2(x0, bounds, min_method, fixed=-1, AccuracyBoost=1.0, 
+             tol=0.01, maxfev=300000, non_linear_emul=2, maxiter=10):
+
+    def mychi2(params, *args):  
+        z, fixed = args
+        params = np.array(params)
+        if fixed > -1:
+            params = np.insert(params, fixed, z)
+
+        return chi2(params=params, 
+                    AccuracyBoost=AccuracyBoost, 
+                    non_linear_emul=non_linear_emul)
+    
+    if fixed > -1:
+        z      = x0[fixed]
+        x0     = np.delete(x0, (fixed))
+        bounds = np.delete(bounds, (fixed), axis=0)
+        args = (z, fixed)
+    else:
+        args = (0.0, -2)
+
+    mycov = np.delete(cov, (fixed), axis=0)
+    mycov = np.delete(mycov, (fixed), axis=1)
+
+    class GaussianStep:
+       def __init__(self, stepsize=0.2):
+           self.cov = stepsize*mycov
+           print(mycov.shape)
+           print(self.cov.shape)
+       def __call__(self, x):
+           return np.random.multivariate_normal(x, self.cov, size=1)
+
+    if min_method == 1:
+        x = copy.deepcopy(x0)
+        tmp = iminuit.minimize(fun=mychi2, 
+                               x0=x, 
+                               args=args, 
+                               bounds=bounds, 
+                               method="migrad", 
+                               tol=tol,
+                               options = {'stra'  : 1, 
+                                          'maxfun': maxfev})
+        x = copy.deepcopy(tmp.x)        
+        tmp = scipy.optimize.basinhopping(func=mychi2, 
+                                          x0=x, 
+                                          T=0.1, 
+                                          target_accept_rate=0.25, 
+                                          niter=maxiter, 
+                                          stepsize=0.1,
+                                          interval=100,
+                                          niter_success=1000,
+                                          take_step=GaussianStep,
+                                          minimizer_kwargs={"method": 'Nelder-Mead', 
+                                                            "args": args, 
+                                                            "bounds": bounds, 
+                                                            "options": {'adaptive' : False, 
+                                                                        'xatol'    : tol,
+                                                                        'fatol'    : tol, 
+                                                                        'maxfev'   : maxfev}})
+        result = tmp.fun
+    elif min_method == 2:
+        x = copy.deepcopy(x0)
+        tmp = scipy.optimize.minimize(fun=mychi2, 
+                                      x0=x, 
+                                      args=args, 
+                                      method='Nelder-Mead', 
+                                      bounds=bounds, 
+                                      options = {'adaptive' : False, 
+                                                 'xatol'    : tol,
+                                                 'fatol'    : tol, 
+                                                 'maxfev'   : maxfev})
+        x = copy.deepcopy(tmp.x) 
+        # https://stats.stackexchange.com/a/456073
+        tmp = scipy.optimize.dual_annealing(func=mychi2, 
+                                            x0=x, 
+                                            args=args, 
+                                            bounds=bounds, 
+                                            maxfun=maxfev,
+                                            no_local_search=True, 
+                                            maxiter=maxiter, 
+                                            visit=1.01, 
+                                            accept=1, 
+                                            initial_temp=5230.0, 
+                                            restart_temp_ratio=0.0002) 
+        result = tmp.fun   
+    elif min_method == 3:
+        tmp = scipy.optimize.shgo(func=mychi2, 
+                                  args=args, 
+                                  bounds=bounds,
+                                  n=50,
+                                  iters=maxiter,
+                                  options={'f_tol'    : tol, 
+                                           'maxfev'   : maxfev,
+                                           'maxiter'  : maxiter},
+                                  minimizer_kwargs={"method": 'Nelder-Mead', 
+                                                              "args": args, 
+                                                              "bounds": bounds, 
+                                                              "options": {'adaptive' : True, 
+                                                                          'xatol'    : tol,
+                                                                          'fatol'    : tol, 
+                                                                          'maxfev'   : maxfev,
+                                                                          'maxiter'  : maxiter}})
+        result = tmp.fun
+    elif min_method == 4:
+        x = copy.deepcopy(x0)
+        partial = []
+        for i in range(maxiter):
+            tmp = scipy.optimize.minimize(fun=mychi2, 
+                                          x0=x, 
+                                          args=args, 
+                                          method='Nelder-Mead', 
+                                          bounds=bounds, 
+                                          options = {'adaptive' : True, 
+                                                     'xatol'   : tol/(i+1),
+                                                     'fatol'   : tol/(i+1), 
+                                                     'maxfev'  : (i+1)*maxfev,
+                                                     'maxiter' : maxiter})
+            x = copy.deepcopy(tmp.x)
+            partial.append(tmp.fun)
+            print(f"i = {i}, chi2 = {tmp.fun}, ns = {args[0]}")
+            
+            tmp = iminuit.minimize(fun=mychi2, 
+                                   x0=x, 
+                                   args=args, 
+                                   bounds=bounds, 
+                                   method="migrad", 
+                                   tol=tol/(i+1),
+                                   options = {'stra' : 2, 
+                                              'maxfun': (i+1)*maxfev})
+            x = copy.deepcopy(tmp.x)
+            partial.append(tmp.fun)
+            result = min(partial)
+            print(f"i = {i}, chi2 = {tmp.fun}, ns = {args[0]}")
+    return result
+
+
+
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
@@ -577,14 +588,14 @@ def prf(val, index):
     x0 = copy.deepcopy(x)
     x0[index] = val
     res =  min_chi2(x0=x0, 
-                  bounds=bounds, 
-                  min_method=min_method, 
-                  fixed=index, 
-                  AccuracyBoost=AccuracyBoost, 
-                  tol=tol, 
-                  maxfev=maxfeval, 
-                  non_linear_emul=non_linear_emul, 
-                  maxiter=maxiter)
+                    bounds=bounds, 
+                    min_method=min_method, 
+                    fixed=index, 
+                    AccuracyBoost=AccuracyBoost, 
+                    tol=tol, 
+                    maxfev=maxfeval, 
+                    non_linear_emul=non_linear_emul, 
+                    maxiter=maxiter)
     return res
 
 
@@ -598,6 +609,7 @@ if __name__ == '__main__':
     executor = MPIPoolExecutor()
 
     param = np.linspace(start=start[index], stop=stop[index], num=nummpi)
+    print(param)
 
     res = np.array(list(executor.map(functools.partial(prf,index=index),param)))
 
@@ -614,7 +626,7 @@ if __name__ == '__main__':
 # method = 1
 # mpirun -n 13 --oversubscribe --mca btl vader,tcp,self --bind-to core:overload-allowed 
 # --rank-by core --map-by numa:pe=${OMP_NUM_THREADS} python -m mpi4py.futures EXAMPLE_PROFILE1.py 
-# --AB 1.1 --tol 0.03 --maxiter 4 --maxfeval 10000 --profile 4 --mpi 12 --outroot "monday" --minmethod 1
+# --AB 1.1 --tol 0.02 --maxiter 10 --maxfeval 7500 --profile 1 --mpi 12 --outroot "monday" --minmethod 1
 
 # method = 3
 # mpirun -n 13 --oversubscribe --mca btl vader,tcp,self --bind-to core:overload-allowed 
