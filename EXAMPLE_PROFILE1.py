@@ -604,15 +604,13 @@ def min_chi2(x0, bounds, min_method, fixed=-1, AccuracyBoost=1.0,
 
         partial = []
         for i in range(6):
-            # Initial point
-            x = []
+            x = [] # Initial point
             for j in range(nwalkers):
                 x.append(GaussianStep(stepsize=temperature[i]*stepsz[i])(x0)[0,:])
             x = np.array(x)
 
             GScov  = copy.deepcopy(cov)
-            GScov *= temperature[i]*stepsz[i]
-            
+            GScov *= temperature[i]*stepsz[i] 
             args2       = copy.deepcopy(args)
             args2[2]    = temperature[i]
          
@@ -623,10 +621,8 @@ def min_chi2(x0, bounds, min_method, fixed=-1, AccuracyBoost=1.0,
                                             moves=[(emcee.moves.GaussianMove(cov=GScov),1.)])
             
             sampler.run_mcmc(x, nsteps, skip_initial_state_check=True)
-        
             samples = sampler.get_chain(flat=True, thin=1, discard=0)      
             j = np.argmin(-1.0*np.array(sampler.get_log_prob(flat=True)))
-            
             x0 = copy.deepcopy(samples[j])
             partial.append(mychi2(sampler[j], *args))
             
