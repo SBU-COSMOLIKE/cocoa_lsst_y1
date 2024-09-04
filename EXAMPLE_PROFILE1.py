@@ -499,10 +499,9 @@ def min_chi2(x0, bounds, min_method, fixed=-1, AccuracyBoost=1.0,
                                method="migrad", 
                                tol=tol,
                                options = {'stra'  : 1, 
-                                          'maxfun': int(maxfev/2)})
-        x = copy.deepcopy(tmp.x)        
+                                          'maxfun': int(maxfev/2)})      
         tmp = scipy.optimize.basinhopping(func=mychi2, 
-                                          x0=x, 
+                                          x0=tmp.x, 
                                           T=0.1, 
                                           target_accept_rate=0.25, 
                                           niter=maxiter, 
@@ -530,10 +529,9 @@ def min_chi2(x0, bounds, min_method, fixed=-1, AccuracyBoost=1.0,
                                                  'xatol'    : tol,
                                                  'fatol'    : tol, 
                                                  'maxfev'   : maxfev})
-        x = copy.deepcopy(tmp.x) 
         # https://stats.stackexchange.com/a/456073
         tmp = scipy.optimize.dual_annealing(func=mychi2, 
-                                            x0=x, 
+                                            x0=tmp.x, 
                                             args=args, 
                                             bounds=bounds, 
                                             maxfun=maxfev,
@@ -563,8 +561,10 @@ def min_chi2(x0, bounds, min_method, fixed=-1, AccuracyBoost=1.0,
                                                                           'maxiter'  : maxiter}})
         result = tmp.fun
     elif min_method == 4:
+        
         x = copy.deepcopy(x0)
         partial = []
+        
         for i in range(maxiter):
             tmp = scipy.optimize.minimize(fun=mychi2, 
                                           x0=x, 
@@ -595,7 +595,7 @@ def min_chi2(x0, bounds, min_method, fixed=-1, AccuracyBoost=1.0,
             result = min(partial)
             
     
-    elif min_method == 5: # ADAPTED FROM PROCOLI
+    elif min_method == 5: # ADAPTED FROM PROCOLI BUT w/ Extra minimizers after each Emcee walking
 
         nwalkers    = int(3)
         ndim        = int(x0.shape[0])
@@ -633,7 +633,7 @@ def min_chi2(x0, bounds, min_method, fixed=-1, AccuracyBoost=1.0,
                                           options = {'adaptive' : True, 
                                                      'xatol'    : tol,
                                                      'fatol'    : tol, 
-                                                     'maxfev'   : int(maxfev),
+                                                     'maxfev'   : maxfev,
                                                      'maxiter'  : maxiter})
             x0 = copy.deepcopy(tmp.x)
             partial.append(tmp.fun)
@@ -645,7 +645,7 @@ def min_chi2(x0, bounds, min_method, fixed=-1, AccuracyBoost=1.0,
                                    method="migrad", 
                                    tol=tol,
                                    options = {'stra'  : 1, 
-                                              'maxfun': int(maxfev)})
+                                              'maxfun': maxfev})
             x0 = copy.deepcopy(tmp.x)
             partial.append(tmp.fun)
 
