@@ -460,9 +460,9 @@ def min_chi2(x0, bounds, min_method, fixed=-1, AccuracyBoost=1.0,
         z      = x0[fixed]
         x0     = np.delete(x0, (fixed))
         bounds = np.delete(bounds, (fixed), axis=0)
-        args = [z, fixed, 1.0]
+        args = (z, fixed, 1.0)
     else:
-        args = [0.0, -2.0, 1.0]
+        args = (0.0, -2.0, 1.0)
 
     def log_prior(params):
         params = np.array(copy.deepcopy(params))
@@ -488,8 +488,7 @@ def min_chi2(x0, bounds, min_method, fixed=-1, AccuracyBoost=1.0,
        def __init__(self, stepsize=0.2):
            self.cov = stepsize*cov
        def __call__(self, x):
-           test = np.random.multivariate_normal(x, self.cov, size=1)
-           return test
+           return np.random.multivariate_normal(x, self.cov, size=1)
 
     if min_method == 1:
         x = copy.deepcopy(x0)
@@ -514,10 +513,11 @@ def min_chi2(x0, bounds, min_method, fixed=-1, AccuracyBoost=1.0,
                                           minimizer_kwargs={"method": 'Nelder-Mead', 
                                                             "args": args, 
                                                             "bounds": bounds, 
-                                                            "options": {'adaptive' : False, 
+                                                            "options": {'adaptive' : True, 
                                                                         'xatol'    : tol,
                                                                         'fatol'    : tol, 
-                                                                        'maxfev'   : maxfev}})
+                                                                        'maxfev'   : maxfev,
+                                                                        'maxiter'  : maxiter}})
         result = tmp.fun
     elif min_method == 2:
         x = copy.deepcopy(x0)
@@ -526,7 +526,7 @@ def min_chi2(x0, bounds, min_method, fixed=-1, AccuracyBoost=1.0,
                                       args=args, 
                                       method='Nelder-Mead', 
                                       bounds=bounds, 
-                                      options = {'adaptive' : False, 
+                                      options = {'adaptive' : True, 
                                                  'xatol'    : tol,
                                                  'fatol'    : tol, 
                                                  'maxfev'   : maxfev})
@@ -563,7 +563,6 @@ def min_chi2(x0, bounds, min_method, fixed=-1, AccuracyBoost=1.0,
                                                                           'maxiter'  : maxiter}})
         result = tmp.fun
     elif min_method == 4:
-        
         x = copy.deepcopy(x0)
         partial = []
         for i in range(maxiter):
@@ -577,10 +576,10 @@ def min_chi2(x0, bounds, min_method, fixed=-1, AccuracyBoost=1.0,
                                                      'fatol'   : tol, 
                                                      'maxfev'  : maxfev,
                                                      'maxiter' : maxiter})
-            x = copy.deepcopy(tmp.x)
             partial.append(tmp.fun)
             print(f"i = {i}, chi2 = {tmp.fun}, ns = {args[0]}")
-            
+            x = GaussianStep(stepsize=0.005)(tmp.x)[0,:]
+
             tmp = iminuit.minimize(fun=mychi2, 
                                    x0=x, 
                                    args=args, 
@@ -589,12 +588,14 @@ def min_chi2(x0, bounds, min_method, fixed=-1, AccuracyBoost=1.0,
                                    tol=tol,
                                    options = {'stra'  : 2, 
                                               'maxfun': maxfev})
-            x = copy.deepcopy(tmp.x)
             partial.append(tmp.fun)
-            result = min(partial)
             print(f"i = {i}, chi2 = {tmp.fun}, ns = {args[0]}")
+            x = GaussianStep(stepsize=0.005)(tmp.x)[0,:]
+
+            result = min(partial)
+            
     
-    elif min_method == 5: # PROCOLI
+    elif min_method == 5: # ADAPTED FROM PROCOLI
 
         nwalkers    = int(3)
         ndim        = int(x0.shape[0])
@@ -611,13 +612,11 @@ def min_chi2(x0, bounds, min_method, fixed=-1, AccuracyBoost=1.0,
 
             GScov  = copy.deepcopy(cov)
             GScov *= temperature[i]*stepsz[i] 
-            args2       = copy.deepcopy(args)
-            args2[2]    = temperature[i]
-         
+      
             sampler = emcee.EnsembleSampler(nwalkers, 
                                             ndim, 
                                             logprob, 
-                                            args=args2,
+                                            args=(args[0], args[1], temperature[i]),
                                             moves=[(emcee.moves.GaussianMove(cov=GScov),1.)])
             
             sampler.run_mcmc(x, nsteps, skip_initial_state_check=True)
@@ -634,10 +633,22 @@ def min_chi2(x0, bounds, min_method, fixed=-1, AccuracyBoost=1.0,
                                           options = {'adaptive' : True, 
                                                      'xatol'    : tol,
                                                      'fatol'    : tol, 
-                                                     'maxfev'   : maxfev,
+                                                     'maxfev'   : int(maxfev),
                                                      'maxiter'  : maxiter})
             x0 = copy.deepcopy(tmp.x)
             partial.append(tmp.fun)
+
+            tmp = iminuit.minimize(fun=mychi2, 
+                                   x0=x0, 
+                                   args=args, 
+                                   bounds=bounds, 
+                                   method="migrad", 
+                                   tol=tol,
+                                   options = {'stra'  : 1, 
+                                              'maxfun': int(maxfev)})
+            x0 = copy.deepcopy(tmp.x)
+            partial.append(tmp.fun)
+
             result = min(partial)
             print(f"i = {i}, chi2 = {result}, ns = {args[0]}")
     return result
