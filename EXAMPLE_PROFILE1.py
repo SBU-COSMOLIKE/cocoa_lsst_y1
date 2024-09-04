@@ -498,17 +498,19 @@ def min_chi2(x0, bounds, min_method, fixed=-1, AccuracyBoost=1.0,
                                bounds=bounds, 
                                method="migrad", 
                                tol=tol,
-                               options = {'stra'  : 1, 
-                                          'maxfun': int(maxfev/2)})      
+                               options = {'stra'  : 2, 
+                                          'maxfun': int(maxfev)}) 
+        x = copy.deepcopy(tmp.x)  
+        GS = GaussianStep()
         tmp = scipy.optimize.basinhopping(func=mychi2, 
-                                          x0=tmp.x, 
+                                          x0=x, 
                                           T=0.1, 
                                           target_accept_rate=0.25, 
                                           niter=maxiter, 
-                                          stepsize=0.1,
+                                          stepsize=0.02,
                                           interval=100,
                                           niter_success=3,
-                                          take_step=GaussianStep,
+                                          take_step=GS,
                                           minimizer_kwargs={"method": 'Nelder-Mead', 
                                                             "args": args, 
                                                             "bounds": bounds, 
@@ -517,21 +519,30 @@ def min_chi2(x0, bounds, min_method, fixed=-1, AccuracyBoost=1.0,
                                                                         'fatol'    : tol, 
                                                                         'maxfev'   : maxfev,
                                                                         'maxiter'  : maxiter}})
+        x = copy.deepcopy(tmp.x)  
+        tmp = iminuit.minimize(fun=mychi2, 
+                               x0=x, 
+                               args=args, 
+                               bounds=bounds, 
+                               method="migrad", 
+                               tol=tol,
+                               options = {'stra'  : 2, 
+                                          'maxfun': int(maxfev)})
         result = tmp.fun
     elif min_method == 2:
         x = copy.deepcopy(x0)
-        tmp = scipy.optimize.minimize(fun=mychi2, 
-                                      x0=x, 
-                                      args=args, 
-                                      method='Nelder-Mead', 
-                                      bounds=bounds, 
-                                      options = {'adaptive' : True, 
-                                                 'xatol'    : tol,
-                                                 'fatol'    : tol, 
-                                                 'maxfev'   : maxfev})
+        tmp = iminuit.minimize(fun=mychi2, 
+                               x0=x, 
+                               args=args, 
+                               bounds=bounds, 
+                               method="migrad", 
+                               tol=tol,
+                               options = {'stra'  : 2, 
+                                          'maxfun': int(maxfev)})
+        x = copy.deepcopy(tmp.x)  
         # https://stats.stackexchange.com/a/456073
         tmp = scipy.optimize.dual_annealing(func=mychi2, 
-                                            x0=tmp.x, 
+                                            x0=x, 
                                             args=args, 
                                             bounds=bounds, 
                                             maxfun=maxfev,
@@ -541,6 +552,16 @@ def min_chi2(x0, bounds, min_method, fixed=-1, AccuracyBoost=1.0,
                                             accept=1, 
                                             initial_temp=5230.0, 
                                             restart_temp_ratio=0.0002) 
+        x = copy.deepcopy(tmp.x)  
+        tmp = iminuit.minimize(fun=mychi2, 
+                               x0=x, 
+                               args=args, 
+                               bounds=bounds, 
+                               method="migrad", 
+                               tol=tol,
+                               options = {'stra'  : 2, 
+                                          'maxfun': int(maxfev)})
+
         result = tmp.fun   
     elif min_method == 3:
         tmp = scipy.optimize.shgo(func=mychi2, 
@@ -561,25 +582,9 @@ def min_chi2(x0, bounds, min_method, fixed=-1, AccuracyBoost=1.0,
                                                                           'maxiter'  : maxiter}})
         result = tmp.fun
     elif min_method == 4:
-        
         x = copy.deepcopy(x0)
         partial = []
-        
         for i in range(maxiter):
-            tmp = scipy.optimize.minimize(fun=mychi2, 
-                                          x0=x, 
-                                          args=args, 
-                                          method='Nelder-Mead', 
-                                          bounds=bounds, 
-                                          options = {'adaptive' : True, 
-                                                     'xatol'   : tol,
-                                                     'fatol'   : tol, 
-                                                     'maxfev'  : maxfev,
-                                                     'maxiter' : maxiter})
-            partial.append(tmp.fun)
-            print(f"i = {i}, chi2 = {tmp.fun}, ns = {args[0]}")
-            x = GaussianStep(stepsize=0.005)(tmp.x)[0,:]
-
             tmp = iminuit.minimize(fun=mychi2, 
                                    x0=x, 
                                    args=args, 
@@ -589,13 +594,10 @@ def min_chi2(x0, bounds, min_method, fixed=-1, AccuracyBoost=1.0,
                                    options = {'stra'  : 2, 
                                               'maxfun': maxfev})
             partial.append(tmp.fun)
-            print(f"i = {i}, chi2 = {tmp.fun}, ns = {args[0]}")
-            x = GaussianStep(stepsize=0.005)(tmp.x)[0,:]
-
-            result = min(partial)
-            
-    
-    elif min_method == 5: # ADAPTED FROM PROCOLI BUT w/ Extra minimizers after each Emcee walking
+            print(f"MN, i = {i}, chi2 = {tmp.fun}, ns = {args[0]}")
+            x = GaussianStep(stepsize=0.0025)(tmp.x)[0,:]
+        result = min(partial)      
+    elif min_method == 5: # adapted from PROCOLI
 
         nwalkers    = int(3)
         ndim        = int(x0.shape[0])
@@ -604,7 +606,7 @@ def min_chi2(x0, bounds, min_method, fixed=-1, AccuracyBoost=1.0,
         stepsz      = np.array([1.0, 1.00, 0.80, 0.5, 0.2, 0.100, 0.050])
 
         partial = []
-        for i in range(6):
+        for i in range(7):
             x = [] # Initial point
             for j in range(nwalkers):
                 x.append(GaussianStep(stepsize=temperature[i]*stepsz[i])(x0)[0,:])
@@ -623,20 +625,8 @@ def min_chi2(x0, bounds, min_method, fixed=-1, AccuracyBoost=1.0,
             samples = sampler.get_chain(flat=True, thin=1, discard=0)      
             j = np.argmin(-1.0*np.array(sampler.get_log_prob(flat=True)))
             x0 = copy.deepcopy(samples[j])
-            partial.append(mychi2(sampler[j], *args))
-            
-            tmp = scipy.optimize.minimize(fun=mychi2, 
-                                          x0=x0, 
-                                          args=args, 
-                                          method='Nelder-Mead', 
-                                          bounds=bounds, 
-                                          options = {'adaptive' : True, 
-                                                     'xatol'    : tol,
-                                                     'fatol'    : tol, 
-                                                     'maxfev'   : maxfev,
-                                                     'maxiter'  : maxiter})
-            x0 = copy.deepcopy(tmp.x)
-            partial.append(tmp.fun)
+            partial.append(mychi2(samples[j], *args))
+            print(f"emcee: i = {i}, chi2 = {min(partial)}, ns = {args[0]}")
 
             tmp = iminuit.minimize(fun=mychi2, 
                                    x0=x0, 
@@ -644,13 +634,12 @@ def min_chi2(x0, bounds, min_method, fixed=-1, AccuracyBoost=1.0,
                                    bounds=bounds, 
                                    method="migrad", 
                                    tol=tol,
-                                   options = {'stra'  : 1, 
+                                   options = {'stra'  : 2, 
                                               'maxfun': maxfev})
             x0 = copy.deepcopy(tmp.x)
             partial.append(tmp.fun)
-
-            result = min(partial)
-            print(f"i = {i}, chi2 = {result}, ns = {args[0]}")
+            print(f"MN: i = {i}, chi2 = {result}, ns = {args[0]}")
+        result = min(partial)
     return result
 
 # ------------------------------------------------------------------------------
@@ -696,7 +685,8 @@ if __name__ == '__main__':
     executor.shutdown()
     
 # TO RUN THIS SCRIPT
-# method = 1
-# mpirun -n 13 --oversubscribe --mca btl vader,tcp,self --bind-to core:overload-allowed 
-# --rank-by core --map-by numa:pe=${OMP_NUM_THREADS} python -m mpi4py.futures EXAMPLE_PROFILE1.py 
-# --AB 1.1 --tol 0.02 --maxiter 10 --maxfeval 7500 --profile 1 --mpi 12 --outroot "monday" --minmethod 1
+#mpirun -n 13 --oversubscribe --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by core --map-by numa:pe=${OMP_NUM_THREADS} python -m mpi4py.futures EXAMPLE_PROFILE1.py --AB 1.0 --tol 0.02 --maxiter 5 --maxfeval 10000 --profile 1 --mpi 12 --outroot "monday" --minmethod 1
+#mpirun -n 13 --oversubscribe --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by core --map-by numa:pe=${OMP_NUM_THREADS} python -m mpi4py.futures EXAMPLE_PROFILE1.py --AB 1.0 --tol 0.02 --maxiter 3 --maxfeval 12000 --profile 1 --mpi 12 --outroot "monday" --minmethod 2
+#mpirun -n 13 --oversubscribe --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by core --map-by numa:pe=${OMP_NUM_THREADS} python -m mpi4py.futures EXAMPLE_PROFILE1.py --AB 1.0 --tol 0.02 --maxiter 2 --maxfeval 500 --profile 1 --mpi 12 --outroot "monday" --minmethod 3
+#mpirun -n 13 --oversubscribe --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by core --map-by numa:pe=${OMP_NUM_THREADS} python -m mpi4py.futures EXAMPLE_PROFILE1.py --AB 1.0 --tol 0.02 --maxiter 3 --maxfeval 4000 --profile 1 --mpi 12 --outroot "monday" --minmethod 4
+#mpirun -n 13 --oversubscribe --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by core --map-by numa:pe=${OMP_NUM_THREADS} python -m mpi4py.futures EXAMPLE_PROFILE1.py  --AB 1.0 --tol 0.02 --maxfeval 3000 --profile 1 --mpi 12 --outroot "monday" --minmethod 5
