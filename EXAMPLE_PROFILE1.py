@@ -17,6 +17,7 @@ import cosmolike_lsst_y1_interface as ci
 import copy
 import argparse
 import random
+import emcee
 
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
@@ -444,36 +445,51 @@ cov = np.delete(cov, (5), axis=1)
 # ------------------------------------------------------------------------------
 
 def min_chi2(x0, bounds, min_method, fixed=-1, AccuracyBoost=1.0, 
-             tol=0.01, maxfev=300000, non_linear_emul=2, maxiter=10):
+             tol=0.01, maxfev=300000, non_linear_emul=2, maxiter=10, cov=cov):
 
-    def mychi2(params, *args):  
-        z, fixed = args
+    def mychi2(params, *args):
+        z, fixed, T = args
         params = np.array(params)
         if fixed > -1:
             params = np.insert(params, fixed, z)
-
         return chi2(params=params, 
                     AccuracyBoost=AccuracyBoost, 
-                    non_linear_emul=non_linear_emul)
-    
+                    non_linear_emul=non_linear_emul)/T
+
     if fixed > -1:
         z      = x0[fixed]
         x0     = np.delete(x0, (fixed))
         bounds = np.delete(bounds, (fixed), axis=0)
-        args = (z, fixed)
+        args = [z, fixed, 1.0]
     else:
-        args = (0.0, -2)
+        args = [0.0, -2.0, 1.0]
 
-    mycov = np.delete(cov, (fixed), axis=0)
-    mycov = np.delete(mycov, (fixed), axis=1)
+    def log_prior(params):
+        params = np.array(copy.deepcopy(params))
+        prior = 1.0
+        for i in range(len(params)):
+            if (params[i] < bounds[i][0]) or (params[i] > bounds[i][1]):
+                return -np.inf
+            else:
+                prior *= np.log(1.0/(bounds[i][1]-bounds[i][0]))
+        return prior
+    
+    def logprob(params, *args):
+        lp = log_prior(params)
+        if not np.isfinite(lp):
+            return -np.inf
+        else:
+            return -0.5*mychi2(params, *args) + lp
+    
+    cov = np.delete(cov, (fixed), axis=0)
+    cov = np.delete(cov, (fixed), axis=1)
 
     class GaussianStep:
        def __init__(self, stepsize=0.2):
-           self.cov = stepsize*mycov
-           print(mycov.shape)
-           print(self.cov.shape)
+           self.cov = stepsize*cov
        def __call__(self, x):
-           return np.random.multivariate_normal(x, self.cov, size=1)
+           test = np.random.multivariate_normal(x, self.cov, size=1)
+           return test
 
     if min_method == 1:
         x = copy.deepcopy(x0)
@@ -484,7 +500,7 @@ def min_chi2(x0, bounds, min_method, fixed=-1, AccuracyBoost=1.0,
                                method="migrad", 
                                tol=tol,
                                options = {'stra'  : 1, 
-                                          'maxfun': maxfev})
+                                          'maxfun': int(maxfev/2)})
         x = copy.deepcopy(tmp.x)        
         tmp = scipy.optimize.basinhopping(func=mychi2, 
                                           x0=x, 
@@ -493,7 +509,7 @@ def min_chi2(x0, bounds, min_method, fixed=-1, AccuracyBoost=1.0,
                                           niter=maxiter, 
                                           stepsize=0.1,
                                           interval=100,
-                                          niter_success=1000,
+                                          niter_success=3,
                                           take_step=GaussianStep,
                                           minimizer_kwargs={"method": 'Nelder-Mead', 
                                                             "args": args, 
@@ -547,6 +563,7 @@ def min_chi2(x0, bounds, min_method, fixed=-1, AccuracyBoost=1.0,
                                                                           'maxiter'  : maxiter}})
         result = tmp.fun
     elif min_method == 4:
+        
         x = copy.deepcopy(x0)
         partial = []
         for i in range(maxiter):
@@ -556,9 +573,9 @@ def min_chi2(x0, bounds, min_method, fixed=-1, AccuracyBoost=1.0,
                                           method='Nelder-Mead', 
                                           bounds=bounds, 
                                           options = {'adaptive' : True, 
-                                                     'xatol'   : tol/(i+1),
-                                                     'fatol'   : tol/(i+1), 
-                                                     'maxfev'  : (i+1)*maxfev,
+                                                     'xatol'   : tol,
+                                                     'fatol'   : tol, 
+                                                     'maxfev'  : maxfev,
                                                      'maxiter' : maxiter})
             x = copy.deepcopy(tmp.x)
             partial.append(tmp.fun)
@@ -569,16 +586,65 @@ def min_chi2(x0, bounds, min_method, fixed=-1, AccuracyBoost=1.0,
                                    args=args, 
                                    bounds=bounds, 
                                    method="migrad", 
-                                   tol=tol/(i+1),
-                                   options = {'stra' : 2, 
-                                              'maxfun': (i+1)*maxfev})
+                                   tol=tol,
+                                   options = {'stra'  : 2, 
+                                              'maxfun': maxfev})
             x = copy.deepcopy(tmp.x)
             partial.append(tmp.fun)
             result = min(partial)
             print(f"i = {i}, chi2 = {tmp.fun}, ns = {args[0]}")
+    
+    elif min_method == 5: # PROCOLI
+
+        nwalkers    = int(3)
+        ndim        = int(x0.shape[0])
+        nsteps      = maxfev
+        temperature = np.array([1.0, 0.33, 0.25, 0.2, 0.1, 0.005, 0.001])
+        stepsz      = np.array([1.0, 1.00, 0.80, 0.5, 0.2, 0.100, 0.050])
+
+        partial = []
+        for i in range(6):
+            # Initial point
+            x = []
+            for j in range(nwalkers):
+                x.append(GaussianStep(stepsize=temperature[i]*stepsz[i])(x0)[0,:])
+            x = np.array(x)
+
+            GScov  = copy.deepcopy(cov)
+            GScov *= temperature[i]*stepsz[i]
+            
+            args2       = copy.deepcopy(args)
+            args2[2]    = temperature[i]
+         
+            sampler = emcee.EnsembleSampler(nwalkers, 
+                                            ndim, 
+                                            logprob, 
+                                            args=args2,
+                                            moves=[(emcee.moves.GaussianMove(cov=GScov),1.)])
+            
+            sampler.run_mcmc(x, nsteps, skip_initial_state_check=True)
+        
+            samples = sampler.get_chain(flat=True, thin=1, discard=0)      
+            j = np.argmin(-1.0*np.array(sampler.get_log_prob(flat=True)))
+            
+            x0 = copy.deepcopy(samples[j])
+            partial.append(mychi2(sampler[j], *args))
+            
+            tmp = scipy.optimize.minimize(fun=mychi2, 
+                                          x0=x0, 
+                                          args=args, 
+                                          method='Nelder-Mead', 
+                                          bounds=bounds, 
+                                          options = {'adaptive' : True, 
+                                                     'xatol'    : tol,
+                                                     'fatol'    : tol, 
+                                                     'maxfev'   : maxfev,
+                                                     'maxiter'  : maxiter})
+            x0 = copy.deepcopy(tmp.x)
+            partial.append(tmp.fun)
+            result = min(partial)
+            print(f"i = {i}, chi2 = {result}, ns = {args[0]}")
     return result
-
-
 
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
@@ -627,18 +693,3 @@ if __name__ == '__main__':
 # mpirun -n 13 --oversubscribe --mca btl vader,tcp,self --bind-to core:overload-allowed 
 # --rank-by core --map-by numa:pe=${OMP_NUM_THREADS} python -m mpi4py.futures EXAMPLE_PROFILE1.py 
 # --AB 1.1 --tol 0.02 --maxiter 10 --maxfeval 7500 --profile 1 --mpi 12 --outroot "monday" --minmethod 1
-
-# method = 3
-# mpirun -n 13 --oversubscribe --mca btl vader,tcp,self --bind-to core:overload-allowed 
-# --rank-by core --map-by numa:pe=${OMP_NUM_THREADS} python -m mpi4py.futures EXAMPLE_PROFILE1.py 
-# --AB 1.1 --tol 0.03 --maxiter 4 --maxfeval 10000 --profile 4 --mpi 12 --outroot "monday" --minmethod 3
-
-# method = 2
-# mpirun -n 13 --oversubscribe --mca btl vader,tcp,self --bind-to core:overload-allowed 
-# --rank-by core --map-by numa:pe=${OMP_NUM_THREADS} python -m mpi4py.futures EXAMPLE_PROFILE1.py 
-# --AB 1.1 --tol 0.03 --maxiter 4 --maxfeval 10000 --profile 4 --mpi 12 --outroot "monday" --minmethod 2
-
-# method = 4
-# mpirun -n 13 --oversubscribe --mca btl vader,tcp,self --bind-to core:overload-allowed 
-# --rank-by core --map-by numa:pe=${OMP_NUM_THREADS} python -m mpi4py.futures EXAMPLE_PROFILE1.py 
-# --AB 1.1 --tol 0.03 --maxiter 4 --maxfeval 10000 --profile 4 --mpi 12 --outroot "monday" --minmethod 4
