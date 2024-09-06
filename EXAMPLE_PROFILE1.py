@@ -274,7 +274,7 @@ x = np.array([
                 0.003,        # M3
                 0.004,        # M4
                 0.001         # M5
-              ])
+              ], dtype='float64')
 
 bounds = np.array([
                     [1.95, 2.4],   # As
@@ -294,7 +294,7 @@ bounds = np.array([
                     [-0.12, 0.12], # M3
                     [-0.12, 0.12], # M4
                     [-0.12, 0.12]  # M5
-                  ])
+                  ], dtype='float64')
 
 start = np.array([ 
                     1.96,         # As
@@ -314,7 +314,7 @@ start = np.array([
                     -0.20,        # M3
                     -0.20,        # M4
                     -0.20         # M5
-                ])
+                ], dtype='float64')
 
 stop  = np.array([ 
                     2.3,         # As
@@ -334,7 +334,7 @@ stop  = np.array([
                     0.20,         # M3
                     0.20,         # M4
                     0.20          # M5
-                 ])
+                 ], dtype='float64')
 
 name  = [ 
             "As",       # As
@@ -440,7 +440,7 @@ cov      = np.loadtxt(cov_file)
 # need to delete the w line
 cov = np.delete(cov, (5), axis=0)
 cov = np.delete(cov, (5), axis=1)
-
+cov = np.array(cov, dtype='float64')
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
@@ -619,21 +619,21 @@ def min_chi2(x0, bounds, min_method, fixed=-1, AccuracyBoost=1.0,
         j = np.argmin(np.array(partial))
         result = [partial_samples[j], partial[j]]   
     
-    elif min_method == 5: # adapted from PROCOLI
-
+    elif min_method == 5: # adapted from PROCOLI       
         nwalkers    = int(3)
         ndim        = int(x0.shape[0])
         nsteps      = maxfeval
-        temperature = np.array([1.0, 0.3, 0.25, 0.2, 0.1, 0.005, 0.001])
+        temperature = np.array([1.0, 0.3, 0.25, 0.2, 0.1, 0.005, 0.001], dtype='float64')
         stepsz      = temperature/4.0
 
         partial_samples = []
         partial = []
+
         for i in range(7):
             x = [] # Initial point
             for j in range(nwalkers):
                 x.append(GaussianStep(stepsize=stepsz[i])(x0)[0,:])
-            x = np.array(x)
+            x = np.array(x, dtype='float64')
 
             GScov  = copy.deepcopy(cov)
             GScov *= temperature[i]*stepsz[i] 
@@ -654,6 +654,8 @@ def min_chi2(x0, bounds, min_method, fixed=-1, AccuracyBoost=1.0,
             j = np.argmin(np.array(partial))
             x0 = copy.deepcopy(partial_samples[j])
             
+            nsteps += 1000
+
             sampler.reset()
 
             print(f"emcee: i = {i}, chi2 = {partial[j]}, param = {args[0]}")
@@ -674,8 +676,6 @@ def min_chi2(x0, bounds, min_method, fixed=-1, AccuracyBoost=1.0,
         result = [partial_samples[j], partial[j]]
 
         print(f"MN: i = {i}, chi2 = {partial}, param = {args[0]}")
-    elif min_method == 6:
-        return [x0, 0.0]
 
     return result
 
@@ -684,8 +684,8 @@ def min_chi2(x0, bounds, min_method, fixed=-1, AccuracyBoost=1.0,
 # ------------------------------------------------------------------------------
 
 def prf(x0, index, min_method, maxiter, maxfeval):
-    res =  min_chi2(x0=x0, 
-                    bounds=bounds, 
+    res =  min_chi2(x0=np.array(x0, dtype='float64'), 
+                    bounds=np.array(bounds, dtype='float64'), 
                     min_method=min_method, 
                     fixed=index, 
                     AccuracyBoost=AccuracyBoost, 
@@ -738,7 +738,7 @@ if __name__ == '__main__':
         res = np.array(list(executor.map(functools.partial(prf,
                                                            index=index, 
                                                            min_method=4,
-                                                           maxiter=2,
+                                                           maxiter=maxiter,
                                                            maxfeval=int(2500)),
                                          x0)))
 
