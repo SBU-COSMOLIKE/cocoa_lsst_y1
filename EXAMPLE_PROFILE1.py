@@ -18,6 +18,7 @@ import copy
 import argparse
 import random
 import emcee
+import itertools
 
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
@@ -249,7 +250,6 @@ def chi2(params, AccuracyBoost=1.0, non_linear_emul=2):
                        B_TA = [0, 0, 0, 0, 0])
 
     datavector = np.array(ci.compute_data_vector_masked())
-    
     return ci.compute_chi2(datavector)
 
 # ------------------------------------------------------------------------------
@@ -277,18 +277,18 @@ x = np.array([
               ])
 
 bounds = np.array([
-                    [1.9, 2.5],    # As
+                    [1.95, 2.4],   # As
                     [0.89, 1.05],  # ns 
-                    [50.0, 90.0],  # H0
-                    [0.027, 0.07], # omegab
-                    [0.2,0.4],     # omegam
+                    [55.0, 87.0],  # H0
+                    [0.027, 0.065], # omegab
+                    [0.22, 0.38],   # omegam
                     [-0.12, 0.12], # S1
                     [-0.12, 0.12], # S2
                     [-0.12, 0.12], # S3
                     [-0.12, 0.12], # S4
                     [-0.12, 0.12], # S5
-                    [-5.0, 5.0],   # A11
-                    [-5.0, 5.0],   # A12
+                    [-4.5, 4.5],   # A11
+                    [-4.5, 4.5],   # A12
                     [-0.12, 0.12], # M1
                     [-0.12, 0.12], # M2
                     [-0.12, 0.12], # M3
@@ -297,11 +297,11 @@ bounds = np.array([
                   ])
 
 start = np.array([ 
-                    1.90,         # As
+                    1.96,         # As
                     0.90,         # ns 
-                    60.0,         # H0
+                    61.0,         # H0
                     0.028,        # omegab
-                    0.20,         # omegam
+                    0.25,         # omegam
                     -0.20,        # S1
                     -0.20,        # S2
                     -0.20,        # S3
@@ -317,11 +317,11 @@ start = np.array([
                 ])
 
 stop  = np.array([ 
-                    2.50,         # As
+                    2.3,         # As
                     1.04,         # ns
-                    80.0,         # H0
+                    78.0,         # H0
                     0.05,         # omegab
-                    0.40,         # omegam
+                    0.35,         # omegam
                     0.20,         # S1
                     0.20,         # S2
                     0.20,         # S3
@@ -359,6 +359,7 @@ name  = [
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
+
 parser = argparse.ArgumentParser(prog='EXAMPLE_PROFILE1')
 
 parser.add_argument("--AB",
@@ -430,7 +431,7 @@ tol             = args.tolerance
 maxfeval        = args.maxfeval
 maxiter         = args.maxiter
 min_method      = args.minmethod
-outroot         = args.outroot
+oroot           = args.outroot
 index           = args.profile
 nummpi          = args.mpi
 
@@ -445,16 +446,17 @@ cov = np.delete(cov, (5), axis=1)
 # ------------------------------------------------------------------------------
 
 def min_chi2(x0, bounds, min_method, fixed=-1, AccuracyBoost=1.0, 
-             tol=0.01, maxfev=300000, non_linear_emul=2, maxiter=10, cov=cov):
+             tol=0.01, maxfeval=3000, non_linear_emul=2, maxiter=10, cov=cov):
 
     def mychi2(params, *args):
         z, fixed, T = args
         params = np.array(params)
         if fixed > -1:
             params = np.insert(params, fixed, z)
-        return chi2(params=params, 
-                    AccuracyBoost=AccuracyBoost, 
-                    non_linear_emul=non_linear_emul)/T
+        res = chi2(params=params, 
+                   AccuracyBoost=AccuracyBoost, 
+                   non_linear_emul=non_linear_emul)/T
+        return res
 
     if fixed > -1:
         z      = x0[fixed]
@@ -491,6 +493,7 @@ def min_chi2(x0, bounds, min_method, fixed=-1, AccuracyBoost=1.0,
            return np.random.multivariate_normal(x, self.cov, size=1)
 
     if min_method == 1:
+    
         x = copy.deepcopy(x0)
         tmp = iminuit.minimize(fun=mychi2, 
                                x0=x, 
@@ -499,7 +502,8 @@ def min_chi2(x0, bounds, min_method, fixed=-1, AccuracyBoost=1.0,
                                method="migrad", 
                                tol=tol,
                                options = {'stra'  : 2, 
-                                          'maxfun': int(maxfev)}) 
+                                          'maxfun': int(maxfeval/3.0)}) 
+        
         x = copy.deepcopy(tmp.x)  
         GS = GaussianStep()
         tmp = scipy.optimize.basinhopping(func=mychi2, 
@@ -517,8 +521,9 @@ def min_chi2(x0, bounds, min_method, fixed=-1, AccuracyBoost=1.0,
                                                             "options": {'adaptive' : True, 
                                                                         'xatol'    : tol,
                                                                         'fatol'    : tol, 
-                                                                        'maxfev'   : maxfev,
+                                                                        'maxfev'   : maxfeval,
                                                                         'maxiter'  : maxiter}})
+        
         x = copy.deepcopy(tmp.x)  
         tmp = iminuit.minimize(fun=mychi2, 
                                x0=x, 
@@ -527,9 +532,11 @@ def min_chi2(x0, bounds, min_method, fixed=-1, AccuracyBoost=1.0,
                                method="migrad", 
                                tol=tol,
                                options = {'stra'  : 2, 
-                                          'maxfun': int(maxfev)})
-        result = tmp.fun
+                                          'maxfun': int(maxfeval/3.0)})
+        result = [tmp.x, tmp.fun]
+    
     elif min_method == 2:
+        
         x = copy.deepcopy(x0)
         tmp = iminuit.minimize(fun=mychi2, 
                                x0=x, 
@@ -538,20 +545,23 @@ def min_chi2(x0, bounds, min_method, fixed=-1, AccuracyBoost=1.0,
                                method="migrad", 
                                tol=tol,
                                options = {'stra'  : 2, 
-                                          'maxfun': int(maxfev)})
-        x = copy.deepcopy(tmp.x)  
+                                          'maxfun': int(maxfeval/3.0)})
+        
+        x = copy.deepcopy(tmp.x)
         # https://stats.stackexchange.com/a/456073
         tmp = scipy.optimize.dual_annealing(func=mychi2, 
                                             x0=x, 
                                             args=args, 
                                             bounds=bounds, 
-                                            maxfun=maxfev,
+                                            maxfun=maxfeval,
                                             no_local_search=True, 
                                             maxiter=maxiter, 
                                             visit=1.01, 
                                             accept=1, 
                                             initial_temp=5230.0, 
                                             restart_temp_ratio=0.0002) 
+        
+        
         x = copy.deepcopy(tmp.x)  
         tmp = iminuit.minimize(fun=mychi2, 
                                x0=x, 
@@ -560,17 +570,19 @@ def min_chi2(x0, bounds, min_method, fixed=-1, AccuracyBoost=1.0,
                                method="migrad", 
                                tol=tol,
                                options = {'stra'  : 2, 
-                                          'maxfun': int(maxfev)})
+                                          'maxfun': int(maxfeval/3.0)})
 
-        result = tmp.fun   
+        result = [tmp.x, tmp.fun]
+
     elif min_method == 3:
+        
         tmp = scipy.optimize.shgo(func=mychi2, 
                                   args=args, 
                                   bounds=bounds,
                                   n=50,
                                   iters=maxiter,
                                   options={'f_tol'    : tol, 
-                                           'maxfev'   : maxfev,
+                                           'maxfev'   : maxfeval,
                                            'maxiter'  : maxiter},
                                   minimizer_kwargs={"method": 'Nelder-Mead', 
                                                               "args": args, 
@@ -578,12 +590,15 @@ def min_chi2(x0, bounds, min_method, fixed=-1, AccuracyBoost=1.0,
                                                               "options": {'adaptive' : True, 
                                                                           'xatol'    : tol,
                                                                           'fatol'    : tol, 
-                                                                          'maxfev'   : maxfev,
+                                                                          'maxfev'   : maxfeval,
                                                                           'maxiter'  : maxiter}})
-        result = tmp.fun
+        result = [tmp.x, tmp.fun]
+    
     elif min_method == 4:
+    
         x = copy.deepcopy(x0)
-        partial = []
+        partial_samples = [x]
+        partial = [mychi2(x, *args)]
         for i in range(maxiter):
             tmp = iminuit.minimize(fun=mychi2, 
                                    x0=x, 
@@ -592,24 +607,32 @@ def min_chi2(x0, bounds, min_method, fixed=-1, AccuracyBoost=1.0,
                                    method="migrad", 
                                    tol=tol,
                                    options = {'stra'  : 2, 
-                                              'maxfun': maxfev})
+                                              'maxfun': maxfeval})
+            partial_samples.append(tmp.x)
             partial.append(tmp.fun)
-            print(f"MN, i = {i}, chi2 = {tmp.fun}, ns = {args[0]}")
-            x = GaussianStep(stepsize=0.0025)(tmp.x)[0,:]
-        result = min(partial)      
+            
+            j = np.argmin(np.array(partial))
+            x = GaussianStep(stepsize=0.005)(partial_samples[j])[0,:]
+            
+            print(f"MN: i = {i}, chi2 = {partial[j]}, param = {args[0]}")
+        
+        j = np.argmin(np.array(partial))
+        result = [partial_samples[j], partial[j]]   
+    
     elif min_method == 5: # adapted from PROCOLI
 
         nwalkers    = int(3)
         ndim        = int(x0.shape[0])
-        nsteps      = maxfev
-        temperature = np.array([1.0, 0.33, 0.25, 0.2, 0.1, 0.005, 0.001])
-        stepsz      = np.array([1.0, 1.00, 0.80, 0.5, 0.2, 0.100, 0.050])
+        nsteps      = maxfeval
+        temperature = np.array([1.0, 0.3, 0.25, 0.2, 0.1, 0.005, 0.001])
+        stepsz      = temperature/4.0
 
+        partial_samples = []
         partial = []
         for i in range(7):
             x = [] # Initial point
             for j in range(nwalkers):
-                x.append(GaussianStep(stepsize=temperature[i]*stepsz[i])(x0)[0,:])
+                x.append(GaussianStep(stepsize=stepsz[i])(x0)[0,:])
             x = np.array(x)
 
             GScov  = copy.deepcopy(cov)
@@ -620,42 +643,54 @@ def min_chi2(x0, bounds, min_method, fixed=-1, AccuracyBoost=1.0,
                                             logprob, 
                                             args=(args[0], args[1], temperature[i]),
                                             moves=[(emcee.moves.GaussianMove(cov=GScov),1.)])
-            
             sampler.run_mcmc(x, nsteps, skip_initial_state_check=True)
-            samples = sampler.get_chain(flat=True, thin=1, discard=0)      
+            
+            samples = sampler.get_chain(flat=True, thin=1, discard=0)
             j = np.argmin(-1.0*np.array(sampler.get_log_prob(flat=True)))
-            x0 = copy.deepcopy(samples[j])
+            
+            partial_samples.append(samples[j])
             partial.append(mychi2(samples[j], *args))
-            print(f"emcee: i = {i}, chi2 = {min(partial)}, ns = {args[0]}")
+            
+            j = np.argmin(np.array(partial))
+            x0 = copy.deepcopy(partial_samples[j])
+            
+            sampler.reset()
 
-            tmp = iminuit.minimize(fun=mychi2, 
-                                   x0=x0, 
-                                   args=args, 
-                                   bounds=bounds, 
-                                   method="migrad", 
-                                   tol=tol,
-                                   options = {'stra'  : 2, 
-                                              'maxfun': maxfev})
-            x0 = copy.deepcopy(tmp.x)
-            partial.append(tmp.fun)
-            print(f"MN: i = {i}, chi2 = {result}, ns = {args[0]}")
-        result = min(partial)
+            print(f"emcee: i = {i}, chi2 = {partial[j]}, param = {args[0]}")
+        
+        tmp = iminuit.minimize(fun=mychi2, 
+                               x0=x0, 
+                               args=args, 
+                               bounds=bounds, 
+                               method="migrad", 
+                               tol=tol,
+                               options = {'stra'  : 2, 
+                                          'maxfun': int(maxfeval/3)})
+        
+        partial_samples.append(tmp.x)
+        partial.append(tmp.fun)  
+        
+        j = np.argmin(np.array(partial))
+        result = [partial_samples[j], partial[j]]
+
+        print(f"MN: i = {i}, chi2 = {partial}, param = {args[0]}")
+    elif min_method == 6:
+        return [x0, 0.0]
+
     return result
 
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 
-def prf(val, index):
-    x0 = copy.deepcopy(x)
-    x0[index] = val
+def prf(x0, index, min_method, maxiter, maxfeval):
     res =  min_chi2(x0=x0, 
                     bounds=bounds, 
                     min_method=min_method, 
                     fixed=index, 
                     AccuracyBoost=AccuracyBoost, 
                     tol=tol, 
-                    maxfev=maxfeval, 
+                    maxfeval=maxfeval, 
                     non_linear_emul=non_linear_emul, 
                     maxiter=maxiter)
     return res
@@ -664,29 +699,52 @@ def prf(val, index):
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
+
 from mpi4py.futures import MPIPoolExecutor
 
 if __name__ == '__main__':
     
+    print(f"min_method={min_method}, maxiter={maxiter}, maxfeval={maxfeval}, tol={tol}, param={index}")
+
     executor = MPIPoolExecutor()
 
     param = np.linspace(start=start[index], stop=stop[index], num=nummpi)
-    print(param)
-
-    res = np.array(list(executor.map(functools.partial(prf,index=index),param)))
-
-    print("Profile = ", res)
     
-    out = outroot + "_" + str(random.randint(0,1000)) + "_minmethod_" + str(min_method) + "_" + name[index] + ".txt"
-    print("Output file = ", out)
+    x0 = []
+    for i in range(nummpi):
+        tmp = copy.deepcopy(x)
+        tmp[index] = param[i]
+        x0.append(tmp)
+    x0 = np.array(x0, dtype=object)
 
-    np.savetxt(out, np.c_[param, res])
+    res = np.array(list(executor.map(functools.partial(prf,
+                                                       index=index, 
+                                                       min_method=min_method,
+                                                       maxiter=maxiter,
+                                                       maxfeval=maxfeval),
+                                     x0)))
+
+    rnd = random.randint(0,1000)
+    out = oroot + "_" + str(rnd) + "_method_" + str(min_method) + "_" + name[index] + ".txt"
+    print("Output file = ", out)
+    np.savetxt(out, np.c_[param, res[:,1]])
+
+    if min_method != 4:
+        x0 = []
+        for i in range(nummpi):
+            x0.append(np.insert(res[i,0], index, param[i]))
+        x0 = np.array(x0, dtype=object)
+
+        res = np.array(list(executor.map(functools.partial(prf,
+                                                           index=index, 
+                                                           min_method=4,
+                                                           maxiter=2,
+                                                           maxfeval=int(2500)),
+                                         x0)))
+
+        rnd = random.randint(0,1000)
+        out = oroot + "_" + str(rnd) + "_method_" + str(4) + "_" + name[index] + ".txt"
+        print("Output file = ", out)
+        np.savetxt(out, np.c_[param, res[:,1]])
     
     executor.shutdown()
-    
-# TO RUN THIS SCRIPT
-#mpirun -n 13 --oversubscribe --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by core --map-by numa:pe=${OMP_NUM_THREADS} python -m mpi4py.futures EXAMPLE_PROFILE1.py --AB 1.0 --tol 0.02 --maxiter 5 --maxfeval 10000 --profile 1 --mpi 12 --outroot "monday" --minmethod 1
-#mpirun -n 13 --oversubscribe --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by core --map-by numa:pe=${OMP_NUM_THREADS} python -m mpi4py.futures EXAMPLE_PROFILE1.py --AB 1.0 --tol 0.02 --maxiter 3 --maxfeval 12000 --profile 1 --mpi 12 --outroot "monday" --minmethod 2
-#mpirun -n 13 --oversubscribe --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by core --map-by numa:pe=${OMP_NUM_THREADS} python -m mpi4py.futures EXAMPLE_PROFILE1.py --AB 1.0 --tol 0.02 --maxiter 2 --maxfeval 500 --profile 1 --mpi 12 --outroot "monday" --minmethod 3
-#mpirun -n 13 --oversubscribe --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by core --map-by numa:pe=${OMP_NUM_THREADS} python -m mpi4py.futures EXAMPLE_PROFILE1.py --AB 1.0 --tol 0.02 --maxiter 3 --maxfeval 4000 --profile 1 --mpi 12 --outroot "monday" --minmethod 4
-#mpirun -n 13 --oversubscribe --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by core --map-by numa:pe=${OMP_NUM_THREADS} python -m mpi4py.futures EXAMPLE_PROFILE1.py  --AB 1.0 --tol 0.02 --maxfeval 3000 --profile 1 --mpi 12 --outroot "monday" --minmethod 5
