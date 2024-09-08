@@ -57,7 +57,7 @@ if [ -z "${IGNORE_COSMOLIKE_LSSTY1_CODE}" ]; then
 
   PROJECT="${ROOTDIR:?}/projects"
 
-  FOLDER="${LSSTY1_NAME:-"lsst_y1"}"
+  FOLDER="${LSST_Y1_NAME:-"lsst_y1"}"
 
   PACKDIR="${PROJECT:?}/${FOLDER:?}"
 
