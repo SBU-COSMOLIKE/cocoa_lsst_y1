@@ -2,9 +2,9 @@ from cobaya.likelihoods.lsst_y1._cosmolike_prototype_base import _cosmolike_prot
 import cosmolike_lsst_y1_interface as ci
 import numpy as np
 
-class lsst_cosmic_shear(_cosmolike_prototype_base):
+class lsst_y1_cosmic_shear(_cosmolike_prototype_base):
   def initialize(self):
-    super(lsst_cosmic_shear,self).initialize(probe="xi")
+    super(lsst_y1_cosmic_shear,self).initialize(probe="xi")
 
   def logp(self, **params_values):
     datavector = self.internal_get_datavector(**params_values)

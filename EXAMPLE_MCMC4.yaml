@@ -3,7 +3,7 @@ debug: False
 stop_at_error: False
 
 likelihood:
-  lsst_y1.lsst_3x2pt:
+  lsst_y1.lsst_y1_3x2pt:
     path: ./external_modules/data/lsst_y1
     accuracyboost: 1.0
     integration_accuracy: 0

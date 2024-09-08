@@ -3,7 +3,7 @@ debug: False
 stop_at_error: True
 
 likelihood:
-  lsst_y1.lsst_xi_gg:
+  lsst_y1.lsst_y1_xi_gg:
     path: ./external_modules/data/lsst_y1
     print_datavector: False
     accuracyboost: 1.0

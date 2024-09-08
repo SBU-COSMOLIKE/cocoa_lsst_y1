@@ -2,14 +2,14 @@ from cobaya.likelihoods.lsst_y1._cosmolike_prototype_base import _cosmolike_prot
 import cosmolike_lsst_y1_interface as ci
 import numpy as np
 
-class lsst_3x2pt(_cosmolike_prototype_base):
+class lsst_y1_2x2pt(_cosmolike_prototype_base):
   def initialize(self):
-    super(lsst_3x2pt,self).initialize(probe="3x2pt")
-
+    super(lsst_y1_2x2pt,self).initialize(probe="2x2pt")
+  
   def logp(self, **params_values):
     datavector = self.internal_get_datavector(**params_values)
     return self.compute_logp(datavector)
-
+  
   def get_datavector(self, **params_values):        
     datavector = self.internal_get_datavector(**params_values)
     return np.array(datavector)
@@ -47,5 +47,5 @@ class lsst_3x2pt(_cosmolike_prototype_base):
       out[:,1] = datavector
       fmt = '%d', '%1.8e'
       np.savetxt(self.print_datavector_file, out, fmt = fmt)
-                
+              
     return datavector
