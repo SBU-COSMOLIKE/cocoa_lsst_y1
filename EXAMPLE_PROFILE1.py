@@ -431,7 +431,7 @@ tol             = args.tolerance
 maxfeval        = args.maxfeval
 maxiter         = args.maxiter
 min_method      = args.minmethod
-oroot           = args.outroot
+oroot           = "chains/" + args.outroot
 index           = args.profile
 nummpi          = args.mpi
 
