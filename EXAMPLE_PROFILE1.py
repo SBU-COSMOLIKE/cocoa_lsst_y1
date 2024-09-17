@@ -674,9 +674,8 @@ def min_chi2(x0, bounds, min_method, fixed=-1, AccuracyBoost=1.0,
         
         j = np.argmin(np.array(partial))
         result = [partial_samples[j], partial[j]]
-
-        print(f"MN: i = {i}, chi2 = {partial}, param = {args[0]}")
-
+        print(f"MN: chi2 = {result}, param = {args[0]}")
+        print(f"All: chi2 = {partial}, param = {args[0]}")
     return result
 
 # ------------------------------------------------------------------------------
