@@ -82,7 +82,6 @@ void init_data_3x2pt_real_space(
 {
   arma::Col<int>::fixed<3> order = {0, 1, 2};
   cosmolike_interface::init_data_3x2pt_real_space(cov, mask, data, order);
-  return;
 }
 
 // ---------------------------------------------------------------------------
@@ -95,7 +94,6 @@ void init_distances(std::vector<double> io_z, std::vector<double> io_chi)
       arma::conv_to<vector>::from(io_z),
       arma::conv_to<vector>::from(io_chi)
     );
-  return;
 }
 
 // ---------------------------------------------------------------------------
@@ -108,7 +106,6 @@ void init_growth(std::vector<double> io_z, std::vector<double> io_G)
       arma::conv_to<vector>::from(io_z),
       arma::conv_to<vector>::from(io_G)
     );
-  return; 
 }
 
 // ---------------------------------------------------------------------------
@@ -127,6 +124,10 @@ void init_linear_power_spectrum(
       arma::conv_to<vector>::from(io_lnP)
     );
 }
+
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
 
 void init_non_linear_power_spectrum(
     std::vector<double> io_log10k,
@@ -381,7 +382,7 @@ arma::Mat<double> compute_baryon_pcas_3x2pt(std::string scenarios)
   // Init BaryonScenario Class --------------------------------------------
   cosmolike_interface::BaryonScenario::get_instance().set_scenarios(scenarios);
 
-  return cosmolike_interface::compute_baryon_pcas_3x2pt(order);
+  return cosmolike_interface::compute_baryon_pcas_3x2pt_real(order);
 }
 
 // ---------------------------------------------------------------------------
@@ -391,9 +392,8 @@ arma::Mat<double> compute_baryon_pcas_3x2pt(std::string scenarios)
 std::vector<double> compute_theory_data_vector_masked()
 {
   arma::Col<int>::fixed<3> order = {0, 1, 2};
-  
   return arma::conv_to<std::vector<double>>::from(
-      cosmolike_interface::compute_data_vector_3x2pt_masked_any_order(order)
+      cosmolike_interface::compute_data_vector_3x2pt_real_masked_any_order(order)
     );
 }
 
@@ -407,7 +407,7 @@ std::vector<double> compute_theory_data_vector_masked_with_baryon_pcs(
 {
   arma::Col<int>::fixed<3> order = {0, 1, 2};
   return arma::conv_to<std::vector<double>>::from(
-      cosmolike_interface::compute_data_vector_3x2pt_masked_any_order(
+      cosmolike_interface::compute_data_vector_3x2pt_real_masked_any_order(
           Q,
           order
         )
