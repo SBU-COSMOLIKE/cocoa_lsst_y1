@@ -5,7 +5,13 @@ In this tutorial, we assume the user installed Cocoa via the *Conda installation
  **Step :one:**: activate the cocoa Conda environment, go to the `cocoa/Cocoa/projects` folder, and clone the Cosmolike LSST-Y1 project:
     
       conda activate cocoa
+
+and
+
       cd ./cocoa/Cocoa/projects
+
+and
+
       ${CONDA_PREFIX}/bin/git clone --depth 1 https://github.com/CosmoLike/cocoa_lsst_y1.git --branch v4.0-beta5 lsst_y1 
 
 :warning: Cocoa scripts and YAML files assume the removal of the `cocoa_` prefix when cloning the repository.
@@ -17,6 +23,9 @@ In this tutorial, we assume the user installed Cocoa via the *Conda installation
  **Step :two:**: go back to the Cocoa main folder and activate the private Python environment
     
       cd ../
+
+and
+
       source start_cocoa.sh
  
 :warning: Remember to run the `start_cocoa.sh` shell script only **after cloning** the project repository (or if you already in the `(.local)` environment, run `start_cocoa.sh` again). 
@@ -39,6 +48,18 @@ One model evaluation:
 MCMC:
 
       mpirun -n 4 --oversubscribe --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by core --map-by numa:pe=${OMP_NUM_THREADS} cobaya-run ./projects/lsst_y1/EXAMPLE_MCMC1.yaml -f
+
+Profile:
+
+      cd ./projects/lsst_y1
+
+and
+
+      export NMPI=4
+
+and
+
+      mpirun -n ${NMPI} --oversubscribe --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by core --map-by numa:pe=${OMP_NUM_THREADS} python -m mpi4py.futures EXAMPLE_PROFILE1.py --mpi $((${NMPI}-1)) --profile 1 --tol 0.05 --AB 1.0 --outroot 'profile' --minmethod 5 --maxiter 2 --maxfeval 500 
 
 ## Deleting Cosmolike projects <a name="running_cosmolike_projects"></a>
 
