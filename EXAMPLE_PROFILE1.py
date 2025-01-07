@@ -26,7 +26,7 @@ import itertools
 
 CLprobe="xi"
 path= os.environ['ROOTDIR'] + "/external_modules/data/lsst_y1"
-data_file="LSST_Y1_M1_GGL0.05.dataset"
+data_file="lsst_y1_M1_GGL0.05.dataset"
 
 IA_model = 0
 IA_redshift_evolution = 3
@@ -620,16 +620,17 @@ def min_chi2(x0, bounds, min_method, fixed=-1, AccuracyBoost=1.0,
         result = [partial_samples[j], partial[j]]   
     
     elif min_method == 5: # adapted from PROCOLI       
-        nwalkers    = int(3)
         ndim        = int(x0.shape[0])
+        nwalkers    = int(2*x0.shape[0])
         nsteps      = maxfeval
-        temperature = np.array([1.0, 0.3, 0.25, 0.2, 0.1, 0.005, 0.001], dtype='float64')
+        #temperature = np.array([1.0, 0.3, 0.25, 0.2, 0.1, 0.005, 0.001], dtype='float64')
+        temperature = np.array([1.0, 0.25, 0.1, 0.005, 0.001], dtype='float64')
         stepsz      = temperature/4.0
 
         partial_samples = []
         partial = []
 
-        for i in range(7):
+        for i in range(5):
             x = [] # Initial point
             for j in range(nwalkers):
                 x.append(GaussianStep(stepsize=stepsz[i])(x0)[0,:])
@@ -654,8 +655,6 @@ def min_chi2(x0, bounds, min_method, fixed=-1, AccuracyBoost=1.0,
             j = np.argmin(np.array(partial))
             x0 = copy.deepcopy(partial_samples[j])
             
-            nsteps += 1000
-
             sampler.reset()
 
             print(f"emcee: i = {i}, chi2 = {partial[j]}, param = {args[0]}")
@@ -709,6 +708,8 @@ if __name__ == '__main__':
 
     param = np.linspace(start=start[index], stop=stop[index], num=nummpi)
     
+    print('f"profile param values=', param)
+
     x0 = []
     for i in range(nummpi):
         tmp = copy.deepcopy(x)
