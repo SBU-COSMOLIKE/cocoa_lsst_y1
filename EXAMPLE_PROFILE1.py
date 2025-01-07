@@ -708,7 +708,7 @@ if __name__ == '__main__':
 
     param = np.linspace(start=start[index], stop=stop[index], num=nummpi)
     
-    print('f"profile param values=', param)
+    print(f"profile param values = {param}")
 
     x0 = []
     for i in range(nummpi):
