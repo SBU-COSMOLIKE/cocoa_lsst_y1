@@ -5,6 +5,7 @@ stop_at_error: True
 likelihood:
   lsst_y1.lsst_y1_2x2pt:
     path: ./external_modules/data/lsst_y1
+    data_file: lsst_y1_M1_GGL0.05.dataset 
     print_datavector: False
     accuracyboost: 1.0
     integration_accuracy: 0
