@@ -1,4 +1,4 @@
-from cobaya.likelihoods.lsst_y1._cosmolike_prototype_base import _cosmolike_prototype_base
+from cobaya.likelihoods.lsst_y1._cosmolike_prototype_base import _cosmolike_prototype_base, survey
 import cosmolike_lsst_y1_interface as ci
 import numpy as np
 
@@ -30,7 +30,7 @@ class lsst_y1_cosmic_shear(_cosmolike_prototype_base):
         ci.compute_data_vector_masked_with_baryon_pcs(
           Q = [
                 params_values.get(p, None) for p in [
-                  "LSST_BARYON_Q"+str(i+1) for i in range(self.npcs)
+                  survey+"_BARYON_Q"+str(i+1) for i in range(self.npcs)
                 ]
               ]
         )

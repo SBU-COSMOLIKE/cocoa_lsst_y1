@@ -155,6 +155,35 @@ params:
   omegan:
     derived: 'lambda omegan2, H0: omegan2/((H0/100)**2)'
     latex: \Omega_\mathrm{\\nu}
+  LSST_A2_1:
+    prior:
+      min: -5
+      max:  5
+    ref:
+      dist: norm
+      loc: -1.36
+      scale: 0.5
+    proposal: 0.5
+    latex: A_\mathrm{2-IA,LSST}^1
+  LSST_A2_2:
+    prior:
+      min: -5
+      max:  5
+    ref:
+      dist: norm
+      loc: -2.5
+      scale: 0.5
+    proposal: 0.5
+    latex: A_\mathrm{2-IA,LSST}^2
+  LSST_BTA_1:
+    prior:
+      min: 0
+      max: 2
+    ref:
+      dist: norm
+      loc: 1
+      scale: 0.15
+    proposal: 0.1
 
 theory:
   camb:
@@ -193,6 +222,9 @@ sampler:
       LSST_M5: -0.0158096
       LSST_A1_1: 0.606102
       LSST_A1_2: -1.51541
+      LSST_A2_1: 0.0
+      LSST_A2_2: -1.51541
+      LSST_BTA_1: 0.0
       w0pwa: -0.9
       w: -0.9
 

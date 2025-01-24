@@ -139,7 +139,6 @@ CSOURCES += \
 		${ROOTDIR}/external_modules/code/cosmolike/cosmo2D.c \
 		${ROOTDIR}/external_modules/code/cosmolike/halo.c \
 		${ROOTDIR}/external_modules/code/cosmolike/IA.c \
-		${ROOTDIR}/external_modules/code/cosmolike/recompute.c \
 		${ROOTDIR}/external_modules/code/cosmolike/radial_weights.c \
 		${ROOTDIR}/external_modules/code/cosmolike/redshift_spline.c \
 		${ROOTDIR}/external_modules/code/cosmolike/structs.c \
@@ -160,7 +159,6 @@ OBJECTC += \
 		./halo.o \
 		./IA.o \
 		./radial_weights.o \
-		./recompute.o \
 		./redshift_spline.o \
 		./structs.o \
 		./pt_cfastpt.o

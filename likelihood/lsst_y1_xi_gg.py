@@ -1,4 +1,4 @@
-from cobaya.likelihoods.lsst_y1._cosmolike_prototype_base import _cosmolike_prototype_base
+from cobaya.likelihoods.lsst_y1._cosmolike_prototype_base import _cosmolike_prototype_base, survey
 import cosmolike_lsst_y1_interface as ci
 import numpy as np
 
@@ -25,14 +25,14 @@ class lsst_y1_xi_gg(_cosmolike_prototype_base):
       pcs = ci.compute_baryon_pcas(scenarios = self.baryon_pca_sims)
       np.savetxt(self.filename_baryon_pca, pcs)
       # No need to call set_cosmo_related again with self.force_cache_false = True
-      # Why? End of compute_baryon_pcas function forced C cosmo cache renew
+      # Why? End of compute_baryon_pcas function forced cosmo cache renew
 
     if self.use_baryon_pca:      
       datavector = np.array(
         ci.compute_data_vector_masked_with_baryon_pcs(
           Q = [
                 params_values.get(p, None) for p in [
-                  "LSST_BARYON_Q"+str(i+1) for i in range(self.npcs)
+                  survey + "_BARYON_Q"+str(i+1) for i in range(self.npcs)
                 ]
               ]
         )
