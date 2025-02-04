@@ -47,8 +47,6 @@ class _cosmolike_prototype_base(DataSetLikelihood):
     self.theta_min_arcmin = ini.float("theta_min_arcmin")
 
     self.theta_max_arcmin = ini.float("theta_max_arcmin")
-
-    self.force_cache_false = False
     
     # ------------------------------------------------------------------------
     

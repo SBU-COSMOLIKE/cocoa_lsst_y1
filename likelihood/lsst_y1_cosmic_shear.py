@@ -22,8 +22,6 @@ class lsst_y1_cosmic_shear(_cosmolike_prototype_base):
     if self.create_baryon_pca:
       pcs = ci.compute_baryon_pcas(scenarios = self.baryon_pca_sims)
       np.savetxt(self.filename_baryon_pca, pcs)
-      # No need to call set_cosmo_related again with self.force_cache_false = True
-      # Why? End of compute_baryon_pcas function forced C cosmo cache renew
     
     if self.use_baryon_pca:      
       datavector = np.array(
