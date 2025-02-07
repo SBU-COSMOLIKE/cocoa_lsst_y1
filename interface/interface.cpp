@@ -44,8 +44,6 @@ namespace py = pybind11;
 // The conversion between STL vector and python np array is cleaner
 // arma:Col is cast to 2D np array with 1 column (not as nice!)
 
-//using vector = arma::Col<double>;
-
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------

@@ -57,12 +57,12 @@ class _cosmolike_prototype_base(DataSetLikelihood):
       np.linspace(1080,2000,20)),axis=0) #CMB 6x2pt g_CMB (possible in the future)
     self.z_interp_1D[0] = 0
 
-    self.z_interp_2D = np.linspace(0,2.0,95)
-    self.z_interp_2D = np.concatenate((self.z_interp_2D, np.linspace(2.0,10,5)),axis=0)
+    self.z_interp_2D = np.linspace(0,2.0,120)
+    self.z_interp_2D = np.concatenate((self.z_interp_2D, np.linspace(2.0,10,30)),axis=0)
     self.z_interp_2D[0] = 0
 
     self.len_z_interp_2D = len(self.z_interp_2D)
-    self.len_log10k_interp_2D = 1200
+    self.len_log10k_interp_2D = 1400
     self.log10k_interp_2D = np.linspace(-4.2,2.0,self.len_log10k_interp_2D)
 
     # Cobaya wants k in 1/Mpc
@@ -94,7 +94,7 @@ class _cosmolike_prototype_base(DataSetLikelihood):
       lens_multihisto_file=self.lens_file,
       lens_ntomo=int(self.lens_ntomo), 
       source_multihisto_file=self.source_file,
-      source_ntomo=int(self.lens_ntomo))  
+      source_ntomo=int(self.source_ntomo))  
 
     ci.init_data_real(self.cov_file, self.mask_file, self.data_vector_file)
      
@@ -224,7 +224,8 @@ class _cosmolike_prototype_base(DataSetLikelihood):
       raise LoggedError(self.log, "non_linear_emul = %d is an invalid option", non_linear_emul)
 
     G_growth = np.sqrt(PKL.P(self.z_interp_2D,0.0005)/PKL.P(0,0.0005))
-    G_growth = G_growth*(1 + self.z_interp_2D)/G_growth[len(G_growth)-1]
+    G_growth = G_growth*(1 + self.z_interp_2D)    # do not merge these lines PI
+    G_growth = G_growth/G_growth[len(G_growth)-1] # do not merge these lines PII
 
     ci.set_cosmology(
       omegam=self.provider.get_param("omegam"),

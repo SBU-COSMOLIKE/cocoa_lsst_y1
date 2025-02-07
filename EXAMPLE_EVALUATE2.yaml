@@ -17,7 +17,7 @@ likelihood:
     kmax_boltzmann: 5.0
     # 1 EE2, 2 Halofit
     non_linear_emul: 2
-    IA_model: 1
+    IA_model: 0
     IA_redshift_evolution: 3
     # ------------------------------------------------------------------------
     # Settings adopted when printing the lsst_y1_theory.modelvector
@@ -248,13 +248,13 @@ sampler:
       LSST_M5: -0.0158096
       LSST_A1_1: 0.606102
       LSST_A1_2: -1.51541
-      #LSST_A2_1: 0.0
-      #LSST_A2_2: -1.51541
-      #LSST_BTA_1: 0.0
-      # chi2 = 285.765
-      LSST_A2_1: -0.852658
-      LSST_A2_2: -2.63433
-      LSST_BTA_1: 1.01257
+      LSST_A2_1: 0.0
+      LSST_A2_2: -1.51541
+      LSST_BTA_1: 0.0
+      # TESTING TATT chi2 = 285.911
+      #LSST_A2_1: -0.852658
+      #LSST_A2_2: -2.63433
+      #LSST_BTA_1: 1.01257
       LSST_DZ_L1: 0.00457604
       LSST_DZ_L2: 0.000309875
       LSST_DZ_L3: 0.00855907

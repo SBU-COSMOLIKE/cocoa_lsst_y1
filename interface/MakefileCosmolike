@@ -31,10 +31,6 @@ PYBIND := 1
 # LINK HDF5 LIBRARY
 #HDF5 := 1
 
-
-# DEFINE TEST CODE
-TEST := 1
-
 CSOURCES =
 OBJECTC =
 
@@ -101,10 +97,6 @@ ifdef SPDLOG
 	ifndef IGNORE_CPP_SPDLOG_INSTALLATION
 		LDFLAGS += ${ROOTDIR}/.local/lib/libspdlog.a
 	endif
-endif
-
-ifdef TEST
-	COMMON_FLAGS += -DTEST
 endif
 
 CFLAGS += ${COMMON_FLAGS}
@@ -181,9 +173,5 @@ cosmolike_lsst_y1_interface.so: $(OBJECTC) $(OBJECTCPP)
 	$(CXX) $(CXXFLAGS) -DCOBAYA_SAMPLER -shared -fPIC -o $@ $(OBJECTC) $(OBJECTCPP) interface.cpp $(LDFLAGS)
 	@rm *.o
 
-test: $(OBJECTC) $(CSOURCES) $(CPPSOURCES)
-	$(CXX) $(CXXFLAGS) -DCOBAYA_SAMPLER -fPIC -o $@ $(OBJECTC) $(CPPSOURCES) $(LDFLAGS)
-
 clean:
 	@rm -rf cosmolike_lsst_y1_interface.so cosmolike_lsst_y1_interface.so.dSYM  *.o
-
