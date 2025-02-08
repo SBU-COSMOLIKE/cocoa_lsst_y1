@@ -443,7 +443,6 @@ PYBIND11_MODULE(cosmolike_lsst_y1_interface, m)
       py::return_value_policy::move
     );
 
-/*
   // --------------------------------------------------------------------
   // --------------------------------------------------------------------
   // Theoretical Cosmolike Functions
@@ -453,6 +452,11 @@ PYBIND11_MODULE(cosmolike_lsst_y1_interface, m)
   m.def("get_binning_real_space",
       &get_binning_real_space,
       "Get real space binning (theta bins)"
+    );
+
+  m.def("get_gs_redshift_bins",
+      &cosmolike_interface::gs_bins,
+      "Get galaxy-galaxy lensing redshift binning"
     );
 
   m.def("xi_pm_tomo",
@@ -572,52 +576,6 @@ PYBIND11_MODULE(cosmolike_lsst_y1_interface, m)
   // --------------------------------------------------------------------
   // --------------------------------------------------------------------
 
-  m.def("C_gg_tomo_limber",
-      py::overload_cast<const double, const int>(
-        &cosmolike_interface::C_gg_tomo_limber_cpp
-      ),
-      "Compute position-position (fourier - limber) data vector at a single"
-      " tomographic bin and ell value",
-      py::arg("l").none(false).noconvert(),
-      py::arg("nz").none(false).noconvert()
-    );
-
-  m.def("C_gg_tomo_limber",
-      py::overload_cast<arma::Col<double>>(
-        &cosmolike_interface::C_gg_tomo_limber_cpp
-      ),
-      "Compute position-position (fourier - limber) data vector at all"
-      " tomographic bins and many ell (vectorized)",
-      py::arg("l").none(false),
-      py::return_value_policy::move
-    );
-
-  m.def("int_for_C_gg_tomo_limber",
-      py::overload_cast<const double, const double, const int, const int>(
-        &cosmolike_interface::int_for_C_gg_tomo_limber_cpp
-      ),
-      "Compute integrand for position-position (fourier - limber) data vector"
-      " at a single tomographic bin and ell value",
-      py::arg("a").none(false).noconvert(),
-      py::arg("l").none(false).noconvert(),
-      py::arg("ni").none(false).noconvert(),
-      py::arg("nj").none(false).noconvert()
-    );
-
-  m.def("int_for_C_gg_tomo_limber",
-      py::overload_cast<arma::Col<double>, arma::Col<double>>(
-        &cosmolike_interface::int_for_C_gg_tomo_limber_cpp
-      ),
-      "Compute integrand position-position (fourier - limber) data vector" 
-      " at all tomographic bins and many scale factor and ell (vectorized)",
-      py::arg("a").none(false),
-      py::arg("l").none(false),
-      py::return_value_policy::move
-    );
-
-  // --------------------------------------------------------------------
-  // --------------------------------------------------------------------
-
   m.def("C_gg_tomo",
       py::overload_cast<arma::Col<double>>(
         &cosmolike_interface::C_gg_tomo_cpp
@@ -630,7 +588,6 @@ PYBIND11_MODULE(cosmolike_lsst_y1_interface, m)
 
   // --------------------------------------------------------------------
   // --------------------------------------------------------------------
-*/
 }
 
 // ----------------------------------------------------------------------------
