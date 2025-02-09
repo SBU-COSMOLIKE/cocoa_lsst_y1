@@ -575,6 +575,16 @@ PYBIND11_MODULE(cosmolike_lsst_y1_interface, m)
 
   // --------------------------------------------------------------------
   // --------------------------------------------------------------------
+  m.def("C_gg_tomo_limber",
+      py::overload_cast<arma::Col<double>>(
+        &cosmolike_interface::C_gg_tomo_limber_cpp
+      ),
+      "Compute position-position (fourier - limber) data vector"
+      " at all tomographic bins and many ell (vectorized)",
+      py::arg("l").none(false),
+      py::return_value_policy::move
+    );
+
 
   m.def("C_gg_tomo",
       py::overload_cast<arma::Col<double>>(
