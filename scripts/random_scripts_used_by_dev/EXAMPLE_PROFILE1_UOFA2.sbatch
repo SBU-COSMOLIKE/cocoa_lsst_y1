@@ -6,7 +6,7 @@
 #SBATCH --ntasks=13
 #SBATCH --ntasks-per-node=13
 #SBATCH --cpus-per-task=7
-#SBATCH --time=72:00:00
+#SBATCH --time=120:00:00
 #SBATCH --partition=standard
 #SBATCH --account=cosmolike
 #SBATCH --exclusive
@@ -34,9 +34,11 @@ else
   export OMP_NUM_THREADS=1
 fi
 
+export tmp=$((${SLURM_NTASKS}-1))
+
 cd $SLURM_SUBMIT_DIR/projects/lsst_y1
 
 mpirun -n ${SLURM_NTASKS} --oversubscribe --mca btl vader,tcp,self \
   --bind-to core:overload-allowed --map-by numa:pe=${OMP_NUM_THREADS} \
   python -m mpi4py.futures EXAMPLE_PROFILE1.py --AB 1.0 --tol 0.02 --profile 1 \
-  --maxiter 3 --maxfeval 5000 --mpi 12 --outroot "monday" --minmethod 2
+  --maxiter 5 --maxfeval 10000 --mpi ${tmp} --outroot "monday" --minmethod 2
