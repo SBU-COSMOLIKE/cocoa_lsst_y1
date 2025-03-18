@@ -1,9 +1,8 @@
-data_file = lsst_y1_theory.modelvector
+data_file = ee2_feducial.modelvector
 cov_file = lsst_y1_cov
-mask_file = lsst_y1_M3_GGLOLAP0.05.mask
+mask_file = lsst_y1_M6_GGLOLAP0.05.mask
 nz_lens_file = lsst_y1_lens.nz 
 nz_source_file = lsst_y1_source.nz
-lensing_overlap_cut = 0.00
 lens_ntomo = 5
 source_ntomo = 5
 n_theta = 26

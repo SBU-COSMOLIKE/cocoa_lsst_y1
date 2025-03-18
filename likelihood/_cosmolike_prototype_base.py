@@ -57,8 +57,10 @@ class _cosmolike_prototype_base(DataSetLikelihood):
       np.linspace(1080,2000,20)),axis=0) #CMB 6x2pt g_CMB (possible in the future)
     self.z_interp_1D[0] = 0
 
-    self.z_interp_2D = np.linspace(0,2.0,120)
-    self.z_interp_2D = np.concatenate((self.z_interp_2D, np.linspace(2.01,10,30)),axis=0)
+    # NOTE(VL) Decreasing the number of interpolation points in z_interp_2D
+    # EE2 crashes calculating many points :(
+    self.z_interp_2D = np.linspace(0,2.0,80)
+    self.z_interp_2D = np.concatenate((self.z_interp_2D, np.linspace(2.01,10,20)),axis=0)
     self.z_interp_2D[0] = 0
 
     self.len_z_interp_2D = len(self.z_interp_2D)
@@ -198,7 +200,11 @@ class _cosmolike_prototype_base(DataSetLikelihood):
       }
 
       kbt = np.power(10.0, np.linspace(-2.0589, 0.973, self.len_k_interp_2D))
-      kbt, tmp_bt = self.emulator.get_boost(params, self.z_interp_2D, kbt)
+      print("Trying EE2")
+      #print("z: ", self.z_interp_2D)
+      kbt, tmp_bt = euclidemu2.get_boost(params, self.z_interp_2D, kbt)
+      #kbt, tmp_bt = euclidemu2.get_boost(params, np.linspace(0,2.0,120), kbt)
+      print("EE2 success!")
       logkbt = np.log10(kbt)
 
       for i in range(self.len_z_interp_2D):    
