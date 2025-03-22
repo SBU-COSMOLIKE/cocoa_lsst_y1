@@ -243,6 +243,39 @@ std::vector<double> get_binning_real_space()
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
+// Miscellaneous
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+
+std::vector<int> get_mask()
+{
+  return arma::conv_to<std::vector<int>>::from(
+      cosmolike_interface::IP::get_instance().get_mask()
+    );
+}
+
+std::vector<double> get_dv_masked()
+{
+  return arma::conv_to<std::vector<double>>::from(
+      cosmolike_interface::IP::get_instance().get_dv_masked()
+    );
+}
+
+arma::Mat<double> get_cov_masked()
+{
+  return cosmolike_interface::IP::get_instance().get_cov_masked();
+}
+
+arma::Mat<double> get_inv_cov_masked()
+{
+  return cosmolike_interface::IP::get_instance().get_inv_cov_masked();
+}
+
+
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
 // PYTHON WRAPPER
 // ---------------------------------------------------------------------------
 // ---------------------------------------------------------------------------
@@ -593,6 +626,35 @@ PYBIND11_MODULE(cosmolike_lsst_y1_interface, m)
       "Compute position-position (fourier - non-limber/limber) data vector"
       " at all tomographic bins and many ell (vectorized)",
       py::arg("l").none(false),
+      py::return_value_policy::move
+    );
+
+  // --------------------------------------------------------------------
+  // --------------------------------------------------------------------
+  // Miscellaneous
+  // --------------------------------------------------------------------
+  // --------------------------------------------------------------------
+  m.def("get_mask",
+      &get_mask,
+      "Get Mask Vector",
+      py::return_value_policy::move
+    );
+
+  m.def("get_dv_masked",
+      &get_dv_masked,
+      "Get Mask Data Vector",
+      py::return_value_policy::move
+    );
+
+  m.def("get_cov_masked",
+      &get_cov_masked,
+      "Get Mask Covariance Matrix",
+      py::return_value_policy::move
+    );
+
+  m.def("get_inv_cov_masked",
+      &get_inv_cov_masked,
+      "Get Mask Covariance Matrix",
       py::return_value_policy::move
     );
 
