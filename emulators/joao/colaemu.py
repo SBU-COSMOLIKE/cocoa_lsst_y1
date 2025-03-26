@@ -3,7 +3,9 @@ import train_utils as utils
 import euclidemu2 as ee2
 from copy import copy
 
-ks = np.loadtxt("ks.txt")
+import os
+current_dir = os.getcwd() # Should be cocoa/Cocoa/
+ks = np.loadtxt(f"{current_dir}/projects/lsst_y1/emulators/joao/ks.txt")
 zs_cola = [
     0.000, 0.020, 0.041, 0.062, 0.085, 0.109, 0.133, 0.159, 0.186, 0.214, 0.244, 0.275, 0.308, 
     0.342, 0.378, 0.417, 0.457, 0.500, 0.543, 0.588, 0.636, 0.688, 0.742, 0.800, 0.862, 0.929, 
@@ -14,7 +16,7 @@ zs_cola = [
 print("[colaemu] Loading models")
 models = {}
 for z in zs_cola:
-    models[z] = utils.load_model(f"models/NN_Z{z:.3f}.model")
+    models[z] = utils.load_model(f"{current_dir}/projects/lsst_y1/emulators/joao/models/NN_Z{z:.3f}.model")
 print("[colaemu] Models loaded")
 
 def get_boost_at_z(x, z):

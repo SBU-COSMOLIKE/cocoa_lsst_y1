@@ -19,6 +19,12 @@ import cosmolike_lsst_y1_interface as ci
 
 survey = "LSST"
 
+# NOTE(JR): adding Colaemu module
+sys_path = './projects/lsst_y1/emulators/joao'
+sys.path.append(sys_path)
+import colaemu
+# JR end
+
 class _cosmolike_prototype_base(DataSetLikelihood):
 
   def initialize(self, probe):
@@ -122,7 +128,16 @@ class _cosmolike_prototype_base(DataSetLikelihood):
     self.baryon_pcs_qs = np.zeros(self.npcs)
         
     if self.non_linear_emul == 1:
+      print("[nonlinear] Using EE2")
       self.emulator = ee2=euclidemu2.PyEuclidEmulator()
+    elif self.non_linear_emul == 2:
+      print("[nonlinear] Using Halofit")
+    elif self.non_linear_emul == 3:
+      print("[nonlinear] Using Joao's COLAEmu")
+    elif self.non_linear_emul == 4:
+      print("[nonlinear] Using Vic's COLAEmu")
+    else:
+      raise LoggedError(self.log, "[nonlinear] Invalid choice for non_linear_emul = %d", self.non_linear_emul)
 
   # ------------------------------------------------------------------------
   # ------------------------------------------------------------------------
@@ -187,7 +202,6 @@ class _cosmolike_prototype_base(DataSetLikelihood):
     lnPL  += np.log((h**3))
 
     if self.non_linear_emul == 1:
-
       params = {
         'Omm'  : self.provider.get_param("omegam"),
         'As'   : self.provider.get_param("As"),
@@ -196,7 +210,7 @@ class _cosmolike_prototype_base(DataSetLikelihood):
         'h'    : h,
         'mnu'  : self.provider.get_param("mnu"), 
         'w'    : self.provider.get_param("w"),
-        'wa'   : 0.0
+        'wa'   : self.provider.get_param("wa")
       }
 
       kbt = np.power(10.0, np.linspace(-2.0589, 0.973, self.len_k_interp_2D))
@@ -208,7 +222,7 @@ class _cosmolike_prototype_base(DataSetLikelihood):
       logkbt = np.log10(kbt)
 
       for i in range(self.len_z_interp_2D):    
-        interp = interp1d(logkbt, 
+        interp = interp1d(logkbt,
             np.log(tmp_bt[i]), 
             kind = 'linear', 
             fill_value = 'extrapolate', 
@@ -221,13 +235,24 @@ class _cosmolike_prototype_base(DataSetLikelihood):
         lnPNL[i::self.len_z_interp_2D]  = lnPL[i::self.len_z_interp_2D] + lnbt
       
     elif self.non_linear_emul == 2:
-
       for i in range(self.len_z_interp_2D):
         lnPNL[i::self.len_z_interp_2D]  = t1[i*self.len_k_interp_2D:(i+1)*self.len_k_interp_2D]  
-      lnPNL += np.log((h**3))      
-
+      lnPNL += np.log((h**3))  
+    elif self.non_linear_emul == 3:
+      tmp_bt = colaemu.get_boost([
+        h, 
+        self.provider.get_param("omegab"),
+        self.provider.get_param("omegam"),
+        self.provider.get_param("As"),
+        self.provider.get_param("ns"),
+        self.provider.get_param("w"),
+        self.provider.get_param("wa"),
+      ])
+      raise LoggedError(self.log, "non_linear_emul = %d is not fully implemented yet", self.non_linear_emul)
+    elif self.non_linear_emul == 4:
+      raise LoggedError(self.log, "non_linear_emul = %d is not implemented yet", self.non_linear_emul)
     else:
-      raise LoggedError(self.log, "non_linear_emul = %d is an invalid option", non_linear_emul)
+      raise LoggedError(self.log, "non_linear_emul = %d is an invalid option", self.non_linear_emul)
 
     G_growth = np.sqrt(PKL.P(self.z_interp_2D,0.0005)/PKL.P(0,0.0005))
     G_growth = G_growth*(1 + self.z_interp_2D)    # do not merge these lines PI
