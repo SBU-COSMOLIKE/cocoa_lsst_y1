@@ -1,4 +1,4 @@
-data_file = ee2_feducial.modelvector
+data_file = ee2_fiducial.modelvector
 cov_file = lsst_y1_cov
 mask_file = lsst_y1_M6_GGLOLAP0.05.mask
 nz_lens_file = lsst_y1_lens.nz 

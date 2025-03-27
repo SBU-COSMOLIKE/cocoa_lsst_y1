@@ -1,3 +1,21 @@
+# COLA $w_0w_a$
+*In case of bugs, contact João ASAP!*
+
+This repository contains a simulated LSST analysis using COLA emulators as nonlinear prescription, comparing the results with those obtained using EE2.
+
+**NOTE**: Users must have installed the Cocoa environment with the machine learning libraries, so you must unset the `IGNORE_EMULATOR_CPU_PACKAGES` flag inside the `set_installation_options.sh` file before running the `compile_cocoa.sh` command. If that's not the case, you can run the compile command again.
+
+**NOTE**: I had to make a small hack in the `keras.saving` library in order to load the NN models properly. Contact João for more information!
+
+## Usage
+
+See the `TEST_COLA.yaml` file that calculates one evaluation of the LSST cosmic shear likelihood for the reference cosmology using the COLA emulator, assuming the EE2 fiducial data vector (see below).
+
+## Fiducial Data Vectors
+
+The `data/ee2_fiducial.modelvector` file contains the theory vector calculated using EE2 at the EE2 reference cosmology (*i.e.* $\Omega_m = 0.319$, $\Omega_b = 0.049$, $h = 0.67$, $A_s = 2.1\times 10^{-9}$, $n_s = 0.96$, $w = -1$, $w_a = 0$).
+
+# Original Docs
 ## Running Cosmolike projects <a name="running_cosmolike_projects"></a> 
 
 In this tutorial, we assume the user installed Cocoa via the *Conda installation* method, and the name of the Conda environment is `cocoa`. We also presume the user's terminal is in the folder where Cocoa was cloned.

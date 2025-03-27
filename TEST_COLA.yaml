@@ -5,14 +5,14 @@ stop_at_error: True
 likelihood:
   lsst_y1.lsst_y1_cosmic_shear:
     path: ./external_modules/data/lsst_y1
-    data_file: ee2_feducial.dataset
-    print_datavector: True
-    print_datavector_file: "./projects/lsst_y1/data/ee2_feducial.modelvector"
+    data_file: ee2_fiducial.dataset
+    print_datavector: False
+    print_datavector_file: "./projects/lsst_y1/data/ee2_fiducial.modelvector"
     accuracyboost: 1.0
     integration_accuracy: 0
     kmax_boltzmann: 5.0
-    # 1 EE2, 2 Halofit
-    non_linear_emul: 1
+    # 1 EE2, 2 Halofit, 3 Colaemu
+    non_linear_emul: 3
     IA_model: 0
     IA_redshift_evolution: 3
   

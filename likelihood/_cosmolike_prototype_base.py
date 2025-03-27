@@ -3,7 +3,7 @@ from __future__ import absolute_import, division, print_function
 import os
 import numpy as np
 import scipy
-from scipy.interpolate import interp1d
+from scipy.interpolate import interp1d, interp2d
 import sys
 import time
 
@@ -19,11 +19,9 @@ import cosmolike_lsst_y1_interface as ci
 
 survey = "LSST"
 
-# NOTE(JR): adding Colaemu module
-sys_path = './projects/lsst_y1/emulators/joao'
-sys.path.append(sys_path)
-import colaemu
-# JR end
+# NOTE(JR): import matplotlib for debugging purposes
+import matplotlib.pyplot as plt
+# END
 
 class _cosmolike_prototype_base(DataSetLikelihood):
 
@@ -134,6 +132,12 @@ class _cosmolike_prototype_base(DataSetLikelihood):
       print("[nonlinear] Using Halofit")
     elif self.non_linear_emul == 3:
       print("[nonlinear] Using Joao's COLAEmu")
+      # NOTE(JR): hack to be able to import emulators
+      sys_path = './projects/lsst_y1/emulators/joao'
+      sys.path.append(sys_path)
+      import colaemu
+      self.emulator = colaemu
+      # JR end
     elif self.non_linear_emul == 4:
       print("[nonlinear] Using Vic's COLAEmu")
     else:
@@ -202,6 +206,7 @@ class _cosmolike_prototype_base(DataSetLikelihood):
     lnPL  += np.log((h**3))
 
     if self.non_linear_emul == 1:
+      # EE2
       params = {
         'Omm'  : self.provider.get_param("omegam"),
         'As'   : self.provider.get_param("As"),
@@ -214,11 +219,7 @@ class _cosmolike_prototype_base(DataSetLikelihood):
       }
 
       kbt = np.power(10.0, np.linspace(-2.0589, 0.973, self.len_k_interp_2D))
-      print("Trying EE2")
-      #print("z: ", self.z_interp_2D)
       kbt, tmp_bt = euclidemu2.get_boost(params, self.z_interp_2D, kbt)
-      #kbt, tmp_bt = euclidemu2.get_boost(params, np.linspace(0,2.0,120), kbt)
-      print("EE2 success!")
       logkbt = np.log10(kbt)
 
       for i in range(self.len_z_interp_2D):    
@@ -235,11 +236,14 @@ class _cosmolike_prototype_base(DataSetLikelihood):
         lnPNL[i::self.len_z_interp_2D]  = lnPL[i::self.len_z_interp_2D] + lnbt
       
     elif self.non_linear_emul == 2:
+      # Halofit
       for i in range(self.len_z_interp_2D):
         lnPNL[i::self.len_z_interp_2D]  = t1[i*self.len_k_interp_2D:(i+1)*self.len_k_interp_2D]  
       lnPNL += np.log((h**3))  
+    
     elif self.non_linear_emul == 3:
-      tmp_bt = colaemu.get_boost([
+      # Joao's COLAEmu
+      cola_boost = self.emulator.get_boost([
         h, 
         self.provider.get_param("omegab"),
         self.provider.get_param("omegam"),
@@ -248,7 +252,42 @@ class _cosmolike_prototype_base(DataSetLikelihood):
         self.provider.get_param("w"),
         self.provider.get_param("wa"),
       ])
-      raise LoggedError(self.log, "non_linear_emul = %d is not fully implemented yet", self.non_linear_emul)
+      logkbt = np.log10(self.emulator.ks)
+
+      # NOTE(JR): This is just an idea but interp2d cannot extrapolate
+      # interp = interp2d(logkbt, self.emulator.zs_cola, cola_boost, kind="linear", fill_value="extrapolate")
+      # boost = interp(log10k_interp_2D, self.z_interp_2D)
+      # boost[:, log10k_interp_2D < logkbt[0]] = 1.0
+      # boost[self.z_interp_2D > 3, :] = 1.0
+      # lnPNL = lnPL + np.log(boost).T.flatten()
+      
+      full_boost = []
+      for i, z in enumerate(self.emulator.zs_cola):
+        interp = interp1d(
+          logkbt,
+          cola_boost[i],
+          kind='linear',
+          fill_value='extrapolate', 
+          assume_sorted=True
+        )
+      
+        boost_extrap = interp(log10k_interp_2D)
+        # JVR DEBUG: plotting boost
+        # if z == 0:
+        #   plt.semilogx(self.k_interp_2D, boost_extrap)
+        #   plt.savefig("./projects/lsst_y1/test_emu.pdf")
+        # JVR end
+        boost_extrap[log10k_interp_2D < logkbt[0]] = 1.0
+        full_boost.append(boost_extrap)
+      
+      full_logboost = np.log(full_boost)
+      logboost_2d_interp = interp2d(self.k_interp_2D, self.emulator.zs_cola, full_logboost)
+      logboost_2d = logboost_2d_interp(self.k_interp_2D, self.z_interp_2D).T.flatten()
+      lnPNL = lnPL + logboost_2d
+      for i, z in enumerate(self.z_interp_2D):
+        if z <= 3: lnPNL[i::self.len_z_interp_2D] += logboost_2d[i]
+        else: break
+
     elif self.non_linear_emul == 4:
       raise LoggedError(self.log, "non_linear_emul = %d is not implemented yet", self.non_linear_emul)
     else:
