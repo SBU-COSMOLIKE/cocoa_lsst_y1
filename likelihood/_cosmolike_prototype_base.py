@@ -272,11 +272,6 @@ class _cosmolike_prototype_base(DataSetLikelihood):
         )
       
         boost_extrap = interp(log10k_interp_2D)
-        # JVR DEBUG: plotting boost
-        # if z == 0:
-        #   plt.semilogx(self.k_interp_2D, boost_extrap)
-        #   plt.savefig("./projects/lsst_y1/test_emu.pdf")
-        # JVR end
         boost_extrap[log10k_interp_2D < logkbt[0]] = 1.0
         full_boost.append(boost_extrap)
       
