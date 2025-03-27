@@ -284,9 +284,6 @@ class _cosmolike_prototype_base(DataSetLikelihood):
       logboost_2d_interp = interp2d(self.k_interp_2D, self.emulator.zs_cola, full_logboost)
       logboost_2d = logboost_2d_interp(self.k_interp_2D, self.z_interp_2D).T.flatten()
       lnPNL = lnPL + logboost_2d
-      # for i, z in enumerate(self.z_interp_2D):
-      #   if z <= 3: lnPNL[i::self.len_z_interp_2D] += logboost_2d[i]
-      #   else: break
 
     elif self.non_linear_emul == 4:
       raise LoggedError(self.log, "non_linear_emul = %d is not implemented yet", self.non_linear_emul)
