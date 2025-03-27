@@ -19,26 +19,6 @@ for z in zs_cola:
     models[z] = utils.load_model(f"{current_dir}/projects/lsst_y1/emulators/joao/models/NN_Z{z:.3f}.model")
 print("[colaemu] Models loaded")
 
-def get_boost_at_z(x, z):
-    _, boost_proj_ee2 = ee2.get_boost({
-        'h': x[0],
-        'Omega_b': x[1],
-        'Omega_m': x[2],
-        'As': x[3],
-        'ns': x[4],
-        'w': -1,
-        'wa': 0,
-        'mnu': 0.058,
-    }, z, ks)
-    model = models[z]
-    boost_cola = model.predict([x])[0]
-    # Projecting onto LCDM
-    x_proj = copy(x)
-    x_proj[-1] = 0
-    x_proj[-2] = -1
-    boost_proj_cola = model.predict([x_proj])[0]
-    return boost_cola * boost_proj_ee2[0] / boost_proj_cola
-
 def get_boost(x):
     boosts = []
     _, boost_proj_ee2 = ee2.get_boost({
@@ -55,8 +35,8 @@ def get_boost(x):
     x_proj = copy(x)
     x_proj[-1] = 0
     x_proj[-2] = -1
-    boosts = [
-        model.predict([x])[0] * boost_proj_ee2[i] / model.predict([x_proj])[0] \
-        for i, (z, model) in enumerate(models.items())
-    ]
+    for i, (z, model) in enumerate(models.items()):
+        boost_case, boost_proj = model.predict([x, x_proj])
+        boost = boost_case * boost_proj_ee2[i] / boost_proj
+        boosts.append(boost)
     return boosts
