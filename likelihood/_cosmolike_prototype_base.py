@@ -253,13 +253,7 @@ class _cosmolike_prototype_base(DataSetLikelihood):
         self.provider.get_param("wa"),
       ])
       logkbt = np.log10(self.emulator.ks)
-
-      # NOTE(JR): This is just an idea but interp2d cannot extrapolate
-      # interp = interp2d(logkbt, self.emulator.zs_cola, cola_boost, kind="linear", fill_value="extrapolate")
-      # boost = interp(log10k_interp_2D, self.z_interp_2D)
-      # boost[:, log10k_interp_2D < logkbt[0]] = 1.0
-      # boost[self.z_interp_2D > 3, :] = 1.0
-      # lnPNL = lnPL + np.log(boost).T.flatten()
+      mask_low_k = log10k_interp_2D < logkbt[0]
       
       full_boost = []
       for i, z in enumerate(self.emulator.zs_cola):
@@ -272,7 +266,7 @@ class _cosmolike_prototype_base(DataSetLikelihood):
         )
       
         boost_extrap = interp(log10k_interp_2D)
-        boost_extrap[log10k_interp_2D < logkbt[0]] = 1.0
+        boost_extrap[mask_low_k] = 1.0
         full_boost.append(boost_extrap)
       
       full_logboost = np.log(full_boost)
