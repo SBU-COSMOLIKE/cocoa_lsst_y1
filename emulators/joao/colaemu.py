@@ -19,18 +19,25 @@ for z in zs_cola:
     models[z] = utils.load_model(f"{current_dir}/projects/lsst_y1/emulators/joao/models/NN_Z{z:.3f}.model")
 print("[colaemu] Models loaded")
 
+# Preload constant parameters
+COSMO_PARAMS_TEMPLATE = {
+    'w': -1,
+    'wa': 0,
+    'mnu': 0.058,
+}
+
 def get_boost(x):
     boosts = []
-    _, boost_proj_ee2 = ee2.get_boost({
+    # Precompute boost_proj_ee2 for all zs_cola
+    cosmo_params = COSMO_PARAMS_TEMPLATE.copy()
+    cosmo_params.update({
         'h': x[0],
         'Omega_b': x[1],
         'Omega_m': x[2],
         'As': x[3],
         'ns': x[4],
-        'w': -1,
-        'wa': 0,
-        'mnu': 0.058,
-    }, zs_cola, ks)
+    })
+    _, boost_proj_ee2 = ee2.get_boost(cosmo_params, zs_cola, ks)
     # Projecting onto LCDM
     x_proj = copy(x)
     x_proj[-1] = 0
