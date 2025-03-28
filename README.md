@@ -11,9 +11,21 @@ This repository contains a simulated LSST analysis using COLA emulators as nonli
 
 See the `TEST_COLA.yaml` file that calculates one evaluation of the LSST cosmic shear likelihood for the reference cosmology using the COLA emulator, assuming the EE2 fiducial data vector (see below).
 
-## Fiducial Data Vectors
+## Fiducial Data Vectors and Dataset files
 
-The `data/ee2_fiducial.modelvector` file contains the theory vector calculated using EE2 at the EE2 reference cosmology (*i.e.* $\Omega_m = 0.319$, $\Omega_b = 0.049$, $h = 0.67$, $A_s = 2.1\times 10^{-9}$, $n_s = 0.96$, $w = -1$, $w_a = 0$).
+The fiducial data vectors are stored in `data/`. Their names have the format `<nonlinear_prescription>_<fiducial_cosmology>.modelvector`.
+
+We define a few fiducial cosmologies:
+- EE2REF: EuclidEmulator2 reference cosmology: $\Omega_m = 0.319$, $\Omega_b = 0.049$, $h = 0.67$, $A_s = 2.1\times 10^{-9}$, $n_s = 0.96$, $w = -1$, $w_a = 0$
+- DESI2CMBPANPLUS: $\Omega_m = 0.3114$, $\Omega_b = 0.049$, $h = 0.6751$, $A_s = 2.1\times 10^{-9}$, $n_s = 0.96$, $w = -0.838$, $w_a = -0.62$ (values from Table V of [DESI DR2](https://arxiv.org/pdf/2503.14738))
+
+The nonlinear prescriptions are `ee2` and `cola`.
+
+The `.dataset` files contain information about the fiducial data vector as well as the scale cuts used. Therefore, these files have the format `<nonlinear>_<fid_cosmo>_<scale_cuts>.dataset`. Other fields in this file are going to be kept fixed.
+
+## Chains
+
+See `CHAINS.md` for the list of chains.
 
 # Original Docs
 ## Running Cosmolike projects <a name="running_cosmolike_projects"></a> 

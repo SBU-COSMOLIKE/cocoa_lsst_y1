@@ -1,6 +1,6 @@
-data_file = ee2_fiducial.modelvector
+data_file = ee2_desi2cmbpanplus.modelvector
 cov_file = lsst_y1_cov
-mask_file = lsst_y1_M6_GGLOLAP0.05.mask
+mask_file = lsst_y1_M1_GGLOLAP0.05.mask
 nz_lens_file = lsst_y1_lens.nz 
 nz_source_file = lsst_y1_source.nz
 lens_ntomo = 5
