@@ -1,6 +1,5 @@
 debug: false
 likelihood:
-  data_file: ee2_ee2ref_M1.dataset
   lsst_y1.lsst_y1_cosmic_shear:
     IA_model: 0
     IA_redshift_evolution: 3
@@ -11,7 +10,6 @@ likelihood:
     non_linear_emul: 1
     path: ./external_modules/data/lsst_y1
     print_datavector: false
-  non_linear_emul: 1
 output: ./projects/lsst_y1/chains/MCMC1/MCMC1
 params:
   As:

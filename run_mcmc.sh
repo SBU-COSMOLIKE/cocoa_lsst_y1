@@ -1,6 +1,6 @@
 #!/bin/bash
 #SBATCH --job-name=COLA
-#SBATCH --time=7-00:00
+#SBATCH --time=4-00:00
 #SBATCH --output=./projects/lsst_y1/logs/%x_%a_%A.out
 #SBATCH --error=./projects/lsst_y1/logs/%x_%a_%A.err
 #SBATCH --nodes=1
