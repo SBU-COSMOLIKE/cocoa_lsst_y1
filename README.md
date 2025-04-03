@@ -9,7 +9,7 @@ This repository contains a simulated LSST analysis using COLA emulators as nonli
 
 ## Usage
 
-See the `TEST_COLA.yaml` file that calculates one evaluation of the LSST cosmic shear likelihood for the reference cosmology using the COLA emulator, assuming the EE2 fiducial data vector (see below).
+See the `TEST_COLA.yaml` file that calculates one evaluation of the LSST cosmic shear likelihood for the reference cosmology using the COLA emulator, assuming the EE2 reference cosmology for the fiducial data vector (see below).
 
 ## Fiducial Data Vectors and Dataset files
 
@@ -25,7 +25,7 @@ The `.dataset` files contain information about the fiducial data vector as well 
 
 ## Chains
 
-See `CHAINS.md` for the list of chains.
+See `CHAINS.md` for the list of chains. The Python script `generate_yamls.py` takes the `CHAINS.md` file as input and generates all of the yaml files. This ensures that the yamls are consistent, decreases the chance of errors and promotes a documentation-first approach, ensuring that all chains are properly listed.
 
 # Original Docs
 ## Running Cosmolike projects <a name="running_cosmolike_projects"></a> 
