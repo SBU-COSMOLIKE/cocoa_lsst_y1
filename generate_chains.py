@@ -5,7 +5,29 @@
 """
 import os
 import yaml
+
+def diff_nested_dicts(dict1, dict2, label1, label2):
+    """
+    Compare two nested dictionaries and return the differences.
+    """
+    diff = {}
+    for key in dict1.keys():
+        if key not in dict2:
+            diff[key] = dict1[key]
+        elif isinstance(dict1[key], dict) and isinstance(dict2[key], dict):
+            nested_diff = diff_nested_dicts(dict1[key], dict2[key], label1, label2)
+            if nested_diff:
+                diff[key] = nested_diff
+        elif dict1[key] != dict2[key]:
+            diff[key] = f"DIFF({label1} has {dict1[key]}, {label2} has {dict2[key]})"# (dict1[key], dict2[key])
+    return diff
+
 if __name__ == "__main__":
+    import sys
+    force = False
+    if len(sys.argv) > 1 and sys.argv[1] == "-f":
+        force = True
+
     # Open documentation file
     with open("CHAINS.md", "r") as f:
         lines = f.readlines()
@@ -26,7 +48,7 @@ if __name__ == "__main__":
         except IndexError:
             extra_info = None
         
-        # Generate chain
+        # Generate yaml
         print(f"Generating chain {index} for {emulator} with fid_cosmo {fid_cosmo} and scale_cuts {scale_cuts} (extra_info: {extra_info})")
         chain = template.copy()
         chain["output"] = f"./projects/lsst_y1/chains/MCMC{index}/MCMC{index}"
@@ -47,16 +69,21 @@ if __name__ == "__main__":
         if extra_info is not None:
             raise Exception(f"Error in chain {index}: extra_info {extra_info} is not implemented yet")
         
-        # If yaml file exists, compare the generated version with what's already there
-        if os.path.isfile(f"yamls/MCMC{index}.yaml"):
+        # Save yaml
+        if force or not os.path.isfile(f"yamls/MCMC{index}.yaml"):
+            with open(f"yamls/MCMC{index}.yaml", "w") as f:
+                yaml.dump(chain, f, default_flow_style=False)
+        else:
+            # If yaml file exists and we are not forcing, compare the generated version with what's already there
             with open(f"yamls/MCMC{index}.yaml", "r") as f:
                 existing_chain = yaml.safe_load(f)
             if existing_chain != chain:
-                raise Exception(f"Error in chain {index}: Chain already exists and is different from the generated one")
+                print(f"  - Error in chain {index}: Yaml already exists and is different from the generated one.")
+                print(f"  - Difference: {diff_nested_dicts(chain, existing_chain, 'new', 'existing')}")
+                print("Aborting.")
+                exit(1)
             else:
-                print(f"Chain {index} exists")
+                print(f"  - Chain {index} already generated. Continuing.")
                 continue
+
         
-        # Save chain
-        with open(f"yamls/MCMC{index}.yaml", "w") as f:
-            yaml.dump(chain, f, default_flow_style=False)

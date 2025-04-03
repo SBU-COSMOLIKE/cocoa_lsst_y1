@@ -311,7 +311,7 @@ theory:
       AccuracyBoost: 1.1
       accurate_massive_neutrino_transfers: false
       dark_energy_model: ppf
-      halofit_version: None
+      halofit_version: takahashi
       k_per_logint: 20
       lens_potential_accuracy: 1.0
       nnu: 3.046
