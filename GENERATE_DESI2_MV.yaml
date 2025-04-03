@@ -5,7 +5,7 @@ stop_at_error: True
 likelihood:
   lsst_y1.lsst_y1_cosmic_shear:
     path: ./external_modules/data/lsst_y1
-    data_file: ee2_ee2ref.dataset
+    data_file: ee2_ee2ref_M6.dataset
     print_datavector: True
     print_datavector_file: "./projects/lsst_y1/data/cola_desi2cmbpanplus.modelvector"
     accuracyboost: 1.0
@@ -227,4 +227,4 @@ sampler:
       w0pwa: -1.458 # wa = -0.62
       w: -0.838
 
-output: ./projects/lsst_y1/chains/EXAMPLE_EVALUATE1
+output: ./projects/lsst_y1/chains/GEN_DESI_DV

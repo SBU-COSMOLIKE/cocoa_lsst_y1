@@ -27,6 +27,10 @@ The `.dataset` files contain information about the fiducial data vector as well 
 
 See `CHAINS.md` for the list of chains. The Python script `generate_yamls.py` takes the `CHAINS.md` file as input and generates all of the yaml files. This ensures that the yamls are consistent, decreases the chance of errors and promotes a documentation-first approach, ensuring that all chains are properly listed.
 
+## Emulator implementation in Cocoa
+
+See `likelihood/_cosmolike_prototype_base.py` for the implementation.
+
 # Original Docs
 ## Running Cosmolike projects <a name="running_cosmolike_projects"></a> 
 

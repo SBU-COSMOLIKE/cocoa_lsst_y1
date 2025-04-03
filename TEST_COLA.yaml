@@ -5,14 +5,14 @@ stop_at_error: True
 likelihood:
   lsst_y1.lsst_y1_cosmic_shear:
     path: ./external_modules/data/lsst_y1
-    data_file: ee2_ref.dataset
+    data_file: ee2_ee2ref_M6.dataset
     print_datavector: False
     print_datavector_file: "./projects/lsst_y1/data/cola_ee2ref.modelvector"
     accuracyboost: 1.0
     integration_accuracy: 0
     kmax_boltzmann: 5.0
     # 1 EE2, 2 Halofit, 3 Colaemu
-    non_linear_emul: 1
+    non_linear_emul: 3
     IA_model: 0
     IA_redshift_evolution: 3
   
@@ -227,4 +227,4 @@ sampler:
       w0pwa: -1.0
       w: -1.0
 
-output: ./projects/lsst_y1/chains/EXAMPLE_EVALUATE1
+output: ./projects/lsst_y1/chains/TEST_COLA

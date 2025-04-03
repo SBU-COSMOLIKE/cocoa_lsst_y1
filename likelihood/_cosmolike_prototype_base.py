@@ -243,36 +243,45 @@ class _cosmolike_prototype_base(DataSetLikelihood):
     
     elif self.non_linear_emul == 3:
       # Joao's COLAEmu
-      cola_boost = self.emulator.get_boost([
-        h, 
-        self.provider.get_param("omegab"),
-        self.provider.get_param("omegam"),
-        self.provider.get_param("As"),
-        self.provider.get_param("ns"),
-        self.provider.get_param("w"),
-        self.provider.get_param("wa"),
-      ])
-      logkbt = np.log10(self.emulator.ks)
-      mask_low_k = log10k_interp_2D < logkbt[0]
+      # NOTE(JR): we call EE2 internally, and EE2 does constant extrapolation (i.e. their boost is constant for k > 10)
+      # Thus, we interpolate inside the emulator from k_cola to k_ee2
+      # and then we extrapolate the boost exactly like EE2
+      kbt = np.power(10.0, np.linspace(-2.0589, 0.973, self.len_k_interp_2D))
+      cola_logboost = np.log(
+        self.emulator.get_boost(
+          [
+            h, 
+            self.provider.get_param("omegab"),
+            self.provider.get_param("omegam"),
+            self.provider.get_param("As"),
+            self.provider.get_param("ns"),
+            self.provider.get_param("w"),
+            self.provider.get_param("wa"),
+          ],
+          k_custom=kbt
+        )
+      )
+      logkbt = np.log10(kbt)
       
-      full_boost = []
-      for i, z in enumerate(self.emulator.zs_cola):
+      logboosts_extrap = []
+      mask_low_k = log10k_interp_2D < logkbt[0]
+      for i, _ in enumerate(self.emulator.zs_cola):
         interp = interp1d(
           logkbt,
-          cola_boost[i],
+          cola_logboost[i],
           kind='linear',
           fill_value='extrapolate', 
           assume_sorted=True
         )
       
-        boost_extrap = interp(log10k_interp_2D)
-        boost_extrap[mask_low_k] = 1.0
-        full_boost.append(boost_extrap)
+        logboost_extrap = interp(log10k_interp_2D)
+        logboost_extrap[mask_low_k] = 0.0
+        logboosts_extrap.append(logboost_extrap)
       
-      full_logboost = np.log(full_boost)
-      logboost_2d_interp = interp2d(self.k_interp_2D, self.emulator.zs_cola, full_logboost)
-      logboost_2d = logboost_2d_interp(self.k_interp_2D, self.z_interp_2D).T.flatten()
-      lnPNL = lnPL + logboost_2d
+      logboost_2d_interp = interp2d(log10k_interp_2D, self.emulator.zs_cola, logboosts_extrap)
+      logboost_2d = logboost_2d_interp(log10k_interp_2D, self.z_interp_2D)
+      logboost_2d[self.z_interp_2D > 3, :] = 0.0
+      lnPNL = lnPL + logboost_2d.T.flatten()
 
     elif self.non_linear_emul == 4:
       raise LoggedError(self.log, "non_linear_emul = %d is not implemented yet", self.non_linear_emul)
