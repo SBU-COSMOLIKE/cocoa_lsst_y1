@@ -23,6 +23,10 @@ The nonlinear prescriptions are `ee2` and `cola`.
 
 The `.dataset` files contain information about the fiducial data vector as well as the scale cuts used. Therefore, these files have the format `<nonlinear>_<fid_cosmo>_<scale_cuts>.dataset`. Other fields in this file are going to be kept fixed.
 
+## Checking $\Delta \chi^2$
+
+Inside `data/`, there is a Python notebook `check_delta_chi2.ipynb` that calculates the $\Delta \chi^2$ between two data vectors.
+
 ## Chains
 
 See `CHAINS.md` for the list of chains. The Python script `generate_yamls.py` takes the `CHAINS.md` file as input and generates all of the yaml files. This ensures that the yamls are consistent, decreases the chance of errors and promotes a documentation-first approach, ensuring that all chains are properly listed.
