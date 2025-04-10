@@ -127,7 +127,7 @@ class _cosmolike_prototype_base(DataSetLikelihood):
         
     if self.non_linear_emul == 1:
       print("[nonlinear] Using EE2")
-      self.emulator = ee2=euclidemu2.PyEuclidEmulator()
+      self.emulator = euclidemu2.PyEuclidEmulator()
     elif self.non_linear_emul == 2:
       print("[nonlinear] Using Halofit")
     elif self.non_linear_emul == 3:
@@ -219,7 +219,7 @@ class _cosmolike_prototype_base(DataSetLikelihood):
       }
 
       kbt = np.power(10.0, np.linspace(-2.0589, 0.973, self.len_k_interp_2D))
-      kbt, tmp_bt = euclidemu2.get_boost(params, self.z_interp_2D, kbt)
+      kbt, tmp_bt = self.emulator.get_boost(params, self.z_interp_2D, kbt)
       logkbt = np.log10(kbt)
 
       for i in range(self.len_z_interp_2D):    

@@ -1,12 +1,12 @@
 import numpy as np
 import train_utils as utils
-import euclidemu2 as ee2
+import euclidemu2
 from copy import copy
 from scipy.interpolate import interp1d
 
 import os
-current_dir = os.getcwd() # Should be cocoa/Cocoa/
-ks = np.loadtxt(f"{current_dir}/projects/lsst_y1/emulators/joao/ks.txt")
+emulator_dir = os.path.dirname(os.path.abspath(__file__))
+ks = np.loadtxt(f"{emulator_dir}/ks.txt")
 log10ks = np.log10(ks)
 zs_cola = [
     0.000, 0.020, 0.041, 0.062, 0.085, 0.109, 0.133, 0.159, 0.186, 0.214, 0.244, 0.275, 0.308, 
@@ -18,8 +18,10 @@ zs_cola = [
 print("[colaemu] Loading models")
 models = {}
 for z in zs_cola:
-    models[z] = utils.load_model(f"{current_dir}/projects/lsst_y1/emulators/joao/models/NN_Z{z:.3f}.model")
+    models[z] = utils.load_model(f"{emulator_dir}/models/NN_Z{z:.3f}.model")
 print("[colaemu] Models loaded")
+
+ee2 = euclidemu2.PyEuclidEmulator()
 
 # Preload constant parameters
 COSMO_PARAMS_TEMPLATE = {
