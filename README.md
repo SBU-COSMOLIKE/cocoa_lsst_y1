@@ -15,9 +15,18 @@ See the `TEST_COLA.yaml` file that calculates one evaluation of the LSST cosmic 
 
 The fiducial data vectors are stored in `data/`. Their names have the format `<nonlinear_prescription>_<fiducial_cosmology>.modelvector`.
 
+We define a few shifts to the cosmological parameters:
+- `Omega_mlow` = 0.28, `Omega_mhi` = 0.36;
+- `Aslow` = $1.9 \times 10-^{-9}$, `Omega_mhi` = $2.3 \times 10-^{-9}$;
+- `nslow` = 0.94, `nshi` = 0.98;
+- `wlow` = -1.15, `whi` = -0.85;
+- `walow` = -0.35, `wahi` = 0.25;
+
 We define a few fiducial cosmologies:
 - EE2REF: EuclidEmulator2 reference cosmology: $\Omega_m = 0.319$, $\Omega_b = 0.049$, $h = 0.67$, $A_s = 2.1\times 10^{-9}$, $n_s = 0.96$, $w = -1$, $w_a = 0$
 - DESI2CMBPANPLUS: $\Omega_m = 0.3114$, $\Omega_b = 0.049$, $h = 0.6751$, $A_s = 2.1\times 10^{-9}$, $n_s = 0.96$, $w = -0.838$, $w_a = -0.62$ (values from Table V of [DESI DR2](https://arxiv.org/pdf/2503.14738))
+- `w(low|hi)_wa(low|hi)`
+- `(Omega_m|As|ns)(low|hi)_w(low|hi)_wa(low|hi)`
 
 The nonlinear prescriptions are `ee2` and `cola`.
 
