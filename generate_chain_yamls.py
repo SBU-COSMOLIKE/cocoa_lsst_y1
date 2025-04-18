@@ -19,7 +19,7 @@ def diff_nested_dicts(dict1, dict2, label1, label2):
             if nested_diff:
                 diff[key] = nested_diff
         elif dict1[key] != dict2[key]:
-            diff[key] = f"DIFF({label1} has {dict1[key]}, {label2} has {dict2[key]})"# (dict1[key], dict2[key])
+            diff[key] = f"DIFF({label1} has {dict1[key]}, {label2} has {dict2[key]})" # (dict1[key], dict2[key])
     return diff
 
 if __name__ == "__main__":
@@ -60,7 +60,12 @@ if __name__ == "__main__":
         else:
             raise Exception(f"Unknown emulator {emulator}")
         
-        dataset_file = f"ee2_{fid_cosmo.lower()}_{scale_cuts}.dataset"
+        # NOTE: the files for Omega_m and As varying cosmologies are capitalized
+        if fid_cosmo in ["EE2REF", "DESI2CMBPANPLUS"]:
+            dataset_file = f"ee2_{fid_cosmo.lower()}_{scale_cuts}.dataset"
+        else:
+            dataset_file = f"ee2_{fid_cosmo}_{scale_cuts}.dataset"
+
         if not os.path.isfile(f"data/{dataset_file}"):
             raise Exception(f"Error in chain {index}: Dataset file {dataset_file} not found")
         chain["likelihood"]["lsst_y1.lsst_y1_cosmic_shear"]["data_file"] = dataset_file
