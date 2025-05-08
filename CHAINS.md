@@ -6,3 +6,15 @@
 - 4 | COLA | DESI2CMBPANPLUS | M1
 - 5 | EE2 | Omega_mhi_whi_walow | M1
 - 6 | COLA | Omega_mhi_whi_walow | M1
+- 7 | EE2 | Omega_mhi_whi_walow | M2
+- 8 | COLA | Omega_mhi_whi_walow | M2
+- 9 | EE2 | Omega_mhi_whi_walow | M3
+- 10 | COLA | Omega_mhi_whi_walow | M3
+- 11 | EE2 | Omega_mhi_whi_walow | M4
+- 12 | COLA | Omega_mhi_whi_walow | M4
+- 13 | EE2 | EE2REF | M2
+- 14 | COLA | EE2REF | M2
+- 15 | EE2 | EE2REF | M3
+- 16 | COLA | EE2REF | M3
+- 17 | EE2 | EE2REF | M4
+- 18 | COLA | EE2REF | M4
