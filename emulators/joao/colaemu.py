@@ -1,3 +1,5 @@
+import pickle
+import keras
 import numpy as np
 import train_utils as utils
 import euclidemu2
@@ -5,9 +7,13 @@ from copy import copy
 from scipy.interpolate import interp1d
 
 import os
+
+ee2 = euclidemu2#.PyEuclidEmulator()
+
 emulator_dir = os.path.dirname(os.path.abspath(__file__))
 ks = np.loadtxt(f"{emulator_dir}/ks.txt")
 log10ks = np.log10(ks)
+
 zs_cola = [
     0.000, 0.020, 0.041, 0.062, 0.085, 0.109, 0.133, 0.159, 0.186, 0.214, 0.244, 0.275, 0.308, 
     0.342, 0.378, 0.417, 0.457, 0.500, 0.543, 0.588, 0.636, 0.688, 0.742, 0.800, 0.862, 0.929, 
@@ -16,12 +22,22 @@ zs_cola = [
 ]
 
 print("[colaemu] Loading models")
+with open(f"{emulator_dir}/metadata/param_scaler", "rb") as f: param_scaler = pickle.load(f)
 models = {}
+boost_scalers = {}
+pcas = {}
+
 for z in zs_cola:
-    models[z] = utils.load_model(f"{emulator_dir}/models/NN_Z{z:.3f}.model")
+    models[z] = keras.saving.load_model(f"{emulator_dir}/models/NN_Z0.000.keras")
+    with open(f"{emulator_dir}/metadata/Z0.000.pca", "rb") as f: pcas[z] = pickle.load(f)
+    with open(f"{emulator_dir}/metadata/Z0.000.boost_scaler", "rb") as f: boost_scalers[z] = pickle.load(f)
 print("[colaemu] Models loaded")
 
-ee2 = euclidemu2.PyEuclidEmulator()
+def predict_logboost(x, z):
+    x_norm = param_scaler.transform([x])
+    pcs = models[z]([x_norm])
+    logboost_norm = pcas[z].inverse_transform(pcs)
+    logboost = boost_scalers[z].inverse_transform(logboost_norm)
 
 # Preload constant parameters
 COSMO_PARAMS_TEMPLATE = {
@@ -50,7 +66,10 @@ def get_boost(x, k_custom=None):
         log10k_custom = np.log10(k_custom)
         mask_low_k = log10k_custom < log10ks[0]
     for i, (z, model) in enumerate(models.items()):
-        boost_case, boost_proj = model.predict([x, x_proj])
+        x_norm = param_scaler.transform([x, x_proj])
+        pcs = models[z](x_norm)
+        logboost_norm = pcas[z].inverse_transform(pcs)
+        boost_case, boost_proj = np.exp(boost_scalers[z].inverse_transform(logboost_norm))
         if k_custom is None: boost = boost_case * boost_proj_ee2[i] / boost_proj
         else:
             ratio = boost_case/boost_proj

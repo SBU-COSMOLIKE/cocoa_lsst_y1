@@ -5,7 +5,7 @@ This repository contains a simulated LSST analysis using COLA emulators as nonli
 
 **NOTE**: Users must have installed the Cocoa environment with the machine learning libraries, so you must unset the `IGNORE_EMULATOR_CPU_PACKAGES` flag inside the `set_installation_options.sh` file before running the `compile_cocoa.sh` command. If that's not the case, you can run the compile command again.
 
-**NOTE**: I had to make a small hack in the `keras.saving` library in order to load the NN models properly. Contact João for more information!
+**NOTE**: Cocoa's environment installs Keras version 2.13.0, but the models are trained on version 3.5.0. In order to use the models, you must have at least Keras version 3.5.0.
 
 ## Usage
 

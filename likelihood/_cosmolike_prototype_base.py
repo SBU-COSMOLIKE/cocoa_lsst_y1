@@ -3,7 +3,7 @@ from __future__ import absolute_import, division, print_function
 import os
 import numpy as np
 import scipy
-from scipy.interpolate import interp1d, interp2d
+from scipy.interpolate import interp1d, interp2d, RectBivariateSpline
 import sys
 import time
 
@@ -278,8 +278,11 @@ class _cosmolike_prototype_base(DataSetLikelihood):
         logboost_extrap[mask_low_k] = 0.0
         logboosts_extrap.append(logboost_extrap)
       
-      logboost_2d_interp = interp2d(log10k_interp_2D, self.emulator.zs_cola, logboosts_extrap)
-      logboost_2d = logboost_2d_interp(log10k_interp_2D, self.z_interp_2D)
+      print(f"shape of k = {np.shape(log10k_interp_2D)}")
+      print(f"shape of z = {np.shape(self.emulator.zs_cola)}")
+      print(f"shape of B = {np.shape(logboosts_extrap)}")
+      logboost_2d_interp = RectBivariateSpline(self.emulator.zs_cola, log10k_interp_2D, logboosts_extrap)
+      logboost_2d = logboost_2d_interp(self.z_interp_2D, log10k_interp_2D)
       logboost_2d[self.z_interp_2D > 3, :] = 0.0
       lnPNL = lnPL + logboost_2d.T.flatten()
 

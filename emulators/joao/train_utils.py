@@ -12,8 +12,7 @@ from sklearn.preprocessing import MinMaxScaler
 from sklearn.metrics import mean_squared_error
 
 import tensorflow as tf
-from tensorflow import keras
-from tensorflow.keras import models, layers, optimizers
+from keras import models, layers, optimizers
 from keras.regularizers import l1_l2
 from tqdm.notebook import tqdm
 
