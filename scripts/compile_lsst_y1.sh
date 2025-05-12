@@ -68,19 +68,17 @@ if [ -z "${IGNORE_COSMOLIKE_LSSTY1_CODE}" ]; then
 
   # ---------------------------------------------------------------------------
   # cleaning any previous compilation
-
   rm -rf "${PACKDIR:?}"/interface/*.o
   rm -rf "${PACKDIR:?}"/interface/*.so
-
   cd "${PACKDIR}"/interface
-  
-  make -f MakefileCosmolike clean \
-      >${OUT1:?} 2>${OUT2:?} || { error "${EC2:?}"; return 1; }
+  make -f MakefileCosmolike clean >${OUT1:?} 2>${OUT2:?} || { error "${EC2:?}"; return 1; }
 
   # ---------------------------------------------------------------------------
+  cd "${PACKDIR}"/interface
 
-  make -j $MNT -f MakefileCosmolike all \
-      >${OUT1:?} 2>${OUT2:?} || { error "${EC8:?}"; return 1; }
+  (export LD_LIBRARY_PATH=${CONDA_PREFIX:?}/lib:$LD_LIBRARY_PATH && \
+   export LD_LIBRARY_PATH=${ROOTDIR:?}/.local/lib:$LD_LIBRARY_PATH && \
+   make -j $MNT -f MakefileCosmolike all >${OUT1:?} 2>${OUT2:?} || { error "${EC8:?}"; return 1; })
 
   cd ${ROOTDIR:?}
 
