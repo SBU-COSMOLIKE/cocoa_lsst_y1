@@ -67,7 +67,7 @@ def get_boost(x, k_custom=None):
         mask_low_k = log10k_custom < log10ks[0]
     for i, (z, model) in enumerate(models.items()):
         x_norm = param_scaler.transform([x, x_proj])
-        pcs = models[z](x_norm)
+        pcs = model(x_norm)
         logboost_norm = pcas[z].inverse_transform(pcs)
         boost_case, boost_proj = np.exp(boost_scalers[z].inverse_transform(logboost_norm))
         if k_custom is None: boost = boost_case * boost_proj_ee2[i] / boost_proj
