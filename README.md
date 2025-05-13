@@ -44,6 +44,10 @@ See `CHAINS.md` for the list of chains. The Python script `generate_yamls.py` ta
 
 See `likelihood/_cosmolike_prototype_base.py` for the implementation.
 
+## Cocoa Emulator debug
+
+The script `plot_boosts_cocoa.py` simulates the Cocoa environment and calculates the boost at Cosmolike's values of k and z. It's a useful script for debugging purposes (i.e. plotting the boosts) so we don't have to keep running Cocoa every time.
+
 # Original Docs
 ## Running Cosmolike projects <a name="running_cosmolike_projects"></a> 
 
