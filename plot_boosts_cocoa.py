@@ -10,6 +10,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 from scipy.interpolate import interp1d, RectBivariateSpline
 
+ee2 = ee2.PyEuclidEmulator()
+
 z_interp_2D = np.linspace(0,2.0,80)
 z_interp_2D = np.concatenate((z_interp_2D, np.linspace(2.01,10,20)),axis=0)
 z_interp_2D[0] = 0
@@ -54,12 +56,10 @@ def get_cocoa_boost_ee2(params):
 
 def get_cocoa_boost_colaemu(params):
     kbt = np.power(10.0, np.linspace(-2.0589, 0.973, len(k_interp_2D)))
-    cola_logboost = np.log(
-        colaemu.get_boost(
-            params,
-            k_custom=kbt
-        )
-    )
+    cola_boost = colaemu.get_boost(params, k_custom=kbt)
+    for i, z in enumerate(colaemu.zs_cola):
+        print(f"z = {z} => boost = {np.array(cola_boost)[i]}")
+    cola_logboost = np.log(cola_boost)
     logkbt = np.log10(kbt)
       
     logboosts_extrap = []
@@ -94,4 +94,4 @@ for i, w0 in enumerate([-1.15, -0.85]):
         axs[i, j].semilogx(k_interp_2D, boosts_cola[0], label="COLA")
         axs[i, j].set_title(f"$w_0 = {w0}$, $w_a = {wa}$")
         axs[i, j].legend()
-plt.show()
+plt.savefig("test.pdf")
