@@ -8,17 +8,18 @@ from scipy.interpolate import interp1d
 
 import os
 
-ee2 = euclidemu2#.PyEuclidEmulator()
+ee2 = euclidemu2.PyEuclidEmulator()
 
 emulator_dir = os.path.dirname(os.path.abspath(__file__))
 ks = np.loadtxt(f"{emulator_dir}/ks.txt")
 log10ks = np.log10(ks)
+z_threshold = 1.182
 
 zs_cola = [
     0.000, 0.020, 0.041, 0.062, 0.085, 0.109, 0.133, 0.159, 0.186, 0.214, 0.244, 0.275, 0.308, 
     0.342, 0.378, 0.417, 0.457, 0.500, 0.543, 0.588, 0.636, 0.688, 0.742, 0.800, 0.862, 0.929, 
     1.000, 1.087, 1.182, 1.286, 1.400, 1.526, 1.667, 1.824, 2.000, 2.158, 2.333, 2.529, 2.750, 
-    3.000
+    # 3.000
 ]
 
 print("[colaemu] Loading models")
@@ -28,16 +29,15 @@ boost_scalers = {}
 pcas = {}
 
 for z in zs_cola:
-    models[z] = keras.saving.load_model(f"{emulator_dir}/models/NN_Z0.000.keras")
-    with open(f"{emulator_dir}/metadata/Z0.000.pca", "rb") as f: pcas[z] = pickle.load(f)
-    with open(f"{emulator_dir}/metadata/Z0.000.boost_scaler", "rb") as f: boost_scalers[z] = pickle.load(f)
+    if z <= z_threshold:
+        models[z] = keras.saving.load_model(f"{emulator_dir}/models/NN_Z{z:.3f}_KMAXPI.keras")
+        with open(f"{emulator_dir}/metadata/Z{z:.3f}_KMAXPI.pca", "rb") as f: pcas[z] = pickle.load(f)
+        with open(f"{emulator_dir}/metadata/Z{z:.3f}_KMAXPI.boost_scaler", "rb") as f: boost_scalers[z] = pickle.load(f)
+    else:
+        models[z] = keras.saving.load_model(f"{emulator_dir}/models/NN_Z{z:.3f}.keras")
+        with open(f"{emulator_dir}/metadata/Z{z:.3f}.pca", "rb") as f: pcas[z] = pickle.load(f)
+        with open(f"{emulator_dir}/metadata/Z{z:.3f}.boost_scaler", "rb") as f: boost_scalers[z] = pickle.load(f)
 print("[colaemu] Models loaded")
-
-def predict_logboost(x, z):
-    x_norm = param_scaler.transform([x])
-    pcs = models[z]([x_norm])
-    logboost_norm = pcas[z].inverse_transform(pcs)
-    logboost = boost_scalers[z].inverse_transform(logboost_norm)
 
 # Preload constant parameters
 COSMO_PARAMS_TEMPLATE = {
@@ -74,7 +74,7 @@ def get_boost(x, k_custom=None):
         else:
             ratio = boost_case/boost_proj
             interp = interp1d(
-                log10ks,
+                log10ks if z <= z_threshold else log10ks[:255],
                 ratio,
                 kind='linear',
                 fill_value='extrapolate', 
