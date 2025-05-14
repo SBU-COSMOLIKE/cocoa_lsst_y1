@@ -57,8 +57,6 @@ def get_cocoa_boost_ee2(params):
 def get_cocoa_boost_colaemu(params):
     kbt = np.power(10.0, np.linspace(-2.0589, 0.973, len(k_interp_2D)))
     cola_boost = colaemu.get_boost(params, k_custom=kbt)
-    for i, z in enumerate(colaemu.zs_cola):
-        print(f"z = {z} => boost = {np.array(cola_boost)[i]}")
     cola_logboost = np.log(cola_boost)
     logkbt = np.log10(kbt)
       

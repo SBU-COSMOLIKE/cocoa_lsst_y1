@@ -5,6 +5,7 @@ import train_utils as utils
 import euclidemu2
 from copy import copy
 from scipy.interpolate import interp1d
+from scipy.signal import savgol_filter
 
 import os
 
@@ -21,6 +22,9 @@ zs_cola = [
     1.000, 1.087, 1.182, 1.286, 1.400, 1.526, 1.667, 1.824, 2.000, 2.158, 2.333, 2.529, 2.750, 
     # 3.000
 ]
+
+window_length = 5  # Choose an odd number for the window length
+polyorder = 1      # Polynomial order for the filter
 
 print("[colaemu] Loading models")
 with open(f"{emulator_dir}/metadata/param_scaler", "rb") as f: param_scaler = pickle.load(f)
@@ -73,6 +77,7 @@ def get_boost(x, k_custom=None):
         if k_custom is None: boost = boost_case * boost_proj_ee2[i] / boost_proj
         else:
             ratio = boost_case/boost_proj
+            ratio[-window_length:] = savgol_filter(ratio[-window_length:], window_length, polyorder)
             interp = interp1d(
                 log10ks if z <= z_threshold else log10ks[:255],
                 ratio,
