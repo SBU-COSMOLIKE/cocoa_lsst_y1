@@ -80,7 +80,7 @@ class _cosmolike_prototype_base(DataSetLikelihood):
     self.z_interp_2D[0] = 0
 
     self.len_z_interp_2D = len(self.z_interp_2D)
-    self.len_log10k_interp_2D = 1400
+    self.len_log10k_interp_2D = self.nk_interp_2d
     self.log10k_interp_2D = np.linspace(-4.2,2.0,self.len_log10k_interp_2D)
 
     # Cobaya wants k in 1/Mpc
