@@ -47,7 +47,7 @@ class _cosmolike_prototype_base(DataSetLikelihood):
     self.theta_min_arcmin = ini.float("theta_min_arcmin")
 
     self.theta_max_arcmin = ini.float("theta_max_arcmin")
-    
+
     # ------------------------------------------------------------------------
  
     self.nz_interp_1d=int(500 + 250*self.accuracyboost)
@@ -108,11 +108,22 @@ class _cosmolike_prototype_base(DataSetLikelihood):
       ia_model = int(self.IA_model), 
       ia_redshift_evolution = int(self.IA_redshift_evolution))
 
-    ci.init_redshift_distributions_from_files(
-      lens_multihisto_file=self.lens_file,
-      lens_ntomo=int(self.lens_ntomo), 
-      source_multihisto_file=self.source_file,
-      source_ntomo=int(self.source_ntomo))  
+    if self.external_nz_modeling: 
+      (self.lens_nz, self.source_nz) = ci.read_redshift_distributions(
+          lens_multihisto_file=self.lens_file,
+          lens_ntomo=int(self.lens_ntomo), 
+          source_multihisto_file=self.source_file,
+          source_ntomo=int(self.source_ntomo)
+        ) 
+      ci.init_lens_sample_size(int(self.lens_ntomo))
+      ci.init_source_sample_size(int(self.source_ntomo))
+      ci.init_ntomo_powerspectra() # must be called after set_source/lens_size  
+    else:
+      ci.init_redshift_distributions_from_files(
+        lens_multihisto_file=self.lens_file,
+        lens_ntomo=int(self.lens_ntomo), 
+        source_multihisto_file=self.source_file,
+        source_ntomo=int(self.source_ntomo))  
 
     ci.init_data_real(self.cov_file, self.mask_file, self.data_vector_file)
      
@@ -269,13 +280,37 @@ class _cosmolike_prototype_base(DataSetLikelihood):
         ]
       ]
     )
-    ci.set_nuisance_shear_photoz(
-      bias = [
-        params_values.get(p, None) for p in [
-          survey+"_DZ_S"+str(i+1) for i in range(self.source_ntomo)
+    if self.external_nz_modeling: 
+      # here we send n(z) at every point in the chain as the user may
+      # modify it using an external function (example: adding outliers)
+     
+      # to modify it
+      # (1) deep copy the numpy array (so we keep track of the fiducial
+      # (2) modify the copy
+      # (3) call set_source_sample
+      source_nz_local = self.source_nz.copy()
+
+      # insert mod function here <-
+      #source_nz_local = f(source_nz_local, nuisance parameters)
+
+      ci.set_source_sample(source_nz_local)
+
+      # user may choose to still add photo-z bias or not (here we ad)
+      ci.set_nuisance_shear_photoz(
+        bias = [
+          params_values.get(p, None) for p in [
+            survey+"_DZ_S"+str(i+1) for i in range(self.source_ntomo)
+          ]
         ]
-      ]
-    )
+      )
+    else:
+      ci.set_nuisance_shear_photoz(
+        bias = [
+          params_values.get(p, None) for p in [
+            survey+"_DZ_S"+str(i+1) for i in range(self.source_ntomo)
+          ]
+        ]
+      )
     ci.set_nuisance_ia(
       A1 = [
         params_values.get(p, None) for p in [
@@ -316,13 +351,37 @@ class _cosmolike_prototype_base(DataSetLikelihood):
         ]
       ]
     )
-    ci.set_nuisance_clustering_photoz(
-      bias = [
-        params_values.get(p, None) for p in [
-          survey+"_DZ_L"+str(i+1) for i in range(self.lens_ntomo)
+    if self.external_nz_modeling: 
+      # here we send n(z) at every point in the chain as the user may
+      # modify it using an external function (example: adding outliers)
+     
+      # to modify it
+      # (1) deep copy the numpy array (so we keep track of the fiducial
+      # (2) modify the copy
+      # (3) call set_source_sample
+      lens_nz_local = self.lens_nz.copy()
+
+      # insert mod function here <-
+      #lens_nz_local = f(lens_nz_local, nuisance parameters)
+
+      ci.set_lens_sample(lens_nz_local)
+
+      # user may choose to still add photo-z bias or not (here we ad)
+      ci.set_nuisance_clustering_photoz(
+        bias = [
+          params_values.get(p, None) for p in [
+            survey+"_DZ_L"+str(i+1) for i in range(self.lens_ntomo)
+          ]
         ]
-      ]
-    )
+      )
+    else:
+      ci.set_nuisance_clustering_photoz(
+        bias = [
+          params_values.get(p, None) for p in [
+            survey+"_DZ_L"+str(i+1) for i in range(self.lens_ntomo)
+          ]
+        ]
+      )
     ci.set_point_mass(
       PMV = [
         params_values.get(p, None) for p in [

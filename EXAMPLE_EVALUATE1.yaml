@@ -20,7 +20,7 @@ likelihood:
     non_linear_emul: 2
     IA_model: 0
     IA_redshift_evolution: 3
-  
+    
 params:
   As_1e9:
     prior:

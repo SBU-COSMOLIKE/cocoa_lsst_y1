@@ -367,6 +367,33 @@ PYBIND11_MODULE(cosmolike_lsst_y1_interface, m)
       py::arg("sigma_e").none(false)
     );
 
+   m.def("read_redshift_distributions",
+      &cosmolike_interface::read_redshift_distributions_from_files,
+      "Read n(z) lens and source from files (same way as old cosmolike)",
+      py::arg("lens_multihisto_file").none(false),
+      py::arg("lens_ntomo").none(false).noconvert(),
+      py::arg("source_multihisto_file").none(false),
+      py::arg("source_ntomo").none(false).noconvert(),
+      py::return_value_policy::move
+    );
+
+    m.def("init_lens_sample_size",
+      &cosmolike_interface::set_lens_sample_size,
+      "Set the lens number of tomo bins",
+      py::arg("Ntomo").none(false).noconvert()
+    );
+
+    m.def("init_source_sample_size",
+      &cosmolike_interface::set_source_sample_size,
+      "Set the source number of tomo bins",
+      py::arg("Ntomo").none(false).noconvert()
+    );
+
+    m.def("init_ntomo_powerspectra",
+      &cosmolike_interface::init_ntomo_powerspectra,
+      "Set the number of power spectra"
+    );
+
   // --------------------------------------------------------------------
   // SET FUNCTIONS
   // --------------------------------------------------------------------
@@ -425,11 +452,33 @@ PYBIND11_MODULE(cosmolike_lsst_y1_interface, m)
       py::arg("bias").none(false)
     );
 
+  m.def("set_nuisance_shear_photoz",
+    &set_nuisance_shear_photoz,
+    "Set nuisance shear photo-z bias amplitudes",
+    py::arg("bias").none(false)
+  );
+
   m.def("set_point_mass",
-      &set_pm,
-       "Set the point mass amplitudes",
-      py::arg("PMV").none(false)
-    );
+    &set_pm,
+     "Set the point mass amplitudes",
+    py::arg("PMV").none(false)
+  );
+
+  m.def("set_lens_sample",
+    py::overload_cast<arma::Mat<double>>(
+      &cosmolike_interface::set_lens_sample
+    ),
+    "Set the lens n(z) from a numpy n(z) histogram",
+    py::arg("nofz").none(false)
+  );
+
+  m.def("set_source_sample",
+    py::overload_cast<arma::Mat<double>>(
+      &cosmolike_interface::set_source_sample
+    ),
+    "Set the source n(z) from a numpy n(z) histogram",
+    py::arg("nofz").none(false)
+  );
 
   // --------------------------------------------------------------------
   // --------------------------------------------------------------------
