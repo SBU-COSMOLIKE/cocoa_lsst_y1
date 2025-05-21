@@ -56,7 +56,7 @@ From `Cocoa/Readme` instructions:
 > 
 >       source ./installation_scripts/compile_all_projects.sh
 > 
-> or (in case users want to just compile lsst-y1 project)
+> or (in case users just want to compile lsst-y1 project)
 >
 >       source ./projects/lsst_y1/scripts/compile_lsst_y1.sh
 
