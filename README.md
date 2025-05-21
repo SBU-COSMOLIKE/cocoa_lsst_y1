@@ -41,7 +41,7 @@ From `Cocoa/Readme` instructions:
 >     #export LSST_Y1_BRANCH="dev"
 >     #COMMIT: if unset, load the specified commit
 >     export LSST_Y1_COMMIT="1abe548281296196dabee7b19e31c56f324eda38"
->     #BRANCH: if unset, load the specified TAG
+>     #TAG: if unset, load the specified TAG
 >     #export LSST_Y1_TAG="v4.0-beta17"
 > 
 > If users comment these lines (unsetting the corresponding IGNORE keys) after running `setup_cocoa.sh` and `compile_cocoa.sh`, there is no need to rerun these general scripts, which would reinstall many packages (slow). Instead, run the following three commands:
