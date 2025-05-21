@@ -32,17 +32,18 @@ From `Cocoa/Readme` instructions:
 >     (...)
 > 
 >     # ------------------------------------------------------------------------------
->     # PACKAGE URL AND VERSIONS. CHANGES IN THE COMMIT ID MAY BREAK COCOA -----------
+>     # Cosmolike projects below -------------------------------------------
 >     # ------------------------------------------------------------------------------
 >     (...)
 >     export LSST_Y1_URL="https://github.com/CosmoLike/cocoa_lsst_y1.git"
 >     export LSST_Y1_NAME="lsst_y1"
->     #warning: users can't unset `BRANCH` and `COMMIT` keys at the same time
 >     #BRANCH: if unset, load the latest commit on the specified branch
 >     #export LSST_Y1_BRANCH="dev"
 >     #COMMIT: if unset, load the specified commit
 >     export LSST_Y1_COMMIT="1abe548281296196dabee7b19e31c56f324eda38"
->
+>     #BRANCH: if unset, load the specified TAG
+>     #export LSST_Y1_TAG="v4.0-beta17"
+> 
 > If users comment these lines (unsetting the corresponding IGNORE keys) after running `setup_cocoa.sh` and `compile_cocoa.sh`, there is no need to rerun these general scripts, which would reinstall many packages (slow). Instead, run the following three commands:
 >
 >      source start_cocoa.sh
