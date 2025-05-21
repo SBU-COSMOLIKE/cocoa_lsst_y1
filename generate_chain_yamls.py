@@ -35,7 +35,6 @@ if __name__ == "__main__":
     with open("TEMPLATE_MCMC.yaml", "r") as f:
         template = yaml.safe_load(f)
 
-    chains = {}
     for line in lines:
         if line.startswith("#"): continue
         fields = line[2:].split(" | ")
