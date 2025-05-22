@@ -5,6 +5,7 @@
 """
 import os
 import yaml
+from copy import deepcopy
 
 def diff_nested_dicts(dict1, dict2, label1, label2):
     """
@@ -50,23 +51,26 @@ if __name__ == "__main__":
         
         assert mcmc_yaml["likelihood"]["lsst_y1.lsst_y1_cosmic_shear"]["non_linear_emul"] == 1, "The MCMC should be EE2"
 
-        postprocess_yaml = mcmc_yaml.copy()
-        postprocess_yaml["sampler"] = {
-            "post": {
-                "skip": 0.35,
-                "thin": 10,
-                "suffix": "POSTCOLA",
-                "remove": {
-                    "theory": mcmc_yaml["theory"],
-                    "likelihood": mcmc_yaml["likelihood"],
-                },
-                "add": {
-                    "theory": mcmc_yaml["theory"],
-                    "likelihood": mcmc_yaml["likelihood"],
-                },
-            }
+        # NOTE: the `dict.copy` method returns shallow copies of a dictionary
+        # Therefore, when I change manually the `non_linear_emul` field inside the `add` block,
+        # it changes ALL occurrences of the `non_linear_emul` field, even in the `remove` block
+        # and in the outside `likelihood` block, which may cause errors. The solution is to use `copy.deepcopy`. 
+        postprocess_yaml = deepcopy(mcmc_yaml)
+        postprocess_yaml.pop("sampler")
+        postprocess_yaml["post"] = {
+            "skip": 0.5,
+            "thin": 15,
+            "suffix": "POSTCOLA",
+            "remove": {
+                "theory": postprocess_yaml["theory"],
+                "likelihood": deepcopy(mcmc_yaml["likelihood"]),
+            },
+            "add": {
+                "theory": postprocess_yaml["theory"],
+                "likelihood": deepcopy(mcmc_yaml["likelihood"]),
+            },
         }
-        postprocess_yaml["sampler"]["post"]["add"]["likelihood"]["lsst_y1.lsst_y1_cosmic_shear"]["non_linear_emul"] = 3
+        postprocess_yaml["post"]["add"]["likelihood"]["lsst_y1.lsst_y1_cosmic_shear"]["non_linear_emul"] = 3
 
         with open(f"./yamls/POST{index}_COLA.yaml", "w") as f:
             yaml.dump(postprocess_yaml, f, default_flow_style=False)

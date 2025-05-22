@@ -1,5 +1,5 @@
 debug: false
-likelihood: &id001
+likelihood:
   lsst_y1.lsst_y1_cosmic_shear:
     IA_model: 0
     IA_redshift_evolution: 3
@@ -7,7 +7,7 @@ likelihood: &id001
     data_file: ee2_desi2cmbpanplus_M1.dataset
     integration_accuracy: 0
     kmax_boltzmann: 5.0
-    non_linear_emul: 3
+    non_linear_emul: 1
     path: ./external_modules/data/lsst_y1
     print_datavector: false
 output: ./projects/lsst_y1/chains/MCMC3/MCMC3
@@ -262,30 +262,49 @@ params:
       scale: 0.1
   yheused:
     latex: Y_P^\mathrm{BBN}
-sampler:
-  post:
-    add:
-      likelihood: *id001
-      theory: &id002
-        camb:
-          extra_args:
-            AccuracyBoost: 1.1
-            accurate_massive_neutrino_transfers: false
-            dark_energy_model: ppf
-            halofit_version: takahashi
-            k_per_logint: 20
-            lens_potential_accuracy: 1.0
-            nnu: 3.046
-            num_massive_neutrinos: 1
-          path: ./external_modules/code/CAMB
-          stop_at_error: false
-          use_renames: true
-    remove:
-      likelihood: *id001
-      theory: *id002
-    skip: 0.35
-    suffix: POSTCOLA
-    thin: 10
+post:
+  add:
+    likelihood:
+      lsst_y1.lsst_y1_cosmic_shear:
+        IA_model: 0
+        IA_redshift_evolution: 3
+        accuracyboost: 1.0
+        data_file: ee2_desi2cmbpanplus_M1.dataset
+        integration_accuracy: 0
+        kmax_boltzmann: 5.0
+        non_linear_emul: 3
+        path: ./external_modules/data/lsst_y1
+        print_datavector: false
+    theory: &id001
+      camb:
+        extra_args:
+          AccuracyBoost: 1.1
+          accurate_massive_neutrino_transfers: false
+          dark_energy_model: ppf
+          halofit_version: takahashi
+          k_per_logint: 20
+          lens_potential_accuracy: 1.0
+          nnu: 3.046
+          num_massive_neutrinos: 1
+        path: ./external_modules/code/CAMB
+        stop_at_error: false
+        use_renames: true
+  remove:
+    likelihood:
+      lsst_y1.lsst_y1_cosmic_shear:
+        IA_model: 0
+        IA_redshift_evolution: 3
+        accuracyboost: 1.0
+        data_file: ee2_desi2cmbpanplus_M1.dataset
+        integration_accuracy: 0
+        kmax_boltzmann: 5.0
+        non_linear_emul: 1
+        path: ./external_modules/data/lsst_y1
+        print_datavector: false
+    theory: *id001
+  skip: 0.5
+  suffix: POSTCOLA
+  thin: 15
 stop_at_error: false
-theory: *id002
+theory: *id001
 timing: false
