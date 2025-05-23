@@ -4,13 +4,13 @@ likelihood:
     IA_model: 0
     IA_redshift_evolution: 3
     accuracyboost: 1.0
-    data_file: ee2_ee2ref_M1.dataset
+    data_file: ee2_ee2ref_M3.dataset
     integration_accuracy: 0
     kmax_boltzmann: 5.0
-    non_linear_emul: 1
+    non_linear_emul: 4
     path: ./external_modules/data/lsst_y1
     print_datavector: false
-output: ./projects/lsst_y1/chains/MCMC1/MCMC1
+output: ./projects/lsst_y1/chains/MCMC20/MCMC20
 params:
   As:
     latex: A_\mathrm{s}
@@ -19,11 +19,11 @@ params:
     drop: true
     latex: 10^9 A_\mathrm{s}
     prior:
-      max: 2.5 # U(1.7, 2.5)
+      max: 2.5
       min: 1.7
     proposal: 0.2
     ref:
-      dist: norm # N(2.1, 0.2)
+      dist: norm
       loc: 2.1
       scale: 0.2
     renames: A
@@ -255,8 +255,8 @@ params:
     prior:
       max: 0.5
       min: -0.7
-    proposal: 0.1 # step ~ U(-0.1, 0.1)
-    ref:          # Initial point
+    proposal: 0.1
+    ref:
       dist: norm
       loc: 0
       scale: 0.1
