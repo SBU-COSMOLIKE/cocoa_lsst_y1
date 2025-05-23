@@ -2,7 +2,10 @@ from numpy import loadtxt
 import warnings
 warnings.filterwarnings("ignore", category=FutureWarning)
 
-base_path = "/gpfs/projects/MirandaGroup/victoria/cocoa/Cocoa/./projects/lsst_y1/emulators/victoria/"
+# base_path = "/gpfs/projects/MirandaGroup/victoria/cocoa/Cocoa/./projects/lsst_y1/emulators/victoria/"
+import os
+cocoa_path = os.getcwd()
+base_path = cocoa_path + "/projects/lsst_y1/emulators/victoria/"
 
 shot_noise_pk = 1
 

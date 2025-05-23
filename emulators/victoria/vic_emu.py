@@ -13,6 +13,8 @@ from w0wa_utils.model import CustomActivationLayer
 import os
 emulator_dir = os.path.dirname(os.path.abspath(__file__))
 
+ee2 = ee2.PyEuclidEmulator()
+
 zs_cola, k_maxs = np.loadtxt(f"{emulator_dir}/kmax_vals.txt", unpack=True, usecols=(0,1), delimiter=',')
 ks = np.loadtxt(f"{emulator_dir}/ks.txt", skiprows=2)
 log10ks = np.log10(ks)
