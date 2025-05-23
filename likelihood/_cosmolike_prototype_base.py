@@ -140,6 +140,10 @@ class _cosmolike_prototype_base(DataSetLikelihood):
       # JR end
     elif self.non_linear_emul == 4:
       print("[nonlinear] Using Vic's COLAEmu")
+      sys_path = './projects/lsst_y1/emulators/victoria'
+      sys.path.append(sys_path)
+      import vic_emu
+      self.emulator = vic_emu
     else:
       raise LoggedError(self.log, "[nonlinear] Invalid choice for non_linear_emul = %d", self.non_linear_emul)
 
@@ -284,7 +288,42 @@ class _cosmolike_prototype_base(DataSetLikelihood):
       lnPNL = lnPL + logboost_2d.T.flatten()
 
     elif self.non_linear_emul == 4:
-      raise LoggedError(self.log, "non_linear_emul = %d is not implemented yet", self.non_linear_emul)
+      kbt = np.power(10.0, np.linspace(-2.0589, 0.973, self.len_k_interp_2D))
+      cola_logboost = np.log(
+        self.emulator.get_boost(
+          [
+            h, 
+            self.provider.get_param("omegab"),
+            self.provider.get_param("omegam"),
+            self.provider.get_param("As"),
+            self.provider.get_param("ns"),
+            self.provider.get_param("w"),
+            self.provider.get_param("wa"),
+          ],
+          k_custom=kbt
+        )
+      )
+      logkbt = np.log10(kbt)
+      
+      logboosts_extrap = []
+      mask_low_k = log10k_interp_2D < logkbt[0]
+      for i, _ in enumerate(self.emulator.zs_cola):
+        interp = interp1d(
+          logkbt,
+          cola_logboost[i],
+          kind='linear',
+          fill_value='extrapolate', 
+          assume_sorted=True
+        )
+      
+        logboost_extrap = interp(log10k_interp_2D)
+        logboost_extrap[mask_low_k] = 0.0
+        logboosts_extrap.append(logboost_extrap)
+      
+      logboost_2d_interp = RectBivariateSpline(self.emulator.zs_cola, log10k_interp_2D, logboosts_extrap)
+      logboost_2d = logboost_2d_interp(self.z_interp_2D, log10k_interp_2D)
+      logboost_2d[self.z_interp_2D > 3, :] = 0.0
+      lnPNL = lnPL + logboost_2d.T.flatten()
     else:
       raise LoggedError(self.log, "non_linear_emul = %d is an invalid option", self.non_linear_emul)
 
