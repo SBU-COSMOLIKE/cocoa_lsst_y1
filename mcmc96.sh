@@ -30,7 +30,7 @@ source /gpfs/projects/MirandaGroup/victoria/miniconda/etc/profile.d/conda.sh
 cd /gpfs/projects/MirandaGroup/victoria/cocoa/Cocoa
 module load slurm
 conda activate cocoa
-source start_cocoa
+source start_cocoa.sh
 
 export OMP_PROC_BIND=close
 if [ -n "$SLURM_CPUS_PER_TASK" ]; then
