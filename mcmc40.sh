@@ -1,8 +1,8 @@
 #!/bin/bash
 
-#SBATCH --job-name=mcmc_emu_40
-#SBATCH --output=/gpfs/projects/MirandaGroup/victoria/cocoa/Cocoa/projects/lsst_y1/chains/MCMC%a/run_%A.out
-#SBATCH --error=/gpfs/projects/MirandaGroup/victoria/cocoa/Cocoa/projects/lsst_y1/chains/MCMC%a/run_%A.err
+#SBATCH --job-name=mcmc_40
+#SBATCH --output=/gpfs/projects/MirandaGroup/victoria/cocoa/Cocoa/projects/lsst_y1/logs/MCMC%a_run_%A.out
+#SBATCH --error=/gpfs/projects/MirandaGroup/victoria/cocoa/Cocoa/projects/lsst_y1/logs/MCMC%a_run_%A.err
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=4
 #SBATCH --cpus-per-task=7
@@ -22,6 +22,7 @@ cd $SLURM_SUBMIT_DIR
 module purge > /dev/null 2>&1
 
 source /gpfs/projects/MirandaGroup/victoria/miniconda/etc/profile.d/conda.sh
+cd /gpfs/projects/MirandaGroup/victoria/cocoa/Cocoa
 module load slurm
 conda activate cocoa
 source start_cocoa
