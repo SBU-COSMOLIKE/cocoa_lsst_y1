@@ -1,8 +1,8 @@
 #!/bin/bash
 
 #SBATCH --job-name=mcmc_40
-#SBATCH --output=/gpfs/projects/MirandaGroup/victoria/cocoa/Cocoa/projects/lsst_y1/logs/MCMC%a_run_%A.out
-#SBATCH --error=/gpfs/projects/MirandaGroup/victoria/cocoa/Cocoa/projects/lsst_y1/logs/MCMC%a_run_%A.err
+#SBATCH --output=/gpfs/projects/MirandaGroup/victoria/cocoa/Cocoa/projects/lsst_y1/logs/MCMC%a.out
+#SBATCH --error=/gpfs/projects/MirandaGroup/victoria/cocoa/Cocoa/projects/lsst_y1/logs/MCMC%a.err
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=4
 #SBATCH --cpus-per-task=7
