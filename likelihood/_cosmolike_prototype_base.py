@@ -3,7 +3,6 @@ from __future__ import absolute_import, division, print_function
 import os
 import numpy as np
 import scipy
-from scipy.interpolate import interp1d
 import sys
 import time
 
@@ -12,6 +11,8 @@ from cobaya.likelihoods.base_classes import DataSetLikelihood
 from cobaya.log import LoggedError
 from getdist import IniFile
 
+from scipy.interpolate import interp1d
+from scipy.interpolate import CubicSpline as _CubicSpline
 import euclidemu2 as ee2
 import math
 
@@ -148,9 +149,6 @@ class _cosmolike_prototype_base(DataSetLikelihood):
     self.npcs = 4
     self.baryon_pcs_qs = np.zeros(self.npcs)
 
-    if self.non_linear_emul == 1:
-      self.emulator = ee2
-
   # ------------------------------------------------------------------------
   # ------------------------------------------------------------------------
   # ------------------------------------------------------------------------
@@ -227,7 +225,7 @@ class _cosmolike_prototype_base(DataSetLikelihood):
       }
 
       kbt = np.power(10.0, np.linspace(-2.0589, 0.973, self.len_k_interp_2D))
-      kbt, tmp_bt = self.emulator.get_boost(params, self.z_interp_2D, kbt)
+      kbt, tmp_bt = ee2.get_boost(params, self.z_interp_2D, kbt)
       logkbt = np.log10(kbt)
 
       for i in range(self.len_z_interp_2D):    
@@ -241,12 +239,12 @@ class _cosmolike_prototype_base(DataSetLikelihood):
         lnbt = interp(log10k_interp_2D)
         lnbt[np.power(10,log10k_interp_2D) < 8.73e-3] = 0.0
     
-        lnPNL[i::self.len_z_interp_2D]  = lnPL[i::self.len_z_interp_2D] + lnbt
+        lnPNL[i::self.len_z_interp_2D] = lnPL[i::self.len_z_interp_2D] + lnbt
       
     elif self.non_linear_emul == 2:
 
       for i in range(self.len_z_interp_2D):
-        lnPNL[i::self.len_z_interp_2D]  = t1[i*self.len_k_interp_2D:(i+1)*self.len_k_interp_2D]  
+        lnPNL[i::self.len_z_interp_2D] = t1[i*self.len_k_interp_2D:(i+1)*self.len_k_interp_2D]  
       lnPNL += np.log((h**3))      
 
     else:
