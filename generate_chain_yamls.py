@@ -58,6 +58,8 @@ if __name__ == "__main__":
             chain["likelihood"]["lsst_y1.lsst_y1_cosmic_shear"]["non_linear_emul"] = 3
         elif emulator == "COLAVIC":
             chain["likelihood"]["lsst_y1.lsst_y1_cosmic_shear"]["non_linear_emul"] = 4
+        elif emulator == "EE2proj":
+            chain["likelihood"]["lsst_y1.lsst_y1_cosmic_shear"]["non_linear_emul"] = 5
         else:
             raise Exception(f"Unknown emulator {emulator}")
         
