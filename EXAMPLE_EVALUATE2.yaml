@@ -250,7 +250,7 @@ sampler:
       #LSST_A2_1: 0.0
       #LSST_A2_2: -1.51541
       #LSST_BTA_1: 0.0
-      # TESTING TATT chi2 ~ 285.9 (˜286.053 with new default accuracy)
+      # TESTING TATT chi2 ~285.9 (~286. with new default accuracy)
       LSST_A2_1: -0.852658
       LSST_A2_2: -2.63433
       LSST_BTA_1: 1.01257

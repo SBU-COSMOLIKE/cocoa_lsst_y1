@@ -11,6 +11,7 @@
 #include <random>
 #include <map>
 
+#define SPDLOG_ACTIVE_LEVEL SPDLOG_LEVEL_INFO
 #include <spdlog/spdlog.h>
 #include <spdlog/sinks/basic_file_sink.h>
 #include <spdlog/cfg/env.h>
@@ -84,8 +85,9 @@ PYBIND11_MODULE(cosmolike_lsst_y1_interface, m)
 
   m.def("init_data_real",
       [](std::string cov, std::string mask, std::string data) {
+        using namespace cosmolike_interface;
         arma::Col<int>::fixed<3> order = {0, 1, 2};
-        cosmolike_interface::init_data_3x2pt_real_space(cov, mask, data, order);
+        init_data_3x2pt_real_space(cov, mask, data, order);
       },
       "Load covariance matrix, mask (vec of 0/1s) and data vector",
       py::arg("COV").none(false),
