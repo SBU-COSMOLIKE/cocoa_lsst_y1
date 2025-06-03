@@ -4,13 +4,13 @@ likelihood:
     IA_model: 0
     IA_redshift_evolution: 3
     accuracyboost: 1.0
-    data_file: ee2_Omega_mhi_whi_walow_M2.dataset
+    data_file: ee2_ee2ref_M2.dataset
     integration_accuracy: 0
     kmax_boltzmann: 5.0
     non_linear_emul: 1
     path: ./external_modules/data/lsst_y1
     print_datavector: false
-output: ./projects/lsst_y1/chains/MCMC7/MCMC7
+output: ./projects/lsst_y1/chains/MCMC13/MCMC13
 params:
   As:
     latex: A_\mathrm{s}
@@ -269,10 +269,10 @@ post:
         IA_model: 0
         IA_redshift_evolution: 3
         accuracyboost: 1.0
-        data_file: ee2_Omega_mhi_whi_walow_M2.dataset
+        data_file: ee2_ee2ref_M2.dataset
         integration_accuracy: 0
         kmax_boltzmann: 5.0
-        non_linear_emul: 3
+        non_linear_emul: 1
         path: ./external_modules/data/lsst_y1
         print_datavector: false
     theory: &id001
@@ -295,7 +295,7 @@ post:
         IA_model: 0
         IA_redshift_evolution: 3
         accuracyboost: 1.0
-        data_file: ee2_Omega_mhi_whi_walow_M2.dataset
+        data_file: ee2_ee2ref_M2.dataset
         integration_accuracy: 0
         kmax_boltzmann: 5.0
         non_linear_emul: 1
@@ -303,7 +303,7 @@ post:
         print_datavector: false
     theory: *id001
   skip: 0.5
-  suffix: POSTCOLA
+  suffix: EE2
   thin: 15
 stop_at_error: false
 theory: *id001
