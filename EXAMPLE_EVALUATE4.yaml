@@ -3,7 +3,7 @@ debug: False
 stop_at_error: True
 
 likelihood:
-  lsst_y1.lsst_y1_xi_ggl:
+  lsst_y1.combo_xi_ggl:
     path: ./external_modules/data/lsst_y1
     data_file: lsst_y1_M1_GGL0.05.dataset 
     print_datavector: False

@@ -176,13 +176,6 @@ class _cosmolike_prototype_base(DataSetLikelihood):
   # ------------------------------------------------------------------------
   # ------------------------------------------------------------------------
 
-  def compute_logp(self, datavector):
-    return -0.5 * ci.compute_chi2(datavector)
-
-  # ------------------------------------------------------------------------
-  # ------------------------------------------------------------------------
-  # ------------------------------------------------------------------------
-
   def set_cosmo_related(self):
     h = self.provider.get_param("H0")/100.0
     # Compute linear & non-linear matter power spectrum
@@ -372,3 +365,61 @@ class _cosmolike_prototype_base(DataSetLikelihood):
   # ------------------------------------------------------------------------
   # ------------------------------------------------------------------------
   # ------------------------------------------------------------------------
+
+  def compute_logp(self, datavector):
+    return -0.5 * ci.compute_chi2(datavector)
+
+  # ------------------------------------------------------------------------
+  # ------------------------------------------------------------------------
+  # ------------------------------------------------------------------------
+
+  def logp(self, **params_values):
+    datavector = self.internal_get_datavector(**params_values)
+    return self.compute_logp(datavector)
+
+  # ------------------------------------------------------------------------
+  # ------------------------------------------------------------------------
+  # ------------------------------------------------------------------------
+
+  def get_datavector(self, **params_values):        
+    datavector = self.internal_get_datavector(**params_values)
+    return np.array(datavector)
+
+  # ------------------------------------------------------------------------
+  # ------------------------------------------------------------------------
+  # ------------------------------------------------------------------------
+
+  def internal_get_datavector(self, **params_values):
+    self.set_cosmo_related()
+
+    if self.probe != "xi":
+        self.set_lens_related(**params_values)
+
+    self.set_source_related(**params_values)
+    
+    if self.create_baryon_pca:
+      pcs = ci.compute_baryon_pcas(scenarios = self.baryon_pca_sims)
+      np.savetxt(self.filename_baryon_pca, pcs)
+    
+    if self.use_baryon_pca:      
+      datavector = np.array(
+        ci.compute_data_vector_masked_with_baryon_pcs(
+          Q = [
+                params_values.get(p, None) for p in [
+                  survey+"_BARYON_Q"+str(i+1) for i in range(self.npcs)
+                ]
+              ]
+        )
+      )
+    else:  
+      datavector = np.array(ci.compute_data_vector_masked())
+    
+    if self.print_datavector:
+      size = len(datavector)
+      out = np.zeros(shape=(size, 2))
+      out[:,0] = np.arange(0, size)
+      out[:,1] = datavector
+      fmt = '%d', '%1.8e'
+      np.savetxt(self.print_datavector_file, out, fmt = fmt)
+
+    return datavector
