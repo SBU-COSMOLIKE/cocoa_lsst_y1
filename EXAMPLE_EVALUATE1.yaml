@@ -184,6 +184,7 @@ params:
       loc: 1
       scale: 0.15
     proposal: 0.1
+    latex: A_\mathrm{BTA-IA,LSST}^1
 
 theory:
   camb:
