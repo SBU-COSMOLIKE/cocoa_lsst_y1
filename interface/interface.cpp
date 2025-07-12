@@ -289,13 +289,50 @@ PYBIND11_MODULE(cosmolike_lsst_y1_interface, m)
     );
   
   // --------------------------------------------------------------------
-  // COMPUTE FUNCTIONS
+  // COMPUTE FUNCTIONS (relevant for emulators)
   // --------------------------------------------------------------------
 
+  // PS: Why return an STL vector?
+  // PS: The conversion between STL vector and python np array is cleaner
+  m.def("compute_add_shear_calib_masked",
+      [](arma::Col<double> datavector)->std::vector<double> {
+        using namespace cosmolike_interface;
+        arma::Col<int>::fixed<3> order = {0, 1, 2};
+        arma::Col<double> res = 
+          compute_add_shear_calib_3x2pt_real_masked_any_order(datavector, order);
+        return arma::conv_to<std::vector<double>>::from(res);
+      },
+      "Add fast shear calibration parameters to the theoretical data vector.",
+      py::return_value_policy::move
+    );
+
+  m.def("compute_add_baryons_pcs_to_dark_matter_data_vector",
+      [](arma::Col<double> datavector, arma::Col<double> Q)->std::vector<double> {
+        using namespace cosmolike_interface;
+        arma::Col<double> res = 
+          compute_add_baryons_pcs_to_dark_matter_data_vector_3x2pt(Q, datavector);
+        return arma::conv_to<std::vector<double>>::from(res);
+      },
+      "Add PCs to DM data vector. Masked dimensions are filled w/ zeros",
+      py::arg("datavector").none(false),
+      py::arg("Q").none(false),
+      py::return_value_policy::move
+    );
+
+  m.def("compute_3x2pt_data_vector_sizes",
+      []()->std::vector<double> {
+        using namespace cosmolike_interface;
+        arma::Col<int>::fixed<3> res = compute_3x2pt_data_vector_sizes();
+        return arma::conv_to<std::vector<double>>::from(res);
+      },
+      "Add PCs to DM data vector. Masked dimensions are filled w/ zeros",
+      py::return_value_policy::move
+    );
+
+  // --------------------------------------------------------------------
+  // COMPUTE FUNCTIONS
+  // --------------------------------------------------------------------
   m.def("compute_data_vector_masked",
-      // Why return an STL vector?
-      // The conversion between STL vector and python np array is cleaner
-      // arma:Col is cast to 2D np array with 1 column (not as nice!)
       []()->std::vector<double> {
         using namespace cosmolike_interface;
         arma::Col<int>::fixed<3> order = {0, 1, 2};
@@ -307,9 +344,6 @@ PYBIND11_MODULE(cosmolike_lsst_y1_interface, m)
     );
 
   m.def("compute_data_vector_masked_with_baryon_pcs",
-      // Why return an STL vector?
-      // The conversion between STL vector and python np array is cleaner
-      // arma:Col is cast to 2D np array with 1 column (not as nice!)
       [](std::vector<double> Q)->std::vector<double> {
         using namespace cosmolike_interface;
         arma::Col<int>::fixed<3> O = {0, 1, 2};
@@ -349,9 +383,6 @@ PYBIND11_MODULE(cosmolike_lsst_y1_interface, m)
   // --------------------------------------------------------------------
 
   m.def("get_binning_real_space",
-      // Why return an STL vector?
-      // The conversion between STL vector and python np array is cleaner
-      // arma:Col is cast to 2D np array with 1 column (not as nice!)
       []()->std::vector<double> {
         arma::Col<double> res = cosmolike_interface::get_binning_real_space();
         return arma::conv_to<std::vector<double>>::from(res);
@@ -488,9 +519,6 @@ PYBIND11_MODULE(cosmolike_lsst_y1_interface, m)
   // Miscellaneous
   // --------------------------------------------------------------------
   m.def("get_mask",
-      // Why return an STL vector?
-      // The conversion between STL vector and python np array is cleaner
-      // arma:Col is cast to 2D np array with 1 column (not as nice!)
       []()->std::vector<int>{
         using namespace cosmolike_interface;
         arma::Col<int> res = IP::get_instance().get_mask();
@@ -501,9 +529,6 @@ PYBIND11_MODULE(cosmolike_lsst_y1_interface, m)
     );
 
   m.def("get_dv_masked",
-      // Why return an STL vector?
-      // The conversion between STL vector and python np array is cleaner
-      // arma:Col is cast to 2D np array with 1 column (not as nice!)
       []()->std::vector<double> {
         using namespace cosmolike_interface;
         arma::Col<double> res = IP::get_instance().get_dv_masked();
