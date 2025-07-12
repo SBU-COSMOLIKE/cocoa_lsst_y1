@@ -294,23 +294,23 @@ PYBIND11_MODULE(cosmolike_lsst_y1_interface, m)
 
   // PS: Why return an STL vector?
   // PS: The conversion between STL vector and python np array is cleaner
-  m.def("compute_add_shear_calib_masked",
+  m.def("compute_add_shear_calib_and_mask_3x2pt_real",
       [](arma::Col<double> datavector)->std::vector<double> {
         using namespace cosmolike_interface;
         arma::Col<int>::fixed<3> order = {0, 1, 2};
         arma::Col<double> res = 
-          compute_add_shear_calib_3x2pt_real_masked_any_order(datavector, order);
+          compute_add_shear_calib_and_mask_3x2pt_real_any_order(datavector, order);
         return arma::conv_to<std::vector<double>>::from(res);
       },
       "Add fast shear calibration parameters to the theoretical data vector.",
       py::return_value_policy::move
     );
 
-  m.def("compute_add_baryons_pcs_to_dark_matter_data_vector",
+  m.def("compute_add_baryons_pcs_to_dark_matter_data_vector_3x2pt_real",
       [](arma::Col<double> datavector, arma::Col<double> Q)->std::vector<double> {
         using namespace cosmolike_interface;
         arma::Col<double> res = 
-          compute_add_baryons_pcs_to_dark_matter_data_vector_3x2pt(Q, datavector);
+        compute_add_baryons_pcs_to_dark_matter_data_vector_3x2pt_real(Q, datavector);
         return arma::conv_to<std::vector<double>>::from(res);
       },
       "Add PCs to DM data vector. Masked dimensions are filled w/ zeros",
@@ -319,10 +319,10 @@ PYBIND11_MODULE(cosmolike_lsst_y1_interface, m)
       py::return_value_policy::move
     );
 
-  m.def("compute_3x2pt_data_vector_sizes",
+  m.def("compute_data_vector_3x2pt_real_sizes",
       []()->std::vector<int> {
         using namespace cosmolike_interface;
-        arma::Col<int>::fixed<3> res = compute_3x2pt_data_vector_sizes();
+        arma::Col<int>::fixed<3> res = compute_data_vector_3x2pt_real_sizes();
         return arma::conv_to<std::vector<int>>::from(res);
       },
       "Add PCs to DM data vector. Masked dimensions are filled w/ zeros",

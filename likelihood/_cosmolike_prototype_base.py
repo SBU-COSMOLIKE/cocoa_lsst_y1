@@ -322,7 +322,7 @@ class _cosmolike_prototype_base(DataSetLikelihood):
 
   def internal_get_datavector_emulator(self, **params):
     self.set_source_related(**params)
-    sizes = ci.compute_3x2pt_data_vector_sizes()
+    sizes = ci.compute_data_vector_3x2pt_real_sizes()
     total_size = int(np.sum(sizes))
     dv = np.zeros(total_size, dtype='float64') 
     if self.probe == "xi":
@@ -331,15 +331,13 @@ class _cosmolike_prototype_base(DataSetLikelihood):
         raise ValueError(f'Incompatible Sizes (Emulator Cosmic Shear)')
       dv[0:sizes[0]] = tmp[0:sizes[0]]
 
-    dv = np.array(ci.compute_add_shear_calib_masked(dv),dtype='float64') 
+    dv = np.array(ci.compute_add_shear_calib_and_mask_3x2pt_real(dv),dtype='float64') 
 
     if self.use_baryon_pca:  
-      dv = np.array(
-        ci.compute_add_baryons_pcs_to_dark_matter_data_vector(
+      dv = np.array(ci.compute_add_baryons_pcs_to_dark_matter_data_vector_3x2pt_real(
           datavector=dv,
           Q=[params.get(p, 0) for p in [survey+"_BARYON_Q"+str(i+1) for i in range(self.npcs)]]),
         dtype='float64') 
-
     if self.print_datavector:
       size = len(dv)
       out = np.zeros(shape=(size, 2))
