@@ -185,7 +185,7 @@ class _cosmolike_prototype_base(DataSetLikelihood):
                                    self.z_interp_2D, 
                                    self.emulator, 
                                    10**np.linspace(-2.0589,0.973,self.len_log10k_interp_2D))
-      bt = np.array([tmp_bt[i] for i in range(self.len_z_interp_2D)])  
+      bt = np.array([tmp_bt[i] for i in range(self.len_z_interp_2D)],dtype='float64')  
       lnbt = interp1d(np.log10(kbt), 
                       np.log(bt), 
                       axis=1,
@@ -311,10 +311,10 @@ class _cosmolike_prototype_base(DataSetLikelihood):
 
   def get_datavector(self, **params):        
     if self.use_emulator:
-      datavector = self.internal_get_datavector_emulator(**params)
+      dv = self.internal_get_datavector_emulator(**params)
     else:
-      datavector = self.internal_get_datavector(**params)
-    return np.array(datavector)
+      dv = self.internal_get_datavector(**params)
+    return np.array(dv,dtype='float64')
 
   # ------------------------------------------------------------------------
   # ------------------------------------------------------------------------
@@ -322,22 +322,32 @@ class _cosmolike_prototype_base(DataSetLikelihood):
 
   def internal_get_datavector_emulator(self, **params):
     self.set_source_related(**params)
-    sizes      = np.array(ci.compute_3x2pt_data_vector_sizes(),)
+    sizes = ci.compute_3x2pt_data_vector_sizes()
     total_size = int(np.sum(sizes))
-    datavector = np.zeros(total_size) 
+    dv = np.zeros(total_size, dtype='float64') 
     if self.probe == "xi":
       tmp = self.provider.get_cosmic_shear()
-      #if (len(tmp) != sizes[0]):
-      datavector[0:] = tmp[0:sizes[0]]
-    
+      if (len(tmp) != sizes[0]):
+        raise ValueError(f'Incompatible Sizes (Emulator Cosmic Shear)')
+      dv[0:sizes[0]] = tmp[0:sizes[0]]
+
+    dv = np.array(ci.compute_add_shear_calib_masked(dv),dtype='float64') 
+
+    if self.use_baryon_pca:  
+      dv = np.array(
+        ci.compute_add_baryons_pcs_to_dark_matter_data_vector(
+          datavector=dv,
+          Q=[params.get(p, 0) for p in [survey+"_BARYON_Q"+str(i+1) for i in range(self.npcs)]]),
+        dtype='float64') 
+
     if self.print_datavector:
-      size = len(datavector)
+      size = len(dv)
       out = np.zeros(shape=(size, 2))
       out[:,0] = np.arange(0, size)
-      out[:,1] = datavector
+      out[:,1] = dv
       fmt = '%d', '%1.8e'
       np.savetxt(self.print_datavector_file, out, fmt = fmt)
-    return datavector
+    return dv
 
   # ------------------------------------------------------------------------
   # ------------------------------------------------------------------------

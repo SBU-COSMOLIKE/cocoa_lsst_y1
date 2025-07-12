@@ -6,8 +6,8 @@ likelihood:
   lsst_y1.cosmic_shear:
     path: ./external_modules/data/lsst_y1
     data_file: lsst_y1_M1_GGL0.05.dataset   # 705 non-masked elements  (EE2 delta chi^2 ~ 11.8)
-    use_emulator: 1
-    print_datavector: True
+    use_emulator: True
+    print_datavector: False
     print_datavector_file: "./projects/lsst_y1/chains/example1_lsst_y1_theory_emul.modelvector"
 
 params:
@@ -66,14 +66,7 @@ params:
     latex: \Omega_\mathrm{m}
     drop: true
   mnu:
-    prior:
-      min: 0.06
-      max: 0.6
-    ref:
-      dist: norm
-      loc: 0.25
-      scale: 0.1
-    proposal: 0.05
+    value: 0.06
   omegabh2:
     value: 'lambda omegab, H0: omegab*(H0/100)**2'
     latex: \Omega_\mathrm{b} h^2
@@ -89,8 +82,8 @@ theory:
     stop_at_error: True
     extra_args: 
       device: 'cuda'
-      file:  ['external_modules/data/emultrf/lsst_y1_cosmic_shear_emulator/transformer']
-      extra: ['external_modules/data/emultrf/lsst_y1_cosmic_shear_emulator/transformer.h5']
+      file:  ['projects/lsst_y1/emulators/lcdm_nla_halofit_cosmic_shear_trf/transformer']
+      extra: ['projects/lsst_y1/emulators/lcdm_nla_halofit_cosmic_shear_trf/transformer.h5']
       ord:   [['logA','ns','H0','omegabh2','omegach2',
                'LSST_DZ_S1','LSST_DZ_S2','LSST_DZ_S3','LSST_DZ_S4','LSST_DZ_S5',
                'LSST_A1_1','LSST_A1_2']]

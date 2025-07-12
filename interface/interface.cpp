@@ -320,10 +320,10 @@ PYBIND11_MODULE(cosmolike_lsst_y1_interface, m)
     );
 
   m.def("compute_3x2pt_data_vector_sizes",
-      []()->std::vector<double> {
+      []()->std::vector<int> {
         using namespace cosmolike_interface;
         arma::Col<int>::fixed<3> res = compute_3x2pt_data_vector_sizes();
-        return arma::conv_to<std::vector<double>>::from(res);
+        return arma::conv_to<std::vector<int>>::from(res);
       },
       "Add PCs to DM data vector. Masked dimensions are filled w/ zeros",
       py::return_value_policy::move
