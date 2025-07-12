@@ -322,13 +322,21 @@ class _cosmolike_prototype_base(DataSetLikelihood):
 
   def internal_get_datavector_emulator(self, **params):
     self.set_source_related(**params)
-    sizes      = ci.compute_3x2pt_data_vector_sizes()
-    total_size = np.sum(sizes)
+    sizes      = np.array(ci.compute_3x2pt_data_vector_sizes(),)
+    total_size = int(np.sum(sizes))
     datavector = np.zeros(total_size) 
-    if self.probe != "xi":
+    if self.probe == "xi":
       tmp = self.provider.get_cosmic_shear()
       #if (len(tmp) != sizes[0]):
-      datavector[0:sizes[0]] = tmp
+      datavector[0:] = tmp[0:sizes[0]]
+    
+    if self.print_datavector:
+      size = len(datavector)
+      out = np.zeros(shape=(size, 2))
+      out[:,0] = np.arange(0, size)
+      out[:,1] = datavector
+      fmt = '%d', '%1.8e'
+      np.savetxt(self.print_datavector_file, out, fmt = fmt)
     return datavector
 
   # ------------------------------------------------------------------------
