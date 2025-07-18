@@ -291,29 +291,29 @@ PYBIND11_MODULE(cosmolike_lsst_y1_interface, m)
   // --------------------------------------------------------------------
   // COMPUTE FUNCTIONS (relevant for emulators)
   // --------------------------------------------------------------------
-
-  // PS: Why return an STL vector?
-  // PS: The conversion between STL vector and python np array is cleaner
-  m.def("compute_add_shear_calib_and_mask_3x2pt_real",
-      [](arma::Col<double> datavector)->std::vector<double> {
+  m.def("compute_add_fpm_3x2pt_real_any_order",
+      [](arma::Col<double> dv)->std::vector<double> {
         using namespace cosmolike_interface;
-        arma::Col<int>::fixed<3> order = {0, 1, 2};
-        arma::Col<double> res = 
-          compute_add_shear_calib_and_mask_3x2pt_real_any_order(datavector, order);
+        arma::Col<int>::fixed<3> ord = {0, 1, 2};
+        arma::Col<double> res = compute_add_fpm_3x2pt_real_any_order(dv,ord);
         return arma::conv_to<std::vector<double>>::from(res);
       },
       "Add fast shear calibration parameters to the theoretical data vector.",
+      py::arg("datavector").none(false),
       py::return_value_policy::move
     );
 
-  m.def("compute_add_baryons_pcs_to_dark_matter_data_vector_3x2pt_real",
-      [](arma::Col<double> datavector, arma::Col<double> Q)->std::vector<double> {
+  m.def("compute_add_fpm_3x2pt_real_any_order_with_pcs",
+      [](arma::Col<double> dv, arma::Col<double> Q)->std::vector<double> {
         using namespace cosmolike_interface;
-        arma::Col<double> res = 
-        compute_add_baryons_pcs_to_dark_matter_data_vector_3x2pt_real(Q, datavector);
+        arma::Col<int>::fixed<3> ord = {0, 1, 2};
+        arma::Col<double> res = compute_add_baryons_pcs(
+            Q,
+            compute_add_fpm_3x2pt_real_any_order(dv,ord)
+          );
         return arma::conv_to<std::vector<double>>::from(res);
       },
-      "Add PCs to DM data vector. Masked dimensions are filled w/ zeros",
+      "Add fast shear calibration parameters to the theoretical data vector.",
       py::arg("datavector").none(false),
       py::arg("Q").none(false),
       py::return_value_policy::move
@@ -335,8 +335,8 @@ PYBIND11_MODULE(cosmolike_lsst_y1_interface, m)
   m.def("compute_data_vector_masked",
       []()->std::vector<double> {
         using namespace cosmolike_interface;
-        arma::Col<int>::fixed<3> order = {0, 1, 2};
-        arma::Col<double> res = compute_data_vector_3x2pt_real_masked_any_order(order);
+        arma::Col<int>::fixed<3> ord = {0, 1, 2};
+        arma::Col<double> res = compute_data_vector_3x2pt_real_masked_any_order(ord);
         return arma::conv_to<std::vector<double>>::from(res);
       },
       "Compute theoretical data vector. Masked dimensions are filled w/ zeros",
@@ -346,8 +346,11 @@ PYBIND11_MODULE(cosmolike_lsst_y1_interface, m)
   m.def("compute_data_vector_masked_with_baryon_pcs",
       [](std::vector<double> Q)->std::vector<double> {
         using namespace cosmolike_interface;
-        arma::Col<int>::fixed<3> O = {0, 1, 2};
-        arma::Col<double> res = compute_data_vector_3x2pt_real_masked_any_order(Q,O);
+        arma::Col<int>::fixed<3> ord = {0, 1, 2};
+        arma::Col<double> res = compute_add_baryons_pcs(
+            Q,
+            compute_data_vector_3x2pt_real_masked_any_order(ord)
+          );
         return arma::conv_to<std::vector<double>>::from(res);
       },
       "Compute theoretical data vector, including contributions from baryonic"

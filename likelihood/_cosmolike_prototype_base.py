@@ -55,7 +55,7 @@ class _cosmolike_prototype_base(DataSetLikelihood):
                                        np.linspace(1080,2000,20)),axis=0)
     self.len_z_interp_1D = len(self.z_interp_1D)
 
-    tmp=int(min(60 + 15*self.accuracyboost,150))
+    tmp=int(min(70 + 15*self.accuracyboost,150))
     self.z_interp_2D = np.concatenate((np.linspace(0,3.0,max(10,int(0.85*tmp))), 
                                        np.linspace(3.01,10,max(10,int(0.15*tmp)))),axis=0)
     self.len_z_interp_2D = len(self.z_interp_2D)
@@ -331,13 +331,13 @@ class _cosmolike_prototype_base(DataSetLikelihood):
         raise ValueError(f'Incompatible Sizes (Emulator Cosmic Shear)')
       dv[0:sizes[0]] = tmp[0:sizes[0]]
 
-    dv = np.array(ci.compute_add_shear_calib_and_mask_3x2pt_real(dv),dtype='float64') 
-
-    if self.use_baryon_pca:  
-      dv = np.array(ci.compute_add_baryons_pcs_to_dark_matter_data_vector_3x2pt_real(
-          datavector=dv,
-          Q=[params.get(p, 0) for p in [survey+"_BARYON_Q"+str(i+1) for i in range(self.npcs)]]),
-        dtype='float64') 
+    if not self.use_baryon_pca:  
+      dv = ci.compute_add_fpm_3x2pt_real_any_order(dv)
+    else:
+      Q = [params.get(p,0) for p in [survey+"_BARYON_Q"+str(i+1) for i in range(self.npcs)]]
+      dv = ci.compute_add_fpm_3x2pt_real_any_order_with_pcs(dv, Q=Q)
+    dv = np.array(dv, dtype='float64')
+    
     if self.print_datavector:
       size = len(dv)
       out = np.zeros(shape=(size, 2))
@@ -360,10 +360,9 @@ class _cosmolike_prototype_base(DataSetLikelihood):
     if self.create_baryon_pca:
       pcs = ci.compute_baryon_pcas(scenarios=self.baryon_pca_sims)
       np.savetxt(self.filename_baryon_pca, pcs)
-    elif self.use_baryon_pca:      
-      datavector = ci.compute_data_vector_masked_with_baryon_pcs(
-        Q=[params.get(p, 0) for p in [survey+"_BARYON_Q"+str(i+1) for i in range(self.npcs)]]
-      )
+    elif self.use_baryon_pca: 
+      Q = [params.get(p,0) for p in [survey+"_BARYON_Q"+str(i+1) for i in range(self.npcs)]]     
+      datavector = ci.compute_data_vector_masked_with_baryon_pcs(Q=Q)
     else:  
       datavector = ci.compute_data_vector_masked()
 
