@@ -1,0 +1,220 @@
+timing: True
+debug: False
+stop_at_error: True
+
+likelihood:
+  lsst_y1.combo_3x2pt:
+    path: ./external_modules/data/lsst_y1
+    data_file: lsst_y1_M1_GGL0.05.dataset
+    use_emulator: True
+    print_datavector: False
+    print_datavector_file: "./projects/lsst_y1/chains/example1_lsst_y1_theory_emul.modelvector"
+
+params:
+  As_1e9:
+    prior:
+      min: 0.5
+      max: 5
+    ref:
+      dist: norm
+      loc: 2.1
+      scale: 0.65
+    proposal: 0.4
+    latex: 10^9 A_\mathrm{s})
+  ns:
+    prior:
+      min: 0.87
+      max: 1.07
+    ref:
+      dist: norm
+      loc: 0.96605
+      scale: 0.01
+    proposal: 0.01
+    latex: n_\mathrm{s}
+  H0:
+    prior:
+      min: 55
+      max: 91
+    ref:
+      dist: norm
+      loc: 67.32
+      scale: 5
+    proposal: 3
+    latex: H_0
+  omegab:
+    prior:
+      min: 0.03
+      max: 0.07
+    ref:
+      dist: norm
+      loc: 0.0495
+      scale: 0.004
+    proposal: 0.004
+    latex: \Omega_\mathrm{b}
+  omegam:
+    prior:
+      min: 0.1
+      max: 0.9
+    ref:
+      dist: norm
+      loc: 0.316
+      scale: 0.02
+    proposal: 0.02
+    latex: \Omega_\mathrm{m}
+  mnu:
+    value: 0.06
+  omegabh2:
+    value: 'lambda omegab, H0: omegab*(H0/100)**2'
+    latex: \Omega_\mathrm{b} h^2
+  omegach2:
+    value: 'lambda omegam, omegab, mnu, H0: (omegam-omegab)*(H0/100)**2-(mnu*(3.046/3)**0.75)/94.0708'
+    latex: \Omega_\mathrm{c} h^2
+  logA:
+    value: 'lambda As_1e9: np.log(10*As_1e9)'
+  # POINT MASS: IF THEY ARE NONZERO - COSMOLIKE WILL COMPUTE PM CONTRIBUTION.
+  # WITHOUT FAST/SLOW DECOMPOSITION (MCMC SAMPLER), COSMOLIKE TAKES 0.025S (1CORE) 
+  # TO SET ALL QUANTITIES IN NEEDED TO COMPUTE PM CONTRIBUTION (don't OpenMP emul)
+  LSST_PM1:
+    prior:
+      min: -5
+      max: 5
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 0.5
+    proposal: 0.5
+    latex: PM_\mathrm{DES}^1
+  LSST_PM2:
+    prior:
+      min: -5
+      max: 5
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 0.5
+    proposal: 0.5
+    latex: PM_\mathrm{DES}^2
+  LSST_PM3:
+    prior:
+      min: -5
+      max: 5
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 0.5
+    proposal: 0.5
+    latex: PM_\mathrm{DES}^3
+  LSST_PM4:
+    prior:
+      min: -5
+      max: 5
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 0.5
+    proposal: 0.5
+    latex: PM_\mathrm{DES}^4
+  LSST_PM5:
+    prior:
+      min: -5
+      max: 5
+    ref:
+      dist: norm
+      loc: 0.0
+      scale: 0.5
+    proposal: 0.5
+    latex: PM_\mathrm{DES}^5
+  # ----------------------------------------------------------------------------
+  rdrag:
+    value: 145.0 # dont need its value here - emulbao just need rdrag to be set
+    latex: r_\mathrm{drag}
+
+theory:
+  emulbaosn:
+    path: ./cobaya/cobaya/theories/
+    stop_at_error: True
+    extra_args:
+      device: "cuda"
+      file:  [None, 'external_modules/data/emultrf/BAO_SN_RES/emul_lcdm_H.pt']
+      extra: [None, 'external_modules/data/emultrf/BAO_SN_RES/extra_lcdm_H.npy']    
+      ord: [None, ['omegam','H0']]
+      extrapar: [{'MLA': 'INT', 'ZMIN' : 0.0001, 'ZMAX' : 3, 'NZ' : 600},
+                 {'MLA': 'ResMLP', 'offset' : 0.0, 'INTDIM' : 1, 'NLAYER' : 1,
+                  'TMAT': 'external_modules/data/emultrf/BAO_SN_RES/PCA_lcdm_H.npy',
+                  'ZLIN': 'external_modules/data/emultrf/BAO_SN_RES/z_lin_lcdm.npy'}]
+  emul_cosmic_shear:
+    path: ./cobaya/cobaya/theories/
+    stop_at_error: True
+    extra_args: 
+      device: 'cuda'
+      file:  ['projects/lsst_y1/emulators/lcdm_nla_halofit_cosmic_shear_trf/transformer.emul']
+      extra: ['projects/lsst_y1/emulators/lcdm_nla_halofit_cosmic_shear_trf/transformer.h5']
+      ord:   [['logA','ns','H0','omegabh2','omegach2',
+               'LSST_DZ_S1','LSST_DZ_S2','LSST_DZ_S3','LSST_DZ_S4','LSST_DZ_S5',
+               'LSST_A1_1','LSST_A1_2']]
+      extrapar: [{'MLA': 'TRF', 'INT_DIM_RES': 256, 
+                  'INT_DIM_TRF': 1024, 'NC_TRF': 32, 'OUTPUT_DIM': 780}]
+  emul_ggl:
+    path: ./cobaya/cobaya/theories/
+    stop_at_error: True
+    extra_args: 
+      device: 'cuda'
+      file:  ['projects/lsst_y1/emulators/lcdm_nla_halofit_ggl_trf/transformer.emul']
+      extra: ['projects/lsst_y1/emulators/lcdm_nla_halofit_ggl_trf/transformer.h5']
+      ord:   [['As_1e9','ns','H0','omegab', 'omegam','LSST_DZ_S1','LSST_DZ_S2',
+               'LSST_DZ_S3','LSST_DZ_S4','LSST_DZ_S5','LSST_A1_1','LSST_A1_2',
+               'LSST_DZ_L1','LSST_DZ_L2','LSST_DZ_L3','LSST_DZ_L4','LSST_DZ_L5',
+               'LSST_B1_1','LSST_B1_2','LSST_B1_3','LSST_B1_4','LSST_B1_5']]
+      extrapar: [{'MLA': 'TRF', 'INT_DIM_RES': 256, 'INT_DIM_TRF': 1024, 
+                  'NC_TRF': 32, 'OUTPUT_DIM': 650}]
+  emul_wtheta:
+    path: ./cobaya/cobaya/theories/
+    stop_at_error: True
+    extra_args: 
+      device: 'cuda'
+      file:  ['projects/lsst_y1/emulators/lcdm_nla_halofit_wtheta_trf/transformer.emul']
+      extra: ['projects/lsst_y1/emulators/lcdm_nla_halofit_wtheta_trf/transformer.h5']
+      ord:   [['As_1e9','ns','H0','omegab', 'omegam','LSST_DZ_L1','LSST_DZ_L2',
+               'LSST_DZ_L3','LSST_DZ_L4','LSST_DZ_L5','LSST_B1_1','LSST_B1_2',
+               'LSST_B1_3','LSST_B1_4','LSST_B1_5']]
+      extrapar: [{'MLA': 'TRF', 'INT_DIM_RES': 128, 'INT_DIM_TRF': 512, 
+                  'NC_TRF': 32, 'OUTPUT_DIM': 130}]
+
+sampler:
+  evaluate:
+    N: 1
+    override:
+      As_1e9: 2.1
+      ns: 0.96605
+      H0: 67.32
+      omegab: 0.04
+      omegam: 0.3
+      LSST_DZ_S1: 0.0414632
+      LSST_DZ_S2: 0.00147332
+      LSST_DZ_S3: 0.0237035
+      LSST_DZ_S4: -0.0773436
+      LSST_DZ_S5: -8.67127e-05
+      LSST_M1: 0.0191832
+      LSST_M2: -0.0431752
+      LSST_M3: -0.034961
+      LSST_M4: -0.0158096
+      LSST_M5: -0.0158096
+      LSST_A1_1: 0.606102
+      LSST_A1_2: -1.51541
+      LSST_DZ_L1: 0.00457604
+      LSST_DZ_L2: 0.000309875
+      LSST_DZ_L3: 0.00855907
+      LSST_DZ_L4: -0.00316269
+      LSST_DZ_L5: -0.0146753 
+      LSST_B1_1: 1.72716
+      LSST_B1_2: 1.65168
+      LSST_B1_3: 1.61423
+      LSST_B1_4: 1.92886
+      LSST_B1_5: 2.11633
+      LSST_PM1: 0.0
+      LSST_PM2: 0.0
+      LSST_PM3: 0.0
+      LSST_PM4: 0.0
+      LSST_PM5: 0.0
+
+output: ./projects/lsst_y1/chains/EXAMPLE_EMUL_EVALUATE3
