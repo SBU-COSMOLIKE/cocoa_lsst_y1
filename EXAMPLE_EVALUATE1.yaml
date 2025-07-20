@@ -225,7 +225,6 @@ sampler:
       LSST_A2_1: 0.0
       LSST_A2_2: -1.51541
       LSST_BTA_1: 0.0
-      # TESTING TATT ~ 245.331 (~244.747 after change in defaul acc)
       #LSST_A2_1: -0.852658
       #LSST_A2_2: -2.63433
       #LSST_BTA_1: 1.01257

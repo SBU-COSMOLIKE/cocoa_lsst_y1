@@ -155,18 +155,6 @@ theory:
                  {'ellmax' : 5000, 'MLA': 'CNN', 'INTDIM': 4, 'INTCNN': 5120},
                  {'ellmax' : 5000, 'MLA': 'CNN', 'INTDIM': 4, 'INTCNN': 5120}, 
                  None]
-      #file: ['external_modules/data/emultrf/CMB_TRF/emul_lcdm_CMBTT_TRF.pt',
-      #       'external_modules/data/emultrf/CMB_TRF/emul_lcdm_CMBTE_TRF.pt',
-      #       'external_modules/data/emultrf/CMB_TRF/emul_lcdm_CMBEE_TRF.pt',
-      #       None] 
-      #extra: ['external_modules/data/emultrf/CMB_TRF/extra_lcdm_CMBTT_TRF.npy',
-      #        'external_modules/data/emultrf/CMB_TRF/extra_lcdm_CMBTE_TRF.npy',
-      #        'external_modules/data/emultrf/CMB_TRF/extra_lcdm_CMBEE_TRF.npy',
-      #        None]
-      #extrapar: [{'ellmax' : 5000, 'MLA': 'TRF', 'NCTRF': 16, 'INTDIM': 4, 'INTTRF': 5120},
-      #           {'ellmax' : 5000, 'MLA': 'TRF', 'NCTRF': 16, 'INTDIM': 4, 'INTTRF': 5120},
-      #           {'ellmax' : 5000, 'MLA': 'TRF', 'NCTRF': 16, 'INTDIM': 4, 'INTTRF': 5120},
-      #           None]
   emulbaosn:
     path: ./cobaya/cobaya/theories/
     stop_at_error: True
