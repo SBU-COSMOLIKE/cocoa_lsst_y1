@@ -160,6 +160,20 @@ PYBIND11_MODULE(cosmolike_lsst_y1_interface, m)
   // --------------------------------------------------------------------
   // SET FUNCTIONS
   // --------------------------------------------------------------------
+  m.def("set_distances",
+      [](arma::Col<double> z, 
+         arma::Col<double> chi)
+      {
+        spdlog::debug("\x1b[90m{}\x1b[0m: Begins", "set_distances");
+        using namespace cosmolike_interface;
+        set_distances(z, chi);
+        spdlog::debug("\x1b[90m{}\x1b[0m: Ends", "set_distances");
+      },
+      "Set Distance (Cosmology)",
+       py::arg("z").none(false),
+       py::arg("chi").none(false),
+       py::return_value_policy::move
+    );
 
   m.def("set_cosmology",
       [](const double omega_matter,
@@ -292,30 +306,39 @@ PYBIND11_MODULE(cosmolike_lsst_y1_interface, m)
   // COMPUTE FUNCTIONS (relevant for emulators)
   // --------------------------------------------------------------------
   m.def("compute_add_fpm_3x2pt_real_any_order",
-      [](arma::Col<double> dv)->std::vector<double> {
+      [](arma::Col<double> dv, 
+         const int force_exclude_pm)->std::vector<double> 
+      {
         using namespace cosmolike_interface;
         arma::Col<int>::fixed<3> ord = {0, 1, 2};
-        arma::Col<double> res = compute_add_fpm_3x2pt_real_any_order(dv,ord);
+        arma::Col<double> res = compute_add_fpm_3x2pt_real_any_order(dv,
+                                                                     ord,
+                                                                     force_exclude_pm);
         return arma::conv_to<std::vector<double>>::from(res);
       },
       "Add fast shear calibration parameters to the theoretical data vector.",
       py::arg("datavector").none(false),
+      py::arg("force_exclude_pm").none(false),
       py::return_value_policy::move
     );
 
   m.def("compute_add_fpm_3x2pt_real_any_order_with_pcs",
-      [](arma::Col<double> dv, arma::Col<double> Q)->std::vector<double> {
+      [](arma::Col<double> dv, 
+         arma::Col<double> Q, 
+         const int force_exclude_pm)->std::vector<double> 
+      {
         using namespace cosmolike_interface;
         arma::Col<int>::fixed<3> ord = {0, 1, 2};
         arma::Col<double> res = compute_add_baryons_pcs(
             Q,
-            compute_add_fpm_3x2pt_real_any_order(dv,ord)
+            compute_add_fpm_3x2pt_real_any_order(dv, ord, force_exclude_pm)
           );
         return arma::conv_to<std::vector<double>>::from(res);
       },
       "Add fast shear calibration parameters to the theoretical data vector.",
       py::arg("datavector").none(false),
       py::arg("Q").none(false),
+      py::arg("force_exclude_pm").none(false),
       py::return_value_policy::move
     );
 

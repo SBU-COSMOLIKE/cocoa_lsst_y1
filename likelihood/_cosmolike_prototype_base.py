@@ -49,18 +49,18 @@ class _cosmolike_prototype_base(DataSetLikelihood):
     self.theta_max_arcmin = ini.float("theta_max_arcmin")
 
     # ------------------------------------------------------------------------   
-    tmp=int(500 + 250*self.accuracyboost)
+    tmp=int(1000 + 250*self.accuracyboost)
     self.z_interp_1D = np.concatenate((np.linspace(0.0,3.0,max(100,int(0.80*tmp))),
-                                       np.linspace(3.0,10.1,max(100,int(0.20*tmp))),
-                                       np.linspace(1080,2000,20)),axis=0)
+                                       np.linspace(3.0,50.1,max(100,int(0.40*tmp))),
+                                       np.linspace(1070,1100,max(50,int(0.10*tmp)))),axis=0)
     self.len_z_interp_1D = len(self.z_interp_1D)
 
-    tmp=int(min(70 + 15*self.accuracyboost,150))
-    self.z_interp_2D = np.concatenate((np.linspace(0,3.0,max(10,int(0.85*tmp))), 
-                                       np.linspace(3.01,10,max(10,int(0.15*tmp)))),axis=0)
+    tmp=int(min(120 + 20*self.accuracyboost,250))
+    self.z_interp_2D = np.concatenate((np.linspace(0,3.0,max(50,int(0.75*tmp))), 
+                                       np.linspace(3.01,50.1,max(30,int(0.25*tmp)))),axis=0)
     self.len_z_interp_2D = len(self.z_interp_2D)
     
-    self.log10k_interp_2D = np.linspace(-4.2,2.0,int(500 + 250*self.accuracyboost))
+    self.log10k_interp_2D = np.linspace(-4.99,2.0,int(1250+250*self.accuracyboost))
     self.len_log10k_interp_2D = len(self.log10k_interp_2D)
     # ------------------------------------------------------------------------
 
@@ -77,11 +77,13 @@ class _cosmolike_prototype_base(DataSetLikelihood):
           source_multihisto_file=self.source_file,
           source_ntomo=int(self.source_ntomo))
       ci.init_data_real(self.cov_file, self.mask_file, self.data_vector_file)  
+      ci.init_accuracy_boost(0.35, 0.35, -1) # seems enough to compute PM
     else:
       ci.init_accuracy_boost(
-        self.accuracyboost, 
-        self.samplingboost, 
-        self.integration_accuracy)
+          self.accuracyboost, 
+          self.samplingboost, 
+          int(self.integration_accuracy)
+        )
 
       ci.init_cosmo_runmode(is_linear=False)
 
@@ -132,9 +134,43 @@ class _cosmolike_prototype_base(DataSetLikelihood):
 
   def get_requirements(self):
     if self.use_emulator:
-      return {
-        'cosmic_shear': None
-      }
+      if self.probe == "xi":
+        return {
+          'cosmic_shear': None
+        }
+      elif self.probe == "3x2pt":
+        return {
+          "H0": None,
+          'cosmic_shear': None,
+          'ggl': None,
+          'wtheta': None,
+          'comoving_radial_distance': {
+            "z": self.z_interp_1D 
+          } # in Mpc
+        }
+      elif self.probe == "xi_gg":
+        return {
+          'cosmic_shear': None,
+          'wtheta': None
+        }
+      elif self.probe == "xi_ggl":
+        return {
+          "H0": None,
+          'cosmic_shear': None,
+          'ggl': None,
+          'comoving_radial_distance': {
+            "z": self.z_interp_1D
+          } # in Mpc
+        }
+      elif self.probe == "2x2pt":
+        return {
+          "H0": None,
+          'ggl': None,
+          'wtheta': None,
+          'comoving_radial_distance': {
+            "z": self.z_interp_1D 
+          } # in Mpc
+        }     
     else:
       return {
         "As": None,
@@ -150,9 +186,8 @@ class _cosmolike_prototype_base(DataSetLikelihood):
           "vars_pairs": ([("delta_tot", "delta_tot")])
         },
         "comoving_radial_distance": {
-          "z": self.z_interp_1D
-        # Get comoving radial distance from us to redshift z in Mpc.
-        },
+          "z": self.z_interp_1D 
+        }, # in Mpc
         "Cl": { # DONT REMOVE THIS - SOME WEIRD BEHAVIOR IN CAMB WITHOUT WANTS_CL
           'tt': 0
         }
@@ -164,59 +199,65 @@ class _cosmolike_prototype_base(DataSetLikelihood):
 
   def set_cosmo_related(self):
     h = self.provider.get_param("H0")/100.0
-    PKL  = self.provider.get_Pk_interpolator(("delta_tot", "delta_tot"), 
-                                             nonlinear=False, 
-                                             extrap_kmax=2.5e2*self.accuracyboost)
-    lnPL = PKL.logP(self.z_interp_2D,
-                    np.power(10.0,self.log10k_interp_2D)).flatten(order='F')+np.log(h**3)
+    if not self.use_emulator:
+      PKL  = self.provider.get_Pk_interpolator(("delta_tot", "delta_tot"), 
+                                               nonlinear=False, 
+                                               extrap_kmax=2.5e2*self.accuracyboost)
+      lnPL = PKL.logP(self.z_interp_2D,
+                      np.power(10.0,self.log10k_interp_2D)).flatten(order='F')+np.log(h**3)
 
-    if self.non_linear_emul == 1:
-      params = {
-        'Omm'  : self.provider.get_param("omegam"),
-        'As'   : self.provider.get_param("As"),
-        'Omb'  : self.provider.get_param("omegab"),
-        'ns'   : self.provider.get_param("ns"),
-        'h'    : h,
-        'mnu'  : self.provider.get_param("mnu"), 
-        'w'    : self.provider.get_param("w"),
-        'wa'   : 0.0
-      }
-      kbt, tmp_bt = ee2.get_boost2(params, 
-                                   self.z_interp_2D, 
-                                   self.emulator, 
-                                   10**np.linspace(-2.0589,0.973,self.len_log10k_interp_2D))
-      bt = np.array([tmp_bt[i] for i in range(self.len_z_interp_2D)],dtype='float64')  
-      lnbt = interp1d(np.log10(kbt), 
-                      np.log(bt), 
-                      axis=1,
-                      kind='linear', 
-                      fill_value='extrapolate', 
-                      assume_sorted=True)(self.log10k_interp_2D-np.log10(h)) #h/Mpc
-      lnbt[:,10**(self.log10k_interp_2D-np.log10(h)) < 8.73e-3] = 0.0
-      lnPNL=(lnPL.reshape(self.len_z_interp_2D, 
-                          self.len_log10k_interp_2D, 
-                          order='F') + lnbt).ravel(order='F')
-    elif self.non_linear_emul == 2:
-      lnPNL = self.provider.get_Pk_interpolator(("delta_tot", "delta_tot"),
-        nonlinear=True, extrap_kmax =2.5e2*self.accuracyboost).logP(self.z_interp_2D,
-        np.power(10.0,self.log10k_interp_2D)).flatten(order='F')+np.log(h**3)   
+      if self.non_linear_emul == 1:
+        params = {
+          'Omm'  : self.provider.get_param("omegam"),
+          'As'   : self.provider.get_param("As"),
+          'Omb'  : self.provider.get_param("omegab"),
+          'ns'   : self.provider.get_param("ns"),
+          'h'    : h,
+          'mnu'  : self.provider.get_param("mnu"), 
+          'w'    : self.provider.get_param("w"),
+          'wa'   : 0.0
+        }
+        kbt, tmp_bt = ee2.get_boost2(params, 
+                                     self.z_interp_2D, 
+                                     self.emulator, 
+                                     10**np.linspace(-2.0589,0.973,self.len_log10k_interp_2D))
+        bt = np.array([tmp_bt[i] for i in range(self.len_z_interp_2D)],dtype='float64')  
+        lnbt = interp1d(np.log10(kbt), 
+                        np.log(bt), 
+                        axis=1,
+                        kind='linear', 
+                        fill_value='extrapolate', 
+                        assume_sorted=True)(self.log10k_interp_2D-np.log10(h)) #h/Mpc
+        lnbt[:,10**(self.log10k_interp_2D-np.log10(h)) < 8.73e-3] = 0.0
+        lnPNL=(lnPL.reshape(self.len_z_interp_2D, 
+                            self.len_log10k_interp_2D, 
+                            order='F') + lnbt).ravel(order='F')
+      elif self.non_linear_emul == 2:
+        lnPNL = self.provider.get_Pk_interpolator(("delta_tot", "delta_tot"),
+          nonlinear=True, extrap_kmax =2.5e2*self.accuracyboost).logP(self.z_interp_2D,
+          np.power(10.0,self.log10k_interp_2D)).flatten(order='F')+np.log(h**3)   
+      else:
+        raise LoggedError(self.log, "non_linear_emul = %d is an invalid option", non_linear_emul)
+
+      G_growth = np.sqrt(PKL.P(self.z_interp_2D,0.0005)/PKL.P(0,0.0005))*(1+self.z_interp_2D)
+      G_growth /= G_growth[-1]
+
+      ci.set_cosmology(
+        omegam=self.provider.get_param("omegam"),
+        H0=self.provider.get_param("H0"),
+        log10k_2D=self.log10k_interp_2D-np.log10(h), #h/Mpc
+        z_2D=self.z_interp_2D,
+        lnP_linear=lnPL, 
+        lnP_nonlinear=lnPNL, 
+        G=G_growth,
+        z_1D=self.z_interp_1D,
+        chi=self.provider.get_comoving_radial_distance(self.z_interp_1D)*h # convert to Mpc/h
+      )
     else:
-      raise LoggedError(self.log, "non_linear_emul = %d is an invalid option", non_linear_emul)
-
-    G_growth = np.sqrt(PKL.P(self.z_interp_2D,0.0005)/PKL.P(0,0.0005))*(1+self.z_interp_2D)
-    G_growth /= G_growth[-1]
-
-    ci.set_cosmology(
-      omegam=self.provider.get_param("omegam"),
-      H0=self.provider.get_param("H0"),
-      log10k_2D=self.log10k_interp_2D-np.log10(h), #h/Mpc
-      z_2D=self.z_interp_2D,
-      lnP_linear=lnPL, 
-      lnP_nonlinear=lnPNL, 
-      G=G_growth,
-      z_1D=self.z_interp_1D,
-      chi=self.provider.get_comoving_radial_distance(self.z_interp_1D)*h # convert to Mpc/h
-    )
+      ci.set_distances(
+        z=self.z_interp_1D,
+        chi=self.provider.get_comoving_radial_distance(self.z_interp_1D)*h
+      )
 
   # ------------------------------------------------------------------------
   # ------------------------------------------------------------------------
@@ -254,7 +295,7 @@ class _cosmolike_prototype_base(DataSetLikelihood):
       ci.set_nuisance_ia(
         A1=[params.get(p,0) for p in [survey+"_A1_"+str(i+1) for i in range(ntomo)]],
         A2=[params.get(p,0) for p in [survey+"_A2_"+str(i+1) for i in range(ntomo)]],
-        B_TA=[params.get(p,0) for p in [survey+"_BTA_"+str(i+1) for i in range(ntomo)]],
+        B_TA=[params.get(p,0) for p in [survey+"_BTA_"+str(i+1) for i in range(ntomo)]]
       )
 
   # ------------------------------------------------------------------------
@@ -263,11 +304,12 @@ class _cosmolike_prototype_base(DataSetLikelihood):
 
   def set_lens_related(self, **params):
     ntomo = self.lens_ntomo
-    ci.set_nuisance_bias(
-      B1=[params.get(p,1) for p in [survey+"_B1_"+str(i+1) for i in range(ntomo)]],
-      B2=[params.get(p,0) for p in [survey+"_B2_"+str(i+1) for i in range(ntomo)]],
-      B_MAG=[params.get(p,0) for p in [survey+"_BMAG_"+str(i+1) for i in range(ntomo)]]
-    )
+    if not self.use_emulator:
+      ci.set_nuisance_bias(
+        B1=[params.get(p,1) for p in [survey+"_B1_"+str(i+1) for i in range(ntomo)]],
+        B2=[params.get(p,0) for p in [survey+"_B2_"+str(i+1) for i in range(ntomo)]],
+        B_MAG=[params.get(p,0) for p in [survey+"_BMAG_"+str(i+1) for i in range(ntomo)]]
+      )
     if self.external_nz_modeling: 
       # here we send n(z) at every point in the chain as the user may
       # modify it using an external function (example: adding outliers)
@@ -321,21 +363,102 @@ class _cosmolike_prototype_base(DataSetLikelihood):
   # ------------------------------------------------------------------------
 
   def internal_get_datavector_emulator(self, **params):
+    # ---------------------------------------------------------------
+    # fast parameters: m's and pm's are never emulated
+    PM = [params.get(p,0) for p in [survey+"_PM"+str(i+1) for i in range(self.lens_ntomo)]]
+    if self.probe not in ("xi", "xi_gg") and not all(v == 0 for v in PM):
+      self.set_lens_related(**params)
+      self.set_cosmo_related()
     self.set_source_related(**params)
+    # ---------------------------------------------------------------
+
     sizes = ci.compute_data_vector_3x2pt_real_sizes()
     total_size = int(np.sum(sizes))
     dv = np.zeros(total_size, dtype='float64') 
+    
     if self.probe == "xi":
       tmp = self.provider.get_cosmic_shear()
       if (len(tmp) != sizes[0]):
         raise ValueError(f'Incompatible Sizes (Emulator Cosmic Shear)')
       dv[0:sizes[0]] = tmp[0:sizes[0]]
+    elif self.probe == "xi_ggl":
+      tmp1 = self.provider.get_cosmic_shear()
+      tmp2 = self.provider.get_ggl()
+      if (len(tmp1) != sizes[0] or 
+          len(tmp2) != sizes[1]):
+        raise ValueError(f'Incompatible Sizes (Emulator xi_ggl)')
+      istart = 0
+      iend = sizes[0]
+      dv[istart:iend] = tmp1[0:sizes[0]]
+      
+      istart = sizes[0]
+      iend = sizes[0]+sizes[1]
+      dv[istart:iend] = tmp2[0:sizes[1]]
+    elif self.probe == "3x2pt":
+      tmp1 = self.provider.get_cosmic_shear()
+      tmp2 = self.provider.get_ggl()
+      tmp3 = self.provider.get_wtheta()
+      if (len(tmp1) != sizes[0] or 
+          len(tmp2) != sizes[1] or
+          len(tmp3) != sizes[2]):
+        raise ValueError(f'Incompatible Sizes (Emulator 3x2pt)')
+      istart = 0
+      iend = sizes[0]
+      dv[istart:iend] = tmp1[0:sizes[0]]
+      
+      istart = sizes[0]
+      iend = sizes[0]+sizes[1]
+      dv[istart:iend] = tmp2[0:sizes[1]]
+      
+      istart = sizes[0]+sizes[1]
+      iend = sizes[0]+sizes[1]+sizes[2]
+      dv[istart:iend] = tmp3[0:sizes[2]]
+    elif self.probe == "xi_gg":
+      tmp1 = self.provider.get_cosmic_shear()
+      tmp3 = self.provider.get_wtheta()
+      if (len(tmp1) != sizes[0] or 
+          len(tmp3) != sizes[2]):
+        raise ValueError(f'Incompatible Sizes (Emulator 3x2pt)')
+      istart = 0
+      iend = sizes[0]
+      dv[istart:iend] = tmp1[0:sizes[0]]
+      
+      istart = sizes[0]+sizes[1]
+      iend = sizes[0]+sizes[1]+sizes[2]
+      dv[istart:iend] = tmp3[0:sizes[2]]
+    elif self.probe == "2x2pt": 
+      tmp2 = self.provider.get_ggl()
+      tmp3 = self.provider.get_wtheta()
+      if (len(tmp2) != sizes[1] or
+          len(tmp3) != sizes[2]):
+        raise ValueError(f'Incompatible Sizes (Emulator 3x2pt)')
+      istart = sizes[0]
+      iend = sizes[0]+sizes[1]
+      dv[istart:iend] = tmp2[0:sizes[1]]
+      
+      istart = sizes[0]+sizes[1]
+      iend = sizes[0]+sizes[1]+sizes[2]
+      dv[istart:iend] = tmp3[0:sizes[2]]
+    else:
+      raise ValueError(f'Unknown probe')
 
-    if not self.use_baryon_pca:  
-      dv = ci.compute_add_fpm_3x2pt_real_any_order(dv)
+    if not self.use_baryon_pca: 
+      if not all(v == 0 for v in PM):
+        dv = ci.compute_add_fpm_3x2pt_real_any_order(datavector=dv,
+                                                     force_exclude_pm=0)
+      else:
+        dv = ci.compute_add_fpm_3x2pt_real_any_order(datavector=dv,
+                                                     force_exclude_pm=1)
     else:
       Q = [params.get(p,0) for p in [survey+"_BARYON_Q"+str(i+1) for i in range(self.npcs)]]
-      dv = ci.compute_add_fpm_3x2pt_real_any_order_with_pcs(dv, Q=Q)
+      if not all(v == 0 for v in PM):
+        dv = ci.compute_add_fpm_3x2pt_real_any_order_with_pcs(datavector=dv,
+                                                              Q=Q,
+                                                              force_exclude_pm=0)
+      else:
+        dv = ci.compute_add_fpm_3x2pt_real_any_order_with_pcs(datavector=dv,
+                                                              Q=Q,
+                                                              force_exclude_pm=1)
     dv = np.array(dv, dtype='float64')
     
     if self.print_datavector:
