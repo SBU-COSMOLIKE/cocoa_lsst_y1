@@ -50,14 +50,17 @@ PYBIND11_MODULE(cosmolike_lsst_y1_interface, m)
 
   m.def("init_accuracy_boost",
       [](const double accuracy_boost,
-         const int integration_accuracy) {
+         const int integration_accuracy,
+         const double lmax) {
         using namespace cosmolike_interface;
+        limits.LMAX=lmax;
         init_accuracy_boost(accuracy_boost,accuracy_boost,integration_accuracy);
         spdlog::debug("\x1b[90m{}\x1b[0m: Ends", "set_cosmology");
       },
       "Init accuracy and sampling Boost (may slow down Cosmolike a lot)",
       py::arg("accuracy_boost").none(false),
-      py::arg("integration_accuracy").none(false)
+      py::arg("integration_accuracy").none(false),
+      py::arg("lmax").none(false)
     );
 
   m.def("init_baryons_contamination",

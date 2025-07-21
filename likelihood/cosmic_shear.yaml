@@ -2,13 +2,18 @@ path: null
 data_file: lsst_y1_M1_GGL0.05.dataset
 accuracyboost: 1.0
 integration_accuracy: 0
+lmax: 50000 
 kmax_boltzmann: 5.0
 speed: 1
 non_linear_emul: 2
-# 0 = NO_IA (AMPLITUDES SET TO ZERO), 1 = IA_NLA_LF
-# 2 = IA_REDSHIFT_BINNING, 3 = IA_REDSHIFT_EVOLUTION
+debug: False
+# IA REDSHIFT EVOLUTION: 0 = NO_IA (AMPLITUDES SET TO ZERO), 
+#                        1 = IA_NLA_LF
+#                        2 = IA_REDSHIFT_BINNING, 
+#                        3 = IA_REDSHIFT_EVOLUTION
 IA_redshift_evolution: 3
-# IA_MODEL: 0 = NLA, 1 = TATT
+# IA_MODEL: 0 = NLA, 
+#           1 = TATT
 IA_model: 0
 external_nz_modeling: 0
 use_emulator: False

@@ -77,9 +77,13 @@ class _cosmolike_prototype_base(DataSetLikelihood):
           source_multihisto_file=self.source_file,
           source_ntomo=int(self.source_ntomo))
       ci.init_data_real(self.cov_file, self.mask_file, self.data_vector_file)  
-      ci.init_accuracy_boost(0.35, -1) # seems enough to compute PM
+      ci.init_accuracy_boost(accuracy_boost=0.35, 
+                             integration_accuracy=-1,
+                             lmax=self.lmax) # seems enough to compute PM
     else:
-      ci.init_accuracy_boost(self.accuracyboost, int(self.integration_accuracy))
+      ci.init_accuracy_boost(accuracy_boost=self.accuracyboost, 
+                             integration_accuracy=int(self.integration_accuracy),
+                             lmax=self.lmax)
 
       ci.init_cosmo_runmode(is_linear=False)
 
@@ -300,38 +304,39 @@ class _cosmolike_prototype_base(DataSetLikelihood):
 
   def set_lens_related(self, **params):
     ntomo = self.lens_ntomo
+    ci.set_point_mass(
+      PMV = [params.get(p, 0) for p in [survey+"_PM"+str(i+1) for i in range(ntomo)]]
+    )
     if not self.use_emulator:
       ci.set_nuisance_bias(
         B1=[params.get(p,1) for p in [survey+"_B1_"+str(i+1) for i in range(ntomo)]],
         B2=[params.get(p,0) for p in [survey+"_B2_"+str(i+1) for i in range(ntomo)]],
         B_MAG=[params.get(p,0) for p in [survey+"_BMAG_"+str(i+1) for i in range(ntomo)]]
       )
-    if self.external_nz_modeling: 
-      # here we send n(z) at every point in the chain as the user may
-      # modify it using an external function (example: adding outliers)
-     
-      # to modify it
-      # (1) deep copy the numpy array (so we keep track of the fiducial
-      # (2) modify the copy
-      # (3) call set_source_sample
-      lens_nz_local = self.lens_nz.copy()
+      if self.external_nz_modeling: 
+        # here we send n(z) at every point in the chain as the user may
+        # modify it using an external function (example: adding outliers)
+       
+        # to modify it
+        # (1) deep copy the numpy array (so we keep track of the fiducial
+        # (2) modify the copy
+        # (3) call set_source_sample
+        lens_nz_local = self.lens_nz.copy()
 
-      # insert mod function here <-
-      #lens_nz_local = f(lens_nz_local, nuisance parameters)
+        # insert mod function here <-
+        #lens_nz_local = f(lens_nz_local, nuisance parameters)
 
-      ci.set_lens_sample(lens_nz_local)
+        ci.set_lens_sample(lens_nz_local)
 
-      # user may choose to still add photo-z bias or not (here we ad)
-      ci.set_nuisance_clustering_photoz(
-        bias=[params.get(p,0) for p in [survey+"_DZ_L"+str(i+1) for i in range(ntomo)]]
-      )
-    else:
-      ci.set_nuisance_clustering_photoz(
-        bias=[params.get(p,0) for p in [survey+"_DZ_L"+str(i+1) for i in range(ntomo)]]
-      )
-    ci.set_point_mass(
-      PMV = [params.get(p, 0) for p in [survey+"_PM"+str(i+1) for i in range(ntomo)]]
-    )
+        # user may choose to still add photo-z bias or not (here we ad)
+        ci.set_nuisance_clustering_photoz(
+          bias=[params.get(p,0) for p in [survey+"_DZ_L"+str(i+1) for i in range(ntomo)]]
+        )
+      else:
+        ci.set_nuisance_clustering_photoz(
+          bias=[params.get(p,0) for p in [survey+"_DZ_L"+str(i+1) for i in range(ntomo)]]
+        )
+
 
   # ------------------------------------------------------------------------
   # ------------------------------------------------------------------------
