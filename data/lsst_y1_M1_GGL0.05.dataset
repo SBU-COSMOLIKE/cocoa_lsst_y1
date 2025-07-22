@@ -1,5 +1,6 @@
 data_file = lsst_y1_theory.modelvector
 #data_file = lsst_y1_theory_TATT.modelvector
+#data_file = example1_lsst_y1_theory_emul.modelvector
 cov_file = lsst_y1_cov
 mask_file = lsst_y1_M1_GGLOLAP0.05.mask
 nz_lens_file = lsst_y1_lens.nz 

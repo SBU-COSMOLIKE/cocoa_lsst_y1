@@ -1,15 +1,14 @@
 #!/bin/bash
-#SBATCH --job-name=PRF1
-#SBATCH --output=PRF1-%A_%a.out
+#SBATCH --job-name=MC1
+#SBATCH --output=MC1-%A_%a.out
 #SBATCH --nodes=1
-#SBATCH --ntasks=80
-#SBATCH --ntasks-per-node=80
-#SBATCH --ntasks-per-socket=40
-#SBATCH --cpus-per-task=1
-#SBATCH --time=30:00:00
+#SBATCH --ntasks=4
+#SBATCH --ntasks-per-node=4
+#SBATCH --ntasks-per-socket=2
+#SBATCH --cpus-per-task=8
+#SBATCH --time=72:00:00
 #SBATCH --partition=standard
 #SBATCH --account=cosmolike
-#SBATCH --exclusive
 
 # Clear the environment from any previously loaded modules
 module purge > /dev/null 2>&1
@@ -34,14 +33,8 @@ else
   export OMP_NUM_THREADS=1
 fi
 
-ulimit -u 2000000 # require line when nmpi is high
-export nmpi=80
-export numpts=79
-
-mpirun -n ${nmpi} --oversubscribe --mca pml ^ucx  \
+mpirun -n ${SLURM_NTASKS} --oversubscribe --mca pml ^ucx \
   --mca btl vader,tcp,self --bind-to core:overload-allowed \
   --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} \
   --mca mpi_yield_when_idle 1 \
-  python -m mpi4py.futures ./projects/lsst_y1/EXAMPLE_PROFILE1.py \
-  --cov 'EXAMPLE_MCMC1.covmat' --nwalkers 5 --profile ${SLURM_ARRAY_TASK_ID} \
-  --maxfeval 9000 --numpts ${numpts} --factor 10
+  cobaya-run ./projects/lsst_y1/EXAMPLE_MCMC${SLURM_ARRAY_TASK_ID}.yaml -r
