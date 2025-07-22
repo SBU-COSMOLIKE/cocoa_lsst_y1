@@ -47,7 +47,6 @@ PYBIND11_MODULE(cosmolike_lsst_y1_interface, m)
   // --------------------------------------------------------------------
   // INIT FUNCTIONS
   // --------------------------------------------------------------------
-
   m.def("init_accuracy_boost",
       [](const double accuracy_boost,
          const int integration_accuracy,

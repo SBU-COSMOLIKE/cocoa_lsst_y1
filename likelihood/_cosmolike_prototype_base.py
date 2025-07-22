@@ -46,6 +46,7 @@ class _cosmolike_prototype_base(DataSetLikelihood):
     self.ntheta = ini.int("n_theta")
 
     self.theta_min_arcmin = ini.float("theta_min_arcmin")
+    
     self.theta_max_arcmin = ini.float("theta_max_arcmin")
 
     # ------------------------------------------------------------------------   
@@ -336,7 +337,6 @@ class _cosmolike_prototype_base(DataSetLikelihood):
         ci.set_nuisance_clustering_photoz(
           bias=[params.get(p,0) for p in [survey+"_DZ_L"+str(i+1) for i in range(ntomo)]]
         )
-
 
   # ------------------------------------------------------------------------
   # ------------------------------------------------------------------------
