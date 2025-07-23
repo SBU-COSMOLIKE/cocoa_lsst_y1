@@ -35,13 +35,13 @@ else
 fi
 
 ulimit -u 2000000 # require line when nmpi is high
-export nmpi=80
-export numpts=79
+export nmpi=${SLURM_NTASKS}
+export numpts=$((${SLURM_NTASKS}-1))
 
 mpirun -n ${nmpi} --oversubscribe --mca pml ^ucx  \
   --mca btl vader,tcp,self --bind-to core:overload-allowed \
   --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} \
   --mca mpi_yield_when_idle 1 \
   python -m mpi4py.futures ./projects/lsst_y1/EXAMPLE_PROFILE1.py \
-  --cov 'EXAMPLE_MCMC1.covmat' --nwalkers 5 --profile ${SLURM_ARRAY_TASK_ID} \
-  --maxfeval 9000 --numpts ${numpts} --factor 10
+  --cov 'EXAMPLE_EMUL_MCMC1.covmat' --nwalkers 5 \
+  --profile ${SLURM_ARRAY_TASK_ID} --maxfeval 9000 --numpts ${numpts} --factor 10

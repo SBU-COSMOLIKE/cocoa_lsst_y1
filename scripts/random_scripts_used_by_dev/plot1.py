@@ -41,7 +41,6 @@ root_chains = (
   'EXAMPLE_MCMC1',
 )
 
-
 # --------------------------------------------------------------------------------
 samples=loadMCSamples(chaindir + '/../chains/' + root_chains[0],settings=analysissettings)
 p = samples.getParams()

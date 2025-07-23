@@ -89,8 +89,6 @@ oroot    = args.root + "chains/" + args.outroot
 index    = args.profile
 numpts   = args.numpts
 nwalkers = args.nwalkers
-cov_file = args.root + args.cov
-
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
@@ -183,7 +181,6 @@ theory:
       extrapar: [{'MLA': 'TRF', 'INT_DIM_RES': 256, 
                   'INT_DIM_TRF': 1024, 'NC_TRF': 32, 'OUTPUT_DIM': 780}]
 """
-
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
@@ -210,49 +207,12 @@ x = np.array([
   0.001         # M5
 ], dtype='float64')
 
-bounds0 = np.array([
-  [1.8,  2.5],   # As
-  [0.92, 1.03],  # ns 
-  [55.0, 80.0],  # H0
-  [0.02, 0.06], # omegab
-  [0.2, 0.4],   # omegam
-  [-0.12, 0.12], # S1
-  [-0.12, 0.12], # S2
-  [-0.12, 0.12], # S3
-  [-0.12, 0.12], # S4
-  [-0.12, 0.12], # S5
-  [-4.5, 4.5],   # A11
-  [-4.5, 4.5],   # A12
-  [-0.12, 0.12], # M1
-  [-0.12, 0.12], # M2
-  [-0.12, 0.12], # M3
-  [-0.12, 0.12], # M4
-  [-0.12, 0.12]  # M5
-], dtype='float64')
-
-name  = [ 
-  "As",       # As
-  "ns",       # ns
-  "H0",       # H0
-  "omegab",   # omegab
-  "omegam",      # omegam
-  "S1",       # S1
-  "S2",       # S2
-  "S3",       # S3
-  "S4",       # S4
-  "S5",       # S5          
-  "A11",      # A11
-  "A12",      # A12
-  "M1",       # M1
-  "M2",       # M2
-  "M3",       # M3
-  "M4",       # M4
-  "M5"        # M5
-]
-
-cov    = np.loadtxt(cov_file)[0:len(x),0:len(x)]
+cov    = np.loadtxt(args.root + args.cov)[0:len(x),0:len(x)]
 sigma  = np.sqrt(np.diag(cov))
-bounds = np.zeros((len(x),2), dtype='float64')
+info  = yaml_load(info_txt)
+model = get_model(info)
+bounds0 = model.prior.bounds(confidence=0.999999)
+name  = list(model.parameterization.sampled_params().keys())
 start  = np.zeros(len(x), dtype='float64')
 stop   = np.zeros(len(x), dtype='float64')
 start    = x - args.factor*sigma
@@ -263,44 +223,29 @@ for i in range(len(x)):
     if (stop[i] > bounds0[i][1]):
       stop[i] = bounds0[i][1]
 
-info  = yaml_load(info_txt)
-model = get_model(info)
-
+def chi2(p):
+    point = dict(zip(model.parameterization.sampled_params(),
+                 model.prior.sample(ignore_external=True)[0]))
+    names = list(model.parameterization.sampled_params().keys())
+    point.update({name: val for name, val in zip(names, p)})
+    res1 = model.logprior(point,make_finite=False)
+    res2 = model.loglike(point,make_finite=False,cached=False,return_derived=False)
+    return -2.0*(res1+res2)
 def chi2v2(p):
     point = dict(zip(model.parameterization.sampled_params(),
                  model.prior.sample(ignore_external=True)[0]))
-    point.update({'As_1e9': p[0], 
-                  'ns':  p[1],
-                  'H0': p[2], 
-                  'omegab': p[3], 
-                  'omegam': p[4], 
-                  'LSST_DZ_S1': p[5],
-                  'LSST_DZ_S2': p[6],
-                  'LSST_DZ_S3': p[7],
-                  'LSST_DZ_S4': p[8],
-                  'LSST_DZ_S5': p[9],
-                  'LSST_A1_1': p[10],
-                  'LSST_A1_2': p[11],
-                  'LSST_M1': p[12],
-                  'LSST_M2': p[13],
-                  'LSST_M3': p[14],
-                  'LSST_M4': p[15],
-                  'LSST_M5': p[16]})
+    names=list(model.parameterization.sampled_params().keys())
+    point.update({name: val for name, val in zip(names, p)})
     logposterior = model.logposterior(point, as_dict=True)
-    if 'loglikes' in logposterior.keys(): 
-      res1 = logposterior["loglikes"].get("lsst_y1.cosmic_shear",-1e20)
-      return np.array([-2.0*res1], dtype='float64')
-    else:
-      return np.array([-2.0*1e20], dtype='float64')
-
-def chi2(p):
-    result = chi2v2(p)
-    return np.sum(result)
-
+    chi2likes=-2*np.array(list(logposterior["loglikes"].values()))
+    chi2prior=-2*np.atleast_1d(model.logprior(point,make_finite=False))
+    return np.concatenate((chi2likes, chi2prior))
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
-
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 def min_chi2(x0, 
              bounds, 
              fixed=-1, 
@@ -413,12 +358,12 @@ def prf(x0, index, maxfeval, bounds, nwalkers=5, maxiter=1):
                     maxiter=maxiter,
                     nwalkers=nwalkers)
     return res
-
-
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
-
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 from mpi4py.futures import MPIPoolExecutor
 
 if __name__ == '__main__':
@@ -456,3 +401,9 @@ if __name__ == '__main__':
                comments="# ")
     # --- saving file ends --------------------
     executor.shutdown()
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
