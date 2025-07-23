@@ -217,21 +217,29 @@ class _cosmolike_prototype_base(DataSetLikelihood):
           'w'    : self.provider.get_param("w"),
           'wa'   : 0.0
         }
+        # Euclid Emulator only works on z<10.0
         kbt, tmp_bt = ee2.get_boost2(params, 
-                                     self.z_interp_2D, 
+                                     self.z_interp_2D[self.z_interp_2D < 10.0], 
                                      self.emulator, 
                                      10**np.linspace(-2.0589,0.973,self.len_log10k_interp_2D))
-        bt = np.array([tmp_bt[i] for i in range(self.len_z_interp_2D)],dtype='float64')  
-        lnbt = interp1d(np.log10(kbt), 
+        bt = np.array(tmp_bt, dtype='float64')
+        tmp = interp1d(np.log10(kbt), 
                         np.log(bt), 
                         axis=1,
                         kind='linear', 
                         fill_value='extrapolate', 
                         assume_sorted=True)(self.log10k_interp_2D-np.log10(h)) #h/Mpc
-        lnbt[:,10**(self.log10k_interp_2D-np.log10(h)) < 8.73e-3] = 0.0
-        lnPNL=(lnPL.reshape(self.len_z_interp_2D, 
-                            self.len_log10k_interp_2D, 
-                            order='F') + lnbt).ravel(order='F')
+        tmp[:,10**(self.log10k_interp_2D-np.log10(h)) < 8.73e-3] = 0.0
+        lnbt = np.zeros((self.len_z_interp_2D, self.len_log10k_interp_2D))
+        lnbt[self.z_interp_2D < 10.0, :] = tmp
+        # Use Halofit first that works on all redshifts        
+        lnPNL = self.provider.get_Pk_interpolator(("delta_tot", "delta_tot"),
+          nonlinear=True, extrap_kmax =2.5e2*self.accuracyboost).logP(self.z_interp_2D,
+          np.power(10.0,self.log10k_interp_2D)).flatten(order='F')+np.log(h**3) 
+        # on z < 10.0, replace it with EE2
+        lnPNL = np.where((self.z_interp_2D<10)[:,None], 
+          lnPL.reshape(self.len_z_interp_2D,self.len_log10k_interp_2D,order='F')+lnbt, 
+          lnPNL.reshape(self.len_z_interp_2D,self.len_log10k_interp_2D,order='F')).ravel(order='F')
       elif self.non_linear_emul == 2:
         lnPNL = self.provider.get_Pk_interpolator(("delta_tot", "delta_tot"),
           nonlinear=True, extrap_kmax =2.5e2*self.accuracyboost).logP(self.z_interp_2D,
