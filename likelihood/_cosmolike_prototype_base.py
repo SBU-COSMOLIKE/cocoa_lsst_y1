@@ -232,7 +232,7 @@ class _cosmolike_prototype_base(DataSetLikelihood):
         tmp[:,10**(self.log10k_interp_2D-np.log10(h)) < 8.73e-3] = 0.0
         lnbt = np.zeros((self.len_z_interp_2D, self.len_log10k_interp_2D))
         lnbt[self.z_interp_2D < 10.0, :] = tmp
-        # Use Halofit first that works on all redshifts        
+        # Use Halofit first that works on all redshifts
         lnPNL = self.provider.get_Pk_interpolator(("delta_tot", "delta_tot"),
           nonlinear=True, extrap_kmax =2.5e2*self.accuracyboost).logP(self.z_interp_2D,
           np.power(10.0,self.log10k_interp_2D)).flatten(order='F')+np.log(h**3) 
