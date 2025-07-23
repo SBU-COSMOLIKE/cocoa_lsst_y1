@@ -1,6 +1,6 @@
 #!/bin/bash
-#SBATCH --job-name=MC1
-#SBATCH --output=MC1-%A_%a.out
+#SBATCH --job-name=MC
+#SBATCH --output=MC-%A_%a.out
 #SBATCH --nodes=1
 #SBATCH --ntasks=4
 #SBATCH --ntasks-per-node=4
@@ -32,7 +32,7 @@ if [ -n "$SLURM_CPUS_PER_TASK" ]; then
 else
   export OMP_NUM_THREADS=1
 fi
-
+#ulimit -u 2000000 # require line when nmpi is high
 mpirun -n ${SLURM_NTASKS} --oversubscribe --mca pml ^ucx \
   --mca btl vader,tcp,self --bind-to core:overload-allowed \
   --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} \

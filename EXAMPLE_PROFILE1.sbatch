@@ -6,7 +6,7 @@
 #SBATCH --ntasks-per-node=80
 #SBATCH --ntasks-per-socket=40
 #SBATCH --cpus-per-task=1
-#SBATCH --time=30:00:00
+#SBATCH --time=48:00:00
 #SBATCH --partition=standard
 #SBATCH --account=cosmolike
 #SBATCH --exclusive
@@ -37,7 +37,6 @@ fi
 ulimit -u 2000000 # require line when nmpi is high
 export nmpi=${SLURM_NTASKS}
 export numpts=$((${SLURM_NTASKS}-1))
-
 mpirun -n ${nmpi} --oversubscribe --mca pml ^ucx  \
   --mca btl vader,tcp,self --bind-to core:overload-allowed \
   --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} \

@@ -27,7 +27,9 @@ matplotlib.rcParams['legend.labelspacing'] = 0.77
 matplotlib.rcParams['savefig.bbox'] = 'tight'
 matplotlib.rcParams['savefig.format'] = 'pdf'
 
-parameter = [u'omegam', u'As_1e9', u'ns', u'omegab', u'H0', u'LSST_A1_1', u'LSST_A1_2']
+parameter = [u'omegam', u'As_1e9', u'ns', u'omegab', u'H0', u'LSST_A1_1', u'LSST_A1_2',
+             u'LSST_DZ_S1',u'LSST_DZ_S2',u'LSST_DZ_S3',u'LSST_DZ_S4',
+             u'LSST_M1',u'LSST_M2',u'LSST_M3',u'LSST_M4']
 chaindir=os.getcwd()
 
 analysissettings={'smooth_scale_1D':0.35, 'smooth_scale_2D':0.3,'ignore_rows': u'0.4',
@@ -38,7 +40,7 @@ analysissettings2={'smooth_scale_1D':0.35,'smooth_scale_2D':0.3,'ignore_rows': u
 
 root_chains = (
   '/EXAMPLE_EMUL_MCMC1',
-  '/EXAMPLE_EMUL_MCMC1',
+  '/example_nautilus1_642',
 )
 
 # --------------------------------------------------------------------------------
