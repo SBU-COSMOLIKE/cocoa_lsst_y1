@@ -392,12 +392,16 @@ if __name__ == '__main__':
     # Append individual chi2 (in case there are more than one data) (ends) --------------------
 
     # --- saving file begins -------------------- 
+    names = list(model.parameterization.sampled_params().keys()) # Cobaya Call
+    names = [names[index], "chi2"] + names
+    names.append("chi2_lsst_y1_cosmic_shear")
     rnd = random.randint(0,1000)
     out = oroot + "_" + str(rnd) + "_" + name[index] 
     print("Output file = ", out + ".txt")
     np.savetxt(out+".txt",
                np.concatenate([np.c_[param,res[:,1]],x0],axis=1),
-               header=f"nwalkers={nwalkers}, maxfeval={maxfeval}, param={name[index]}",
+               fmt="%.6e",
+               header=f"nwalkers={nwalkers}, maxfeval={maxfeval}, param={name[index]}\n"+' '.join(names),
                comments="# ")
     # --- saving file ends --------------------
     executor.shutdown()
@@ -407,3 +411,12 @@ if __name__ == '__main__':
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
+#HOW TO CALL THIS SCRIPT
+#export nmpi=5
+#export numpts=$((${nmpi}-1))
+#mpirun -n ${nmpi} --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
+#  --bind-to core:overload-allowed --mca mpi_yield_when_idle 1 \
+#  --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} \
+#  python -m mpi4py.futures ./projects/lsst_y1/EXAMPLE_EMUL_PROFILE1.py \
+#  --cov 'EXAMPLE_EMUL_MCMC1.covmat' --nwalkers 5 --numpts ${numpts} \
+#  --profile ${SLURM_ARRAY_TASK_ID} --maxfeval 9000 --factor 10

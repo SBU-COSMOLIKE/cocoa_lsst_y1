@@ -11,10 +11,6 @@
 #SBATCH --account=cosmolike
 #SBATCH --exclusive
 
-# Clear the environment from any previously loaded modules
-module purge > /dev/null 2>&1
-source ~/.bashrc 
-
 echo Running on host `hostname`
 echo Time is `date`
 echo Directory is `pwd`
@@ -24,8 +20,11 @@ echo Number of task is $SLURM_NTASKS
 echo Number of cpus per task is $SLURM_CPUS_PER_TASK
 
 cd $SLURM_SUBMIT_DIR
-conda activate cocoa
-source start_cocoa
+# -----------------------------------------------------------------
+# Submit this script with conda and cocoa env previously activated
+# -----------------------------------------------------------------
+#conda activate cocoa
+#source start_cocoa
 
 export OMP_PROC_BIND=close
 if [ -n "$SLURM_CPUS_PER_TASK" ]; then
@@ -42,5 +41,5 @@ mpirun -n ${nmpi} --oversubscribe --mca pml ^ucx  \
   --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} \
   --mca mpi_yield_when_idle 1 \
   python -m mpi4py.futures ./projects/lsst_y1/EXAMPLE_EMUL_PROFILE1.py \
-  --cov 'EXAMPLE_EMUL_MCMC1.covmat' --nwalkers 5 \
-  --profile ${SLURM_ARRAY_TASK_ID} --maxfeval 9000 --numpts ${numpts} --factor 10
+  --cov 'EXAMPLE_EMUL_MCMC1.covmat' --nwalkers 5 --numpts ${numpts} \
+  --profile ${SLURM_ARRAY_TASK_ID} --maxfeval 9000 --factor 10

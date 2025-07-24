@@ -21,8 +21,11 @@ echo Number of task is $SLURM_NTASKS
 echo Number of cpus per task is $SLURM_CPUS_PER_TASK
 
 cd $SLURM_SUBMIT_DIR
-conda activate cocoa
-source start_cocoa
+# -----------------------------------------------------------------
+# Submit this script with conda and cocoa env previously activated
+# -----------------------------------------------------------------
+#conda activate cocoa
+#source start_cocoa
 
 export OMP_PROC_BIND=close
 if [ -n "$SLURM_CPUS_PER_TASK" ]; then

@@ -420,19 +420,20 @@ if __name__ == '__main__':
                                bounds=bounds0, 
                                nwalkers=nwalkers,
                                pool=pool)), dtype="object")
-        x0 = np.array(res[0],dtype='float64')
-
+        x0 = np.array([res[0]],dtype='float64')
         # Append individual chi2 (in case there are more than one data) (begins)
         tmp = np.array([chi2v2(d) for d in x0], dtype='float64')
         x0 = np.column_stack((x0,tmp[:,0]))
         # Append individual chi2 (in case there are more than one data) (ends)
-
         # --- saving file begins --------------------
+        names = list(model.parameterization.sampled_params().keys()) # Cobaya Call
+        names.append("chi2")
         rnd = random.randint(0,1000)
         print("Output file = ", oroot + "_" + str(rnd) + ".txt")
         np.savetxt(oroot + "_" + str(rnd) +".txt", 
                    x0,
-                   header=f"maxfeval={maxfeval}, nwalkers={nwalkers}",
+                   fmt="%.6e",
+                   header=f"nwalkers={nwalkers}, maxfeval={maxfeval}\n"+' '.join(names),
                    comments="# ")
         # --- saving file ends --------------------
 # ------------------------------------------------------------------------------
@@ -442,8 +443,9 @@ if __name__ == '__main__':
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 #HOW TO CALL THIS SCRIPT
-#mpirun -n 5 --oversubscribe --mca pml ^ucx  \
-#  --mca btl vader,tcp,self --bind-to core:overload-allowed \
-#  --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS}  \
+#export nmpi=5
+#mpirun -n ${nmpi} --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
+#  --bind-to core:overload-allowed --mca mpi_yield_when_idle 1 \
+#  --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} \
 #  python ./projects/lsst_y1/EXAMPLE_EMUL_MINIMIZE1.py --root ./projects/lsst_y1/ \
 #  --cov 'EXAMPLE_EMUL_MCMC1.covmat' --outroot "example_min1" --nwalkers 5 --maxfeval 10000

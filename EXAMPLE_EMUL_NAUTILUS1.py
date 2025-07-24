@@ -329,9 +329,9 @@ if __name__ == '__main__':
     print("Output file = ", cfile)
     np.savetxt(cfile,
                np.column_stack((np.exp(log_w), log_l, points, -2*log_l)),
+               fmt="%.5e",
                header=f"nlive={args.nlive}, output={cfile}",
                comments="# ")
-    
     # Now we need to save a paramname files --------------------
     cfile   = args.root + "chains/" + args.outroot +  "_" + str(rnd) + ".paramnames"
     param_info = model.info()['params']
@@ -340,12 +340,11 @@ if __name__ == '__main__':
     names2.append("chi2*")
     latex.append("\\chi^2")
     np.savetxt(cfile, np.column_stack((names2,latex)),fmt="%s")
-    
     # Now we need to save a range files --------------------
     cfile   = args.root + "chains/" + args.outroot +  "_" + str(rnd) + ".ranges"
     rows = [(str(n),float(l),float(h)) for n,l,h in zip(names,bounds[:,0],bounds[:,1])]
     with open(cfile, "w") as f: 
-      f.writelines(f"{n} {l:.6f} {h:.6f}\n" for n, l, h in rows)
+      f.writelines(f"{n} {l:.5e} {h:.5e}\n" for n, l, h in rows)
     # --- saving file ends --------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
