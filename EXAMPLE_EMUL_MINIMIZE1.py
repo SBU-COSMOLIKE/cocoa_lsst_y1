@@ -267,7 +267,6 @@ x = np.array([
   0.001         # M5
 ], dtype='float64')
 
-
 cov      = np.loadtxt(cov_file)[0:len(x),0:len(x)]
 sigma    = np.sqrt(np.diag(cov))
 
@@ -436,10 +435,15 @@ if __name__ == '__main__':
                    header=f"maxfeval={maxfeval}, nwalkers={nwalkers}",
                    comments="# ")
         # --- saving file ends --------------------
-
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 #HOW TO CALL THIS SCRIPT
 #mpirun -n 5 --oversubscribe --mca pml ^ucx  \
 #  --mca btl vader,tcp,self --bind-to core:overload-allowed \
 #  --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS}  \
-#  python ./projects/lsst_y1/EXAMPLE_MINIMIZE1.py --root ./projects/lsst_y1/ \
+#  python ./projects/lsst_y1/EXAMPLE_EMUL_MINIMIZE1.py --root ./projects/lsst_y1/ \
 #  --cov 'EXAMPLE_EMUL_MCMC1.covmat' --outroot "example_min1" --nwalkers 5 --maxfeval 10000

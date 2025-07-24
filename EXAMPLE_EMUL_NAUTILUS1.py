@@ -313,3 +313,9 @@ if __name__ == '__main__':
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
+#HOW TO CALL THIS SCRIPT
+#mpirun -n 5 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
+#   --bind-to core:overload-allowed --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} \
+#   python -m mpi4py.futures ./projects/lsst_y1/EXAMPLE_EMUL_NAUTILUS1.py \
+#   --root ./projects/lsst_y1/ --outroot "example_nautilus1"  \
+#   --maxfeval 50000 --nlive 500 --neff 10000 --flive 0.01

@@ -51,7 +51,7 @@ samples.addDerived(100*p.omegab,name='ob100',label='{100 \\Omega_b}')
 samples.addDerived(10*p.ns,name='ns10',label='{10 n_s}')
 samples.saveAsText(chaindir + '/.VM_P1_TMP1')
 # --------------------------------------------------------------------------------
-samples=loadMCSamples(chaindir+ root_chains[1],settings=analysissettings)
+samples=loadMCSamples(chaindir+ root_chains[1],settings=analysissettings2)
 p = samples.getParams()
 samples.addDerived(10*p.omegam,name='om10',label='{10 \\Omega_m}')
 samples.addDerived(100*p.omegab,name='ob100',label='{100 \\Omega_b}')

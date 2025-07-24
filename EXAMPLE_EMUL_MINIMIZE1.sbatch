@@ -35,8 +35,9 @@ ulimit -u 2000000 # require line when nmpi is high
 export nmpi=${SLURM_NTASKS}
 export nwalkers=$((${SLURM_NTASKS}-1))
 
-mpirun -n 5 --oversubscribe --mca pml ^ucx  \
+mpirun -n ${nmpi} --oversubscribe --mca pml ^ucx  \
   --mca btl vader,tcp,self --bind-to core:overload-allowed \
   --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS}  \
   python ./projects/lsst_y1/EXAMPLE_EMUL_MINIMIZE1.py --root ./projects/lsst_y1/ \
-  --cov 'EXAMPLE_EMUL_MCMC1.covmat' --outroot "example_min1" --nwalkers 5 --maxfeval 10000
+  --cov 'EXAMPLE_EMUL_MCMC1.covmat' --outroot "example_min1" \
+  --nwalkers ${nwalkers} --maxfeval 10000
