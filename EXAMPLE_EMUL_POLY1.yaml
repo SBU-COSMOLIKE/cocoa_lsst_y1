@@ -236,6 +236,6 @@ sampler:
     do_clustering: false
     precision_criterion: 0.001
     boost_posterior: 10
-    feedback: 2
+    feedback: 1
 
 output: ./projects/lsst_y1/chains/EXAMPLE_EMUL_POLY1

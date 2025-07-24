@@ -220,8 +220,8 @@ theory:
     use_renames: True
     extra_args:
       halofit_version: takahashi
-      AccuracyBoost: 1.2 # AB=1.2 tested in jupyter w(\theta) stability large theta
-      lens_potential_accuracy: 1.0
+      AccuracyBoost: 1.0 # AB=1.2 suggested in jupyter w(\theta) stability large theta
+                         # maybe worth postprocessing a chain on 1.2
       num_massive_neutrinos: 1
       nnu: 3.046
       dark_energy_model: ppf
