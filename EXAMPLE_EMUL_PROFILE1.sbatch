@@ -41,6 +41,6 @@ mpirun -n ${nmpi} --oversubscribe --mca pml ^ucx  \
   --mca btl vader,tcp,self --bind-to core:overload-allowed \
   --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} \
   --mca mpi_yield_when_idle 1 \
-  python -m mpi4py.futures ./projects/lsst_y1/EXAMPLE_PROFILE1.py \
+  python -m mpi4py.futures ./projects/lsst_y1/EXAMPLE_EMUL_PROFILE1.py \
   --cov 'EXAMPLE_EMUL_MCMC1.covmat' --nwalkers 5 \
   --profile ${SLURM_ARRAY_TASK_ID} --maxfeval 9000 --numpts ${numpts} --factor 10

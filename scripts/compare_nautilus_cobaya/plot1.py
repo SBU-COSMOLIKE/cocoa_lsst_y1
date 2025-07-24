@@ -39,8 +39,8 @@ analysissettings2={'smooth_scale_1D':0.35,'smooth_scale_2D':0.3,'ignore_rows': u
 'range_confidence' : u'0.005'}
 
 root_chains = (
-  '/EXAMPLE_EMUL_MCMC1',
-  '/example_nautilus1_642',
+  '../chains/EXAMPLE_EMUL_MCMC1',
+  '../chains/example_nautilus1_896',
 )
 
 # --------------------------------------------------------------------------------

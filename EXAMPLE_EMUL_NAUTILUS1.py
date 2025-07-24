@@ -81,26 +81,55 @@ params:
     prior:
       min: 0.5
       max: 5
+    ref:
+      dist: norm
+      loc: 2.1
+      scale: 0.65
+    proposal: 0.1
+    latex: 10^9 A_\mathrm{s}
   ns:
     prior:
       min: 0.92
       max: 1.05
+    ref:
+      dist: norm
+      loc: 0.96605
+      scale: 0.01
+    proposal: 0.005
+    latex: n_\mathrm{s}
   H0:
     prior:
       min: 55
       max: 91
+    ref:
+      dist: norm
+      loc: 67.32
+      scale: 5
+    proposal: 1
     latex: H_0
   omegab:
     prior:
       min: 0.03
       max: 0.07
+    ref:
+      dist: norm
+      loc: 0.0495
+      scale: 0.004
+    proposal: 0.004
+    latex: \Omega_\mathrm{b}
   omegam:
     prior:
       min: 0.1
       max: 0.9
-    drop: true
+    ref:
+      dist: norm
+      loc: 0.316
+      scale: 0.02
+    proposal: 0.02
+    latex: \Omega_\mathrm{m}
   mnu:
     value: 0.06
+    latex: m_\nu
   omegabh2:
     value: 'lambda omegab, H0: omegab*(H0/100)**2'
     latex: \Omega_\mathrm{b} h^2
@@ -109,7 +138,6 @@ params:
     latex: \Omega_\mathrm{c} h^2
   logA:
     value: 'lambda As_1e9: np.log(10*As_1e9)'
-  # WL photo-z errors
   LSST_DZ_S1:
     prior:
       dist: norm
@@ -165,7 +193,6 @@ params:
       scale: 0.002
     proposal: 0.002
     latex: \Delta z_\mathrm{s,LSST}^5
-  # Intrinsic alignment
   LSST_A1_1:
     prior:
       min: -5
@@ -185,7 +212,7 @@ params:
       loc: -1.7
       scale: 0.5
     proposal: 0.5
-  # Shear calibration parameters
+    latex: A_\mathrm{1-IA,LSST}^2
   LSST_M1:
     prior:
       dist: norm
@@ -255,14 +282,12 @@ theory:
       extrapar: [{'MLA': 'TRF', 'INT_DIM_RES': 256, 
                   'INT_DIM_TRF': 1024, 'NC_TRF': 32, 'OUTPUT_DIM': 780}]
 """
-info  = yaml_load(info_txt)
-model = get_model(info)
+model = get_model(yaml_load(info_txt))
 def likelihood(p):
     point = dict(zip(model.parameterization.sampled_params(),
                  model.prior.sample(ignore_external=True)[0]))
     names=list(model.parameterization.sampled_params().keys())
     point.update({ name: p[name].item() for name in names })
-    logposterior = model.logposterior(point, as_dict=True,make_finite=True)
     res1 = model.logprior(point,make_finite=False)
     res2 = model.loglike(point,make_finite=False,cached=False,return_derived=False)
     return res1+res2
@@ -274,8 +299,7 @@ def likelihood(p):
 # ------------------------------------------------------------------------------
 from mpi4py.futures import MPIPoolExecutor
 if __name__ == '__main__':
-    #rnd = random.randint(0,1000)
-    rnd = 642
+    rnd = random.randint(0,1000)
     cfile= args.root + "chains/" + args.outroot +  "_" + str(rnd) + "_checkpoint" ".hdf5"
     print(f"nlive={args.nlive}, output={cfile}")
     # Here we need to pass Cobaya Prior to Nautilus
@@ -299,13 +323,29 @@ if __name__ == '__main__':
                 verbose=True,
                 discard_exploration=True)
     points, log_w, log_l = sampler.posterior()
+    
     # --- saving file begins --------------------
-    cfile   = args.root + "chains/" + args.outroot +  "_" + str(rnd) + ".txt"
+    cfile   = args.root + "chains/" + args.outroot +  "_" + str(rnd) + ".1.txt"
     print("Output file = ", cfile)
     np.savetxt(cfile,
                np.column_stack((np.exp(log_w), log_l, points, -2*log_l)),
                header=f"nlive={args.nlive}, output={cfile}",
                comments="# ")
+    
+    # Now we need to save a paramname files --------------------
+    cfile   = args.root + "chains/" + args.outroot +  "_" + str(rnd) + ".paramnames"
+    param_info = model.info()['params']
+    names2 = names.copy()
+    latex  = [param_info[x]['latex'] for x in names2]
+    names2.append("chi2*")
+    latex.append("\\chi^2")
+    np.savetxt(cfile, np.column_stack((names2,latex)),fmt="%s")
+    
+    # Now we need to save a range files --------------------
+    cfile   = args.root + "chains/" + args.outroot +  "_" + str(rnd) + ".ranges"
+    rows = [(str(n),float(l),float(h)) for n,l,h in zip(names,bounds[:,0],bounds[:,1])]
+    with open(cfile, "w") as f: 
+      f.writelines(f"{n} {l:.6f} {h:.6f}\n" for n, l, h in rows)
     # --- saving file ends --------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
