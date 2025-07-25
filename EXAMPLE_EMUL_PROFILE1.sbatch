@@ -42,4 +42,5 @@ mpirun -n ${nmpi} --oversubscribe --mca pml ^ucx  \
   --mca mpi_yield_when_idle 1 \
   python -m mpi4py.futures ./projects/lsst_y1/EXAMPLE_EMUL_PROFILE1.py \
   --cov 'EXAMPLE_EMUL_MCMC1.covmat' --nwalkers 5 --numpts ${numpts} \
-  --profile ${SLURM_ARRAY_TASK_ID} --maxfeval 9000 --factor 10
+  --profile ${SLURM_ARRAY_TASK_ID} --maxfeval 15000 --factor 3 \
+  --minfile="./projects/lsst_y1/example_min1_lcdm.txt"

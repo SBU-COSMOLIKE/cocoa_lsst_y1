@@ -23,7 +23,6 @@ import numpy as np
 from cobaya.yaml import yaml_load
 from cobaya.model import get_model
 from getdist import IniFile
-
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
@@ -31,7 +30,6 @@ from getdist import IniFile
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 parser = argparse.ArgumentParser(prog='EXAMPLE_PROFILE1')
-
 parser.add_argument("--maxfeval",
                     dest="maxfeval",
                     help="Minimizer: maximum number of likelihood evaluations",
@@ -58,13 +56,6 @@ parser.add_argument("--profile",
                     nargs='?',
                     const=1,
                     default=1)
-parser.add_argument("--numpts",
-                    dest="numpts",
-                    help="Number of Points to Compute Minimum",
-                    type=int,
-                    nargs='?',
-                    const=1,
-                    default=20)
 parser.add_argument("--factor",
                     dest="factor",
                     help="Factor that set the bounds (multiple of cov matrix)",
@@ -72,6 +63,13 @@ parser.add_argument("--factor",
                     nargs='?',
                     const=1,
                     default=3)
+parser.add_argument("--numpts",
+                    dest="numpts",
+                    help="Number of Points to Compute Minimum",
+                    type=int,
+                    nargs='?',
+                    const=1,
+                    default=20)
 parser.add_argument("--cov",
                     dest="cov",
                     help="Chain Covariance Matrix",
@@ -83,12 +81,18 @@ parser.add_argument("--nwalkers",
                     help="Number of emcee walkers",
                     nargs='?',
                     const=1)
+parser.add_argument("--minfile",
+                    dest="minfile",
+                    help="Minimization Result",
+                    nargs='?',
+                    const=1)
 args, unknown = parser.parse_known_args()
 maxfeval = args.maxfeval
 oroot    = args.root + "chains/" + args.outroot
 index    = args.profile
 numpts   = args.numpts
 nwalkers = args.nwalkers
+cov_file = args.root + args.cov
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
@@ -187,42 +191,8 @@ theory:
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
-x = np.array([
-  2.1,          # As
-  0.96,         # ns
-  67.0,         # H0
-  0.04,         # omegab
-  0.30,         # omegam
-  0.04,         # S1
-  0.0016,       # S2
-  0.03,         # S3
-  -0.08,        # S4
-  -8.67127e-05, # S5
-  0.7,          # A11
-  -1.5,         # A12
-  0.001,        # M1
-  0.002,        # M2
-  0.003,        # M3
-  0.004,        # M4
-  0.001         # M5
-], dtype='float64')
-
-cov    = np.loadtxt(args.root + args.cov)[0:len(x),0:len(x)]
-sigma  = np.sqrt(np.diag(cov))
-info  = yaml_load(info_txt)
-model = get_model(info)
-bounds0 = model.prior.bounds(confidence=0.999999)
-name  = list(model.parameterization.sampled_params().keys())
-start  = np.zeros(len(x), dtype='float64')
-stop   = np.zeros(len(x), dtype='float64')
-start    = x - args.factor*sigma
-stop     = x + args.factor*sigma
-for i in range(len(x)):
-    if (start[i] < bounds0[i][0]):
-      start[i] = bounds0[i][0]
-    if (stop[i] > bounds0[i][1]):
-      stop[i] = bounds0[i][1]
-
+model = get_model(yaml_load(info_txt))
+name = list(model.parameterization.sampled_params().keys())
 def chi2(p):
     point = dict(zip(model.parameterization.sampled_params(),
                  model.prior.sample(ignore_external=True)[0]))
@@ -247,13 +217,11 @@ def chi2v2(p):
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 def min_chi2(x0, 
-             bounds, 
+             cov,
              fixed=-1, 
              maxfeval=3000, 
-             maxiter=10, 
-             cov=cov,
+             maxiter=10,
              nwalkers=5):
-
     def mychi2(params, *args):
         z, fixed, T = args
         params = np.array(params, dtype='float64')
@@ -264,7 +232,6 @@ def min_chi2(x0,
     if fixed > -1:
         z      = x0[fixed]
         x0     = np.delete(x0, (fixed))
-        bounds = np.delete(bounds, (fixed), axis=0)
         args = (z, fixed, 1.0)
         cov = np.delete(cov, (fixed), axis=0)
         cov = np.delete(cov, (fixed), axis=1)
@@ -337,26 +304,14 @@ def min_chi2(x0,
     j = np.argmin(np.array(partial))
     return [partial_samples[j], partial[j]]
 
-def prf(x0, index, maxfeval, bounds, nwalkers=5, maxiter=1):
+def prf(x0, index, maxfeval, cov, nwalkers=5, maxiter=1):
     t0 = np.array(x0, dtype='float64')
-    t1 = np.array(bounds, dtype="float64") # np.array do a deep copy. Deep copy necessary 
-                                           # line to avoid weird bug that changes on bounds
-                                           # propagate from different iterations (same MPI core)
-    t1[:,0] += t0
-    t1[:,1] += t0
-
-    for i in range(len(x)):
-        if (t1[i][0] < bounds0[i][0]):
-          t1[i][0] = bounds0[i][0]
-        if (t1[i][1] > bounds0[i][1]):
-          t1[i][1] = bounds0[i][1]
-
     res =  min_chi2(x0=t0, 
-                    bounds=t1, 
                     fixed=index, 
                     maxfeval=maxfeval, 
                     maxiter=maxiter,
-                    nwalkers=nwalkers)
+                    nwalkers=nwalkers,
+                    cov=cov)
     return res
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
@@ -367,34 +322,45 @@ def prf(x0, index, maxfeval, bounds, nwalkers=5, maxiter=1):
 from mpi4py.futures import MPIPoolExecutor
 
 if __name__ == '__main__':
+    # First we need to load minimum (from running EXAMPLE_EMUL_MINIMIZE1.py)
+    x = np.loadtxt(args.minfile)[0:model.prior.d()]
     
+    cov = np.loadtxt(cov_file)[0:model.prior.d(),0:model.prior.d()]
+    sigma = np.sqrt(np.diag(cov))
+    start = np.zeros(len(x), dtype='float64')
+    stop  = np.zeros(len(x), dtype='float64')
+    start = x - args.factor*sigma
+    stop  = x + args.factor*sigma
+    bounds0 = model.prior.bounds(confidence=0.999999)
+    for i in range(len(x)):
+        if (start[i] < bounds0[i][0]):
+          start[i] = bounds0[i][0]
+        if (stop[i] > bounds0[i][1]):
+          stop[i] = bounds0[i][1]
+    # --------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     print(f"nwalkers={nwalkers}, maxfeval={maxfeval}, param={index}")
-
-    executor = MPIPoolExecutor()
-    
     param = np.linspace(start=start[index], stop=stop[index], num=numpts)
     print(f"profile param values = {param}")
-    x0 = np.tile(x, (param.size, 1))
+
+    x0 = np.tile(x,(param.size,1))
     x0[:,index] = param
-    bounds = np.c_[- 25.0*args.factor*sigma,+ 25.0*args.factor*sigma]
-
-    res = np.array(list(executor.map(functools.partial(prf, 
-                                                       index=index, 
-                                                       maxfeval=maxfeval, 
-                                                       bounds=bounds, 
-                                                       nwalkers=nwalkers),x0)),dtype="object")
-
-    x0 = np.array([np.insert(row,index,p) for row, p in zip(res[:,0],param)],dtype='float64')
+    pool = MPIPoolExecutor()
+    res = np.array(list(pool.map(functools.partial(prf, 
+                                                   index=index, 
+                                                   maxfeval=maxfeval, 
+                                                   nwalkers=nwalkers,
+                                                   cov=cov),x0)),dtype="object")
+    x0 = np.array([np.insert(r,index,p) for r, p in zip(res[:,0],param)],dtype='float64')
     
-    # Append individual chi2 (in case there are more than one data) (begins) --------------------
+    # Append individual chi2 (in case there are more than one data) (begins) ---
     tmp = np.array([chi2v2(d) for d in x0], dtype='float64')
     x0 = np.column_stack((x0,tmp[:,0]))
-    # Append individual chi2 (in case there are more than one data) (ends) --------------------
-
-    # --- saving file begins -------------------- 
+    # Append individual chi2 (in case there are more than one data) (ends) -----
+    # --- saving file begins ---------------------------------------------------
     names = list(model.parameterization.sampled_params().keys()) # Cobaya Call
-    names = [names[index], "chi2"] + names
-    names.append("chi2_lsst_y1_cosmic_shear")
+    names = [names[index], "chi2"]+names+list(model.info()['likelihood'].keys())
     rnd = random.randint(0,1000)
     out = oroot + "_" + str(rnd) + "_" + name[index] 
     print("Output file = ", out + ".txt")
@@ -403,8 +369,8 @@ if __name__ == '__main__':
                fmt="%.6e",
                header=f"nwalkers={nwalkers}, maxfeval={maxfeval}, param={name[index]}\n"+' '.join(names),
                comments="# ")
-    # --- saving file ends --------------------
-    executor.shutdown()
+    # --- saving file ends -----------------------------------------------------
+    pool.shutdown()
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
@@ -419,4 +385,5 @@ if __name__ == '__main__':
 #  --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} \
 #  python -m mpi4py.futures ./projects/lsst_y1/EXAMPLE_EMUL_PROFILE1.py \
 #  --cov 'EXAMPLE_EMUL_MCMC1.covmat' --nwalkers 5 --numpts ${numpts} \
-#  --profile ${SLURM_ARRAY_TASK_ID} --maxfeval 9000 --factor 10
+#  --profile ${SLURM_ARRAY_TASK_ID} --maxfeval 9000 --factor 3 \
+#  --minfile="./projects/lsst_y1/example_min1_lcdm.txt"

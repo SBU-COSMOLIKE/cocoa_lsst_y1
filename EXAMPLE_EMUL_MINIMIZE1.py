@@ -72,7 +72,6 @@ maxfeval    = args.maxfeval
 oroot       = args.root + "chains/" + args.outroot
 nwalkers    = args.nwalkers
 cov_file = args.root + args.cov
-
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
@@ -226,7 +225,6 @@ params:
       scale: 0.005
     proposal: 0.005
     latex: m_\mathrm{LSST}^5
-
 theory:
   emul_cosmic_shear:
     path: ./cobaya/cobaya/theories/
@@ -247,34 +245,8 @@ theory:
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
-x = np.array([
-  2.1,          # As
-  0.96,         # ns
-  67.0,         # H0
-  0.04,         # omegab
-  0.30,         # omegam
-  0.04,         # S1
-  0.0016,       # S2
-  0.03,         # S3
-  -0.08,        # S4
-  -8.67127e-05, # S5
-  0.7,          # A11
-  -1.5,         # A12
-  0.001,        # M1
-  0.002,        # M2
-  0.003,        # M3
-  0.004,        # M4
-  0.001         # M5
-], dtype='float64')
-
-cov      = np.loadtxt(cov_file)[0:len(x),0:len(x)]
-sigma    = np.sqrt(np.diag(cov))
-
-info  = yaml_load(info_txt)
-model = get_model(info)
-bounds0 = model.prior.bounds(confidence=0.999999)
+model = get_model(yaml_load(info_txt))
 name  = list(model.parameterization.sampled_params().keys())
-
 def chi2(p):
     point = dict(zip(model.parameterization.sampled_params(),
                  model.prior.sample(ignore_external=True)[0]))
@@ -283,7 +255,6 @@ def chi2(p):
     res1 = model.logprior(point,make_finite=False)
     res2 = model.loglike(point,make_finite=False,cached=False,return_derived=False)
     return -2.0*(res1+res2)
-
 def chi2v2(p):
     point = dict(zip(model.parameterization.sampled_params(),
                  model.prior.sample(ignore_external=True)[0]))
@@ -300,13 +271,12 @@ def chi2v2(p):
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 def min_chi2(x0, 
-             bounds, 
+             bounds,
+             cov, 
              fixed=-1, 
-             maxfeval=3000, 
-             cov=cov,
+             maxfeval=3000,
              nwalkers=5,
              pool=None):
-
     def mychi2(params, *args):
         z, fixed, T = args
         params = np.array(params, dtype='float64')
@@ -382,11 +352,7 @@ def min_chi2(x0,
     result = [partial_samples[j], partial[j]]
     return result
 
-# ------------------------------------------------------------------------------
-# ------------------------------------------------------------------------------
-# ------------------------------------------------------------------------------
-
-def prf(x0, index, maxfeval, bounds, nwalkers=5, pool=None):
+def prf(x0, index, maxfeval, bounds, cov, nwalkers=5, pool=None):
     t0 = np.array(x0, dtype='float64')
     t1 = np.array(bounds, dtype="float64") # np.array do a deep copy. Deep copy necessary 
                                            # line to avoid weird bug that changes on bounds
@@ -396,38 +362,42 @@ def prf(x0, index, maxfeval, bounds, nwalkers=5, pool=None):
                     fixed=index, 
                     maxfeval=maxfeval, 
                     nwalkers=nwalkers, 
-                    pool=pool)
+                    pool=pool,
+                    cov=cov)
     return res
-
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
-
 if __name__ == '__main__':
     with MPIPool() as pool:
         if not pool.is_master():
             pool.wait()
             sys.exit(0)
-
         print(f"nwalkers={nwalkers}, maxfeval={maxfeval}")
-        
+        (x, results) = model.get_valid_point(max_tries=10000, 
+                                             ignore_fixed_ref= False,
+                                             logposterior_as_dict=True)
+        bounds0 = model.prior.bounds(confidence=0.999999)
+        cov = np.loadtxt(cov_file)[0:model.prior.d(),0:model.prior.d()]
         res = np.array(list(prf(np.array(x, dtype='float64'), 
                                index=-1, 
                                maxfeval=maxfeval, 
                                bounds=bounds0, 
                                nwalkers=nwalkers,
-                               pool=pool)), dtype="object")
+                               pool=pool,
+                               cov=cov)), dtype="object")
         x0 = np.array([res[0]],dtype='float64')
-        # Append individual chi2 (in case there are more than one data) (begins)
-        tmp = np.array([chi2v2(d) for d in x0], dtype='float64')
-        x0 = np.column_stack((x0,tmp[:,0]))
-        # Append individual chi2 (in case there are more than one data) (ends)
-        # --- saving file begins --------------------
+        # Append derived (begins) ----------------------------------------------
+        x0 = np.column_stack((x0, 
+                              np.array([chi2v2(d) for d in x0],dtype='float64'),
+                              res[1]))
+        # Append derived (ends) ------------------------------------------------
+        # --- saving file begins -----------------------------------------------
         names = list(model.parameterization.sampled_params().keys()) # Cobaya Call
-        names.append("chi2")
+        names = names+list(model.info()['likelihood'].keys())+["prior"]+["chi2"]
         rnd = random.randint(0,1000)
         print("Output file = ", oroot + "_" + str(rnd) + ".txt")
         np.savetxt(oroot + "_" + str(rnd) +".txt", 
@@ -435,7 +405,7 @@ if __name__ == '__main__':
                    fmt="%.6e",
                    header=f"nwalkers={nwalkers}, maxfeval={maxfeval}\n"+' '.join(names),
                    comments="# ")
-        # --- saving file ends --------------------
+        # --- saving file ends -------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------

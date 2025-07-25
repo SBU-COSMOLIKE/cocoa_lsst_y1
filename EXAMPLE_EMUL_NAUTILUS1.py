@@ -282,14 +282,20 @@ theory:
       extrapar: [{'MLA': 'TRF', 'INT_DIM_RES': 256, 
                   'INT_DIM_TRF': 1024, 'NC_TRF': 32, 'OUTPUT_DIM': 780}]
 """
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 model = get_model(yaml_load(info_txt))
 def likelihood(p):
     point = dict(zip(model.parameterization.sampled_params(),
                  model.prior.sample(ignore_external=True)[0]))
     names=list(model.parameterization.sampled_params().keys())
     point.update({ name: p[name].item() for name in names })
-    res1 = model.logprior(point,make_finite=False)
-    res2 = model.loglike(point,make_finite=False,cached=False,return_derived=False)
+    res1 = model.logprior(point,make_finite=True)
+    res2 = model.loglike(point,make_finite=True,cached=False,return_derived=False)
     return res1+res2
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
