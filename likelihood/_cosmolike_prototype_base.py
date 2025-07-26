@@ -84,7 +84,6 @@ class _cosmolike_prototype_base(DataSetLikelihood):
       ci.init_ntable_lmax(lmax=int(self.lmax))
       ci.init_accuracy_boost(accuracy_boost=self.accuracyboost, 
                              integration_accuracy=int(self.integration_accuracy))
-
       ci.init_cosmo_runmode(is_linear=False)
 
       if self.external_nz_modeling: 

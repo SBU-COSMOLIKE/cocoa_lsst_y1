@@ -99,12 +99,15 @@ cov_file = args.root + args.cov
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
-info_txt = r"""
+yaml_string=r"""
 likelihood:
   lsst_y1.cosmic_shear:
     path: ./external_modules/data/lsst_y1
-    data_file: lsst_y1_M1_GGL0.05.dataset
+    data_file: lsst_y1_M1_GGL0.05.dataset   # 705 non-masked elements  (EE2 delta chi^2 ~ 11.8)
     use_emulator: True
+    print_datavector: False
+    print_datavector_file: "./projects/lsst_y1/chains/example1_lsst_y1_theory_emul.modelvector"
+
 params:
   As_1e9:
     prior:
@@ -115,7 +118,7 @@ params:
       loc: 2.1
       scale: 0.65
     proposal: 0.4
-    latex: 10^9 A_\mathrm{s}
+    latex: 10^9 A_\mathrm{s})
     drop: true
     renames: A
   ns:
@@ -191,7 +194,7 @@ theory:
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
-model = get_model(yaml_load(info_txt))
+model = get_model(yaml_load(yaml_string))
 name = list(model.parameterization.sampled_params().keys())
 def chi2(p):
     point = dict(zip(model.parameterization.sampled_params(),
