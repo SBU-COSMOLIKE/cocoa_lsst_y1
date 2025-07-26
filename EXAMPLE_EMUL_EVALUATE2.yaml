@@ -20,7 +20,6 @@ likelihood:
     use_emulator: True
     print_datavector: False
     print_datavector_file: "./projects/lsst_y1/chains/example1_lsst_y1_theory_emul.modelvector"
-
 params:
   logA:
     prior:
@@ -116,7 +115,6 @@ params:
   rdrag:
     derived: true
     latex: r_\mathrm{drag}
-
 theory:
   emultheta:
     path: ./cobaya/cobaya/theories/
@@ -179,7 +177,6 @@ theory:
                'LSST_A1_1','LSST_A1_2']]
       extrapar: [{'MLA': 'TRF', 'INT_DIM_RES': 256, 
                   'INT_DIM_TRF': 1024, 'NC_TRF': 32, 'OUTPUT_DIM': 780}]
-
 sampler:
   evaluate:
     N: 1
@@ -203,5 +200,4 @@ sampler:
       LSST_M5: -0.0158096
       LSST_A1_1: 0.606102
       LSST_A1_2: -1.51541
-
 output: ./projects/lsst_y1/chains/EXAMPLE_EMUL_EVALUATE2

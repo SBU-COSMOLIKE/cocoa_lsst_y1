@@ -220,7 +220,6 @@ def min_chi2(x0,
              cov,
              fixed=-1, 
              maxfeval=3000, 
-             maxiter=10,
              nwalkers=5):
     def mychi2(params, *args):
         z, fixed, T = args
@@ -304,12 +303,11 @@ def min_chi2(x0,
     j = np.argmin(np.array(partial))
     return [partial_samples[j], partial[j]]
 
-def prf(x0, index, maxfeval, cov, nwalkers=5, maxiter=1):
+def prf(x0, index, maxfeval, cov, nwalkers=5):
     t0 = np.array(x0, dtype='float64')
     res =  min_chi2(x0=t0, 
                     fixed=index, 
                     maxfeval=maxfeval, 
-                    maxiter=maxiter,
                     nwalkers=nwalkers,
                     cov=cov)
     return res
