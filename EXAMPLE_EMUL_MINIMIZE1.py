@@ -68,10 +68,6 @@ parser.add_argument("--nwalkers",
 
 # need to use parse_known_args because of mpifuture 
 args, unknown = parser.parse_known_args()
-maxfeval    = args.maxfeval
-oroot       = args.root + "chains/" + args.outroot
-nwalkers    = args.nwalkers
-cov_file = args.root + args.cov
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
@@ -86,7 +82,6 @@ likelihood:
     use_emulator: True
     print_datavector: False
     print_datavector_file: "./projects/lsst_y1/chains/example1_lsst_y1_theory_emul.modelvector"
-
 params:
   As_1e9:
     prior:
@@ -97,7 +92,7 @@ params:
       loc: 2.1
       scale: 0.65
     proposal: 0.4
-    latex: 10^9 A_\mathrm{s})
+    latex: 10^9 A_\mathrm{s}
     drop: true
     renames: A
   ns:
@@ -152,7 +147,144 @@ params:
     latex: \Omega_\mathrm{c} h^2
   logA:
     value: 'lambda As_1e9: np.log(10*As_1e9)'
-
+  LSST_BARYON_Q1:
+    value: 0.0
+    latex: Q1_\mathrm{LSST}^1
+  LSST_BARYON_Q2:
+    value: 0.0
+    latex: Q2_\mathrm{LSST}^2
+  # WL photo-z errors
+  LSST_DZ_S1:
+    prior:
+      dist: norm
+      loc: 0.0414632
+      scale: 0.002
+    ref:
+      dist: norm
+      loc: 0.0414632
+      scale: 0.002
+    proposal: 0.002
+    latex: \Delta z_\mathrm{s,LSST}^1
+  LSST_DZ_S2:
+    prior:
+      dist: norm
+      loc: 0.00147332
+      scale: 0.002
+    ref:
+      dist: norm
+      loc: 0.00147332
+      scale: 0.002
+    proposal: 0.002
+    latex: \Delta z_\mathrm{s,LSST}^2
+  LSST_DZ_S3:
+    prior:
+      dist: norm
+      loc: 0.0237035
+      scale: 0.002
+    ref:
+      dist: norm
+      loc: 0.0237035
+      scale: 0.002
+    proposal: 0.002
+    latex: \Delta z_\mathrm{s,LSST}^3
+  LSST_DZ_S4:
+    prior:
+      dist: norm
+      loc: -0.0773436
+      scale: 0.002
+    ref:
+      dist: norm
+      loc: -0.0773436
+      scale: 0.002
+    proposal: 0.002
+    latex: \Delta z_\mathrm{s,LSST}^4
+  LSST_DZ_S5:
+    prior:
+      dist: norm
+      loc: -8.67127e-05
+      scale: 0.002
+    ref:
+      dist: norm
+      loc: -8.67127e-05
+      scale: 0.002
+    proposal: 0.002
+    latex: \Delta z_\mathrm{s,LSST}^5
+  # Intrinsic alignment
+  LSST_A1_1:
+    prior:
+      min: -5
+      max:  5
+    ref:
+      dist: norm
+      loc: 0.7
+      scale: 0.5
+    proposal: 0.5
+    latex: A_\mathrm{1-IA,LSST}^1
+  LSST_A1_2:
+    prior:
+      min: -5
+      max:  5
+    ref:
+      dist: norm
+      loc: -1.7
+      scale: 0.5
+    proposal: 0.5
+  # Shear calibration parameters
+  LSST_M1:
+    prior:
+      dist: norm
+      loc: 0.0191832
+      scale: 0.005
+    ref:
+      dist: norm
+      loc: 0.0191832
+      scale: 0.005
+    proposal: 0.005
+    latex: m_\mathrm{LSST}^1
+  LSST_M2:
+    prior:
+      dist: norm
+      loc: -0.0431752
+      scale: 0.005
+    ref:
+      dist: norm
+      loc: -0.0431752
+      scale: 0.005
+    proposal: 0.005
+    latex: m_\mathrm{LSST}^2
+  LSST_M3:
+    prior:
+      dist: norm
+      loc: -0.034961
+      scale: 0.005
+    ref:
+      dist: norm
+      loc: -0.034961
+      scale: 0.005
+    proposal: 0.005
+    latex: m_\mathrm{LSST}^3
+  LSST_M4:
+    prior:
+      dist: norm
+      loc: -0.0158096
+      scale: 0.005
+    ref:
+      dist: norm
+      loc: -0.0158096
+      scale: 0.005
+    proposal: 0.005
+    latex: m_\mathrm{LSST}^4
+  LSST_M5:
+    prior:
+      dist: norm
+      loc: -0.0158096
+      scale: 0.005
+    ref:
+      dist: norm
+      loc: -0.0158096
+      scale: 0.005
+    proposal: 0.005
+    latex: m_\mathrm{LSST}^5
 theory:
   emul_cosmic_shear:
     path: ./cobaya/cobaya/theories/
@@ -175,18 +307,12 @@ theory:
 # ------------------------------------------------------------------------------
 model = get_model(yaml_load(yaml_string))
 def chi2(p):
-    point = dict(zip(model.parameterization.sampled_params(),
-                 model.prior.sample(ignore_external=True)[0]))
-    names = list(model.parameterization.sampled_params().keys())
-    point.update({name: val for name, val in zip(names, p)})
-    res1 = model.logprior(point,make_finite=False)
-    res2 = model.loglike(point,make_finite=False,cached=False,return_derived=False)
+    point = dict(zip(model.parameterization.sampled_params(), p))
+    res1 = model.logprior(point,make_finite=True)
+    res2 = model.loglike(point,make_finite=True,cached=False,return_derived=False)
     return -2.0*(res1+res2)
 def chi2v2(p):
-    point = dict(zip(model.parameterization.sampled_params(),
-                 model.prior.sample(ignore_external=True)[0]))
-    names=list(model.parameterization.sampled_params().keys())
-    point.update({name: val for name, val in zip(names, p)})
+    point = dict(zip(model.parameterization.sampled_params(), p))
     logposterior = model.logposterior(point, as_dict=True)
     chi2likes=-2*np.array(list(logposterior["loglikes"].values()))
     chi2prior=-2*np.atleast_1d(model.logprior(point,make_finite=False))
@@ -198,7 +324,6 @@ def chi2v2(p):
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 def min_chi2(x0, 
-             bounds,
              cov, 
              fixed=-1, 
              maxfeval=3000,
@@ -214,7 +339,6 @@ def min_chi2(x0,
     if fixed > -1:
         z      = x0[fixed]
         x0     = np.delete(x0, (fixed))
-        bounds = np.delete(bounds, (fixed), axis=0)
         args = (z, fixed, 1.0)
         
         cov = np.delete(cov, (fixed), axis=0)
@@ -240,15 +364,15 @@ def min_chi2(x0,
     
     ndim        = int(x0.shape[0])
     nwalkers    = int(nwalkers)
-    nsteps      = maxfeval
+    nsteps      = np.array([  maxfeval, 
+                            2*maxfeval, 
+                              maxfeval, 
+                            int(0.5*maxfeval)], dtype='int')
     temperature = np.array([1.0, 0.25, 0.1, 0.005, 0.001], dtype='float64')
-    stepsz      = temperature/4.0
-
-    mychi2(x0, *args) # first call takes a lot longer (when running on cuda)
+    stepsz      = temperature/5.0
 
     partial_samples = []
     partial = []
-
     for i in range(len(temperature)):
         x = [] # Initial point
         for j in range(nwalkers):
@@ -263,29 +387,31 @@ def min_chi2(x0,
                                         logprob, 
                                         args=(args[0], args[1], temperature[i]),
                                         moves=[(emcee.moves.GaussianMove(cov=GScov),1.)],
-                                        pool=pool)
-        
-        sampler.run_mcmc(x, nsteps, skip_initial_state_check=True)
+                                        pool=pool)    
+        sampler.run_mcmc(x, nsteps[i], skip_initial_state_check=True)
         samples = sampler.get_chain(flat=True, thin=1, discard=0)
-
         j = np.argmin(-1.0*np.array(sampler.get_log_prob(flat=True)))
         partial_samples.append(samples[j])
         tchi2 = mychi2(samples[j], *args)
         partial.append(tchi2)
         x0 = copy.deepcopy(samples[j])
         sampler.reset()    
+        j = np.argmin(np.array(partial))
+        print(f"Partial ({i+1}/{len(temperature)}): "
+              f"params = {partial_samples[j]}, and chi2 = {partial[j]}")
     # min chi2 from the entire emcee runs
     j = np.argmin(np.array(partial))
     result = [partial_samples[j], partial[j]]
     return result
-
-def prf(x0, index, maxfeval, bounds, cov, nwalkers=5, pool=None):
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+def prf(x0, index, maxfeval, cov, nwalkers=5, pool=None):
     t0 = np.array(x0, dtype='float64')
-    t1 = np.array(bounds, dtype="float64") # np.array do a deep copy. Deep copy necessary 
-                                           # line to avoid weird bug that changes on bounds
-                                           # propagate from different iterations (same MPI core)
     res =  min_chi2(x0=t0, 
-                    bounds=t1, 
                     fixed=index, 
                     maxfeval=maxfeval, 
                     nwalkers=nwalkers, 
@@ -303,34 +429,40 @@ if __name__ == '__main__':
         if not pool.is_master():
             pool.wait()
             sys.exit(0)
-        print(f"nwalkers={nwalkers}, maxfeval={maxfeval}")
-        (x, results) = model.get_valid_point(max_tries=10000, 
-                                             ignore_fixed_ref= False,
+        nwalkers = pool.comm.Get_size()
+        maxevals = int(args.maxfeval/(5.0*nwalkers))
+
+        (x0, results) = model.get_valid_point(max_tries=1000, 
+                                             ignore_fixed_ref=False,
                                              logposterior_as_dict=True)
-        bounds0 = model.prior.bounds(confidence=0.999999)
-        cov = np.loadtxt(cov_file)[0:model.prior.d(),0:model.prior.d()]
-        res = np.array(list(prf(np.array(x, dtype='float64'), 
+        # get covariance -------------------------------------------------------
+        if args.cov is None:
+          cov = model.prior.covmat(ignore_external=False) # cov from prior
+        else:
+          cov = np.loadtxt(args.root+args.cov)[0:model.prior.d(),0:model.prior.d()]
+        
+        # run the chains -------------------------------------------------------
+        res = np.array(list(prf(np.array(x0, dtype='float64'), 
                                index=-1, 
-                               maxfeval=maxfeval, 
-                               bounds=bounds0, 
+                               maxfeval=maxevals,
                                nwalkers=nwalkers,
                                pool=pool,
                                cov=cov)), dtype="object")
-        x0 = np.array([res[0]],dtype='float64')
+        xf = np.array([res[0]],dtype='float64')
+        
         # Append derived (begins) ----------------------------------------------
-        x0 = np.column_stack((x0, 
-                              np.array([chi2v2(d) for d in x0],dtype='float64'),
+        xf = np.column_stack((xf, 
+                              np.array([chi2v2(d) for d in xf], dtype='float64'),
                               res[1]))
         # Append derived (ends) ------------------------------------------------
+        
         # --- saving file begins -----------------------------------------------
         names = list(model.parameterization.sampled_params().keys()) # Cobaya Call
         names = names+list(model.info()['likelihood'].keys())+["prior"]+["chi2"]
-        rnd = random.randint(0,1000)
-        print("Output file = ", oroot + "_" + str(rnd) + ".txt")
-        np.savetxt(oroot + "_" + str(rnd) +".txt", 
-                   x0,
+        np.savetxt(f"{args.root}chains/{args.outroot}.txt", 
+                   xf,
                    fmt="%.6e",
-                   header=f"nwalkers={nwalkers}, maxfeval={maxfeval}\n"+' '.join(names),
+                   header=f"maxfeval={args.maxfeval}\n"+' '.join(names),
                    comments="# ")
         # --- saving file ends -------------------------------------------------
 # ------------------------------------------------------------------------------
@@ -339,10 +471,3 @@ if __name__ == '__main__':
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
-#HOW TO CALL THIS SCRIPT
-#export nmpi=5
-#mpirun -n ${nmpi} --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
-#  --bind-to core:overload-allowed --mca mpi_yield_when_idle 1 \
-#  --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} \
-#  python ./projects/lsst_y1/EXAMPLE_EMUL_MINIMIZE1.py --root ./projects/lsst_y1/ \
-#  --cov 'EXAMPLE_EMUL_MCMC1.covmat' --outroot "example_min1" --nwalkers 5 --maxfeval 10000

@@ -3,6 +3,11 @@ debug: False
 stop_at_error: True
 
 likelihood:
+  planck_2018_highl_plik.TTTEEE_lite:
+    path: ./external_modules/
+    clik_file: plc_3.0/hi_l/plik_lite/plik_rd12_HM_v22b_TTTEEE_33_396
+  planck_2020_lollipop.lowlE:
+    data_folder: planck/lollipop
   lsst_y1.cosmic_shear:
     path: ./external_modules/data/lsst_y1
     data_file: lsst_y1_M1_GGL0.05.dataset   # 705 non-masked elements  (EE2 delta chi^2 ~ 11.8)

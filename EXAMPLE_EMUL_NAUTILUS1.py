@@ -9,13 +9,19 @@ warnings.filterwarnings(
 warnings.filterwarnings(
     "ignore",
     category=RuntimeWarning,
-    message=r".*overflow encountered in exp.*"
+    message=r".*overflow encountered*"
+)
+warnings.filterwarnings(
+    "ignore",
+    category=UserWarning,
+    message=r".*Hartlap correction*"
 )
 import argparse, random
 import numpy as np
 from cobaya.yaml import yaml_load
 from cobaya.model import get_model
 from nautilus import Prior, Sampler
+from getdist import loadMCSamples
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
@@ -63,6 +69,13 @@ parser.add_argument("--flive",
                     nargs='?',
                     const=1,
                     default=0.01)
+parser.add_argument("--nnetworks",
+                    dest="nnetworks",
+                    help="Number of Neural Networks",
+                    type=int,
+                    nargs='?',
+                    const=1,
+                    default=4)
 args, unknown = parser.parse_known_args()
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
@@ -78,7 +91,6 @@ likelihood:
     use_emulator: True
     print_datavector: False
     print_datavector_file: "./projects/lsst_y1/chains/example1_lsst_y1_theory_emul.modelvector"
-
 params:
   As_1e9:
     prior:
@@ -89,7 +101,7 @@ params:
       loc: 2.1
       scale: 0.65
     proposal: 0.4
-    latex: 10^9 A_\mathrm{s})
+    latex: 10^9 A_\mathrm{s}
     drop: true
     renames: A
   ns:
@@ -144,7 +156,144 @@ params:
     latex: \Omega_\mathrm{c} h^2
   logA:
     value: 'lambda As_1e9: np.log(10*As_1e9)'
-
+  LSST_BARYON_Q1:
+    value: 0.0
+    latex: Q1_\mathrm{LSST}^1
+  LSST_BARYON_Q2:
+    value: 0.0
+    latex: Q2_\mathrm{LSST}^2
+  # WL photo-z errors
+  LSST_DZ_S1:
+    prior:
+      dist: norm
+      loc: 0.0414632
+      scale: 0.002
+    ref:
+      dist: norm
+      loc: 0.0414632
+      scale: 0.002
+    proposal: 0.002
+    latex: \Delta z_\mathrm{s,LSST}^1
+  LSST_DZ_S2:
+    prior:
+      dist: norm
+      loc: 0.00147332
+      scale: 0.002
+    ref:
+      dist: norm
+      loc: 0.00147332
+      scale: 0.002
+    proposal: 0.002
+    latex: \Delta z_\mathrm{s,LSST}^2
+  LSST_DZ_S3:
+    prior:
+      dist: norm
+      loc: 0.0237035
+      scale: 0.002
+    ref:
+      dist: norm
+      loc: 0.0237035
+      scale: 0.002
+    proposal: 0.002
+    latex: \Delta z_\mathrm{s,LSST}^3
+  LSST_DZ_S4:
+    prior:
+      dist: norm
+      loc: -0.0773436
+      scale: 0.002
+    ref:
+      dist: norm
+      loc: -0.0773436
+      scale: 0.002
+    proposal: 0.002
+    latex: \Delta z_\mathrm{s,LSST}^4
+  LSST_DZ_S5:
+    prior:
+      dist: norm
+      loc: -8.67127e-05
+      scale: 0.002
+    ref:
+      dist: norm
+      loc: -8.67127e-05
+      scale: 0.002
+    proposal: 0.002
+    latex: \Delta z_\mathrm{s,LSST}^5
+  # Intrinsic alignment
+  LSST_A1_1:
+    prior:
+      min: -5
+      max:  5
+    ref:
+      dist: norm
+      loc: 0.7
+      scale: 0.5
+    proposal: 0.5
+    latex: A_\mathrm{1-IA,LSST}^1
+  LSST_A1_2:
+    prior:
+      min: -5
+      max:  5
+    ref:
+      dist: norm
+      loc: -1.7
+      scale: 0.5
+    proposal: 0.5
+  # Shear calibration parameters
+  LSST_M1:
+    prior:
+      dist: norm
+      loc: 0.0191832
+      scale: 0.005
+    ref:
+      dist: norm
+      loc: 0.0191832
+      scale: 0.005
+    proposal: 0.005
+    latex: m_\mathrm{LSST}^1
+  LSST_M2:
+    prior:
+      dist: norm
+      loc: -0.0431752
+      scale: 0.005
+    ref:
+      dist: norm
+      loc: -0.0431752
+      scale: 0.005
+    proposal: 0.005
+    latex: m_\mathrm{LSST}^2
+  LSST_M3:
+    prior:
+      dist: norm
+      loc: -0.034961
+      scale: 0.005
+    ref:
+      dist: norm
+      loc: -0.034961
+      scale: 0.005
+    proposal: 0.005
+    latex: m_\mathrm{LSST}^3
+  LSST_M4:
+    prior:
+      dist: norm
+      loc: -0.0158096
+      scale: 0.005
+    ref:
+      dist: norm
+      loc: -0.0158096
+      scale: 0.005
+    proposal: 0.005
+    latex: m_\mathrm{LSST}^4
+  LSST_M5:
+    prior:
+      dist: norm
+      loc: -0.0158096
+      scale: 0.005
+    ref:
+      dist: norm
+      loc: -0.0158096
+      scale: 0.005
+    proposal: 0.005
+    latex: m_\mathrm{LSST}^5
 theory:
   emul_cosmic_shear:
     path: ./cobaya/cobaya/theories/
@@ -182,24 +331,22 @@ def likelihood(p):
 # ------------------------------------------------------------------------------
 from mpi4py.futures import MPIPoolExecutor
 if __name__ == '__main__':
-    #rnd = random.randint(0,1000)
-    rnd = 896
-    cfile= args.root + "chains/" + args.outroot +  "_" + str(rnd) + "_checkpoint" ".hdf5"
-    print(f"nlive={args.nlive}, output={cfile}")
-    # Here we need to pass Cobaya Prior to Nautilus
-    NautilusPrior = Prior()                              # Nautilus Call 
-    dim    = model.prior.d()                             # Cobaya call
-    bounds = model.prior.bounds(confidence=0.999999)     # Cobaya call
+    print(f"nlive={args.nlive}, output={args.root}chains/{args.outroot}")
+    # Build Nautilus Prior from Cobaya
+    NautilusPrior = Prior()                                       # Nautilus Call 
+    dim    = model.prior.d()                                      # Cobaya call
+    bounds = model.prior.bounds(confidence=0.999999)              # Cobaya call
     names  = list(model.parameterization.sampled_params().keys()) # Cobaya Call
     for b, name in zip(bounds, names):
       NautilusPrior.add_parameter(name, dist=(b[0], b[1]))
-    # Start Nautilus
+    
     sampler = Sampler(NautilusPrior, 
                       likelihood,  
-                      filepath=cfile, 
+                      filepath=f"{args.root}chains/{args.outroot}_checkpoint.hdf5", 
                       n_dim=dim,
                       pool=MPIPoolExecutor(),
                       n_live=args.nlive,
+                      n_networks=args.nnetworks,
                       resume=True)
     sampler.run(f_live=args.flive,
                 n_eff=args.neff,
@@ -208,27 +355,36 @@ if __name__ == '__main__':
                 discard_exploration=True)
     points, log_w, log_l = sampler.posterior()
     
-    # --- saving file begins --------------------
-    cfile   = args.root + "chains/" + args.outroot +  "_" + str(rnd) + ".1.txt"
-    print("Output file = ", cfile)
-    np.savetxt(cfile,
+    # --- saving file begins ---------------------------------------------------
+    np.savetxt(f"{args.root}chains/{args.outroot}.1.txt",
                np.column_stack((np.exp(log_w), log_l, points, -2*log_l)),
                fmt="%.5e",
-               header=f"nlive={args.nlive}, output={cfile}",
+               header=f"nlive={args.nlive}, maxfeval={args.maxfeval}, log-Z ={sampler.log_z}\n"+' '.join(names),
                comments="# ")
-    # Now we need to save a paramname files --------------------
-    cfile   = args.root + "chains/" + args.outroot +  "_" + str(rnd) + ".paramnames"
+    
+    # Now we need to save a paramname files ------------------------------------
     param_info = model.info()['params']
     names2 = names.copy()
     latex  = [param_info[x]['latex'] for x in names2]
     names2.append("chi2*")
     latex.append("\\chi^2")
-    np.savetxt(cfile, np.column_stack((names2,latex)),fmt="%s")
-    # Now we need to save a range files --------------------
-    cfile   = args.root + "chains/" + args.outroot +  "_" + str(rnd) + ".ranges"
+    np.savetxt(f"{args.root}chains/{args.outroot}.paramnames", 
+               np.column_stack((names2,latex)),
+               fmt="%s")
+    
+    # Now we need to save a range files ----------------------------------------
     rows = [(str(n),float(l),float(h)) for n,l,h in zip(names,bounds[:,0],bounds[:,1])]
-    with open(cfile, "w") as f: 
+    with open(f"{args.root}chains/{args.outroot}.ranges", "w") as f: 
       f.writelines(f"{n} {l:.5e} {h:.5e}\n" for n, l, h in rows)
+    
+    # Now we need to save a cov matrix -----------------------------------------
+    samples = loadMCSamples(f"{args.root}chains/{args.outroot}",
+                            settings={'ignore_rows': u'0.0'})
+    np.savetxt(f"{args.root}chains/{args.outroot}.covmat",
+               np.array(samples.cov(), dtype='float64'),
+               fmt="%.5e",
+               header=' '.join(names),
+               comments="# ")
     # --- saving file ends --------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
@@ -240,5 +396,5 @@ if __name__ == '__main__':
 #mpirun -n 5 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
 #   --bind-to core:overload-allowed --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} \
 #   python -m mpi4py.futures ./projects/lsst_y1/EXAMPLE_EMUL_NAUTILUS1.py \
-#   --root ./projects/lsst_y1/ --outroot "example_nautilus1"  \
-#   --maxfeval 50000 --nlive 500 --neff 10000 --flive 0.01
+#   --root ./projects/lsst_y1/ --outroot "EXAMPLE_NAUTILUS1"  \
+#   --maxfeval 10000000 --nlive 500 --neff 15000 --flive 0.01
