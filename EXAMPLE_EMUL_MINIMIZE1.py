@@ -10,12 +10,17 @@ warnings.filterwarnings(
 warnings.filterwarnings(
     "ignore",
     category=RuntimeWarning,
-    message=r".*invalid value encountered in subtract.*"
+    message=r".*invalid value encountered*"
 )
 warnings.filterwarnings(
     "ignore",
     category=RuntimeWarning,
     message=r".*overflow encountered*"
+)
+warnings.filterwarnings(
+    "ignore",
+    category=UserWarning,
+    message=r".*Function not smooth or differentiabl*"
 )
 warnings.filterwarnings(
     "ignore",
@@ -399,14 +404,13 @@ def min_chi2(x0,
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
-def prf(x0, index, maxfeval, cov, nwalkers=5, pool=None):
-    t0 = np.array(x0, dtype='float64')
-    res =  min_chi2(x0=t0, 
-                    fixed=index, 
-                    maxfeval=maxfeval, 
-                    nwalkers=nwalkers, 
-                    pool=pool,
-                    cov=cov)
+def prf(x0, nstw, cov, fixed=-1, nwalkers=5, pool=None):
+    res =  min_chi2(x0=np.array(x0, dtype='float64'), 
+                    fixed=fixed,
+                    cov=cov, 
+                    nstw=nstw, 
+                    nwalkers=nwalkers,
+                    pool=pool)
     return res
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------

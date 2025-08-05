@@ -9,7 +9,6 @@ likelihood:
     use_emulator: True
     print_datavector: False
     print_datavector_file: "./projects/lsst_y1/chains/example1_lsst_y1_theory_emul.modelvector"
-
 params:
   As_1e9:
     prior:
@@ -213,7 +212,6 @@ params:
       scale: 0.005
     proposal: 0.005
     latex: m_\mathrm{LSST}^5
-
 theory:
   emul_cosmic_shear:
     path: ./cobaya/cobaya/theories/
@@ -227,15 +225,15 @@ theory:
                'LSST_A1_1','LSST_A1_2']]
       extrapar: [{'MLA': 'TRF', 'INT_DIM_RES': 256, 
                   'INT_DIM_TRF': 1024, 'NC_TRF': 32, 'OUTPUT_DIM': 780}]
-
 sampler:
   polychord:
     path: null
     nlive: 512
     num_repeats: 3d
     do_clustering: false
-    precision_criterion: 0.001
+    measure_speeds: False
+    oversample_power: 0
+    precision_criterion: 0.05
     boost_posterior: 10
-    feedback: 1
-
+    feedback: 2
 output: ./projects/lsst_y1/chains/EXAMPLE_EMUL_POLY1

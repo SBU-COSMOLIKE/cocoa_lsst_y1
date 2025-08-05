@@ -1,4 +1,3 @@
-import os
 import warnings
 from sklearn.exceptions import InconsistentVersionWarning
 warnings.filterwarnings("ignore", category=InconsistentVersionWarning)
@@ -27,66 +26,59 @@ warnings.filterwarnings(
     category=UserWarning,
     message=r".*Hartlap correction*"
 )
-import argparse, random
+import functools, iminuit, copy, argparse, random, time 
+import emcee, itertools
 import numpy as np
+from emcee.autocorr import AutocorrError
 from cobaya.yaml import yaml_load
 from cobaya.model import get_model
-from nautilus import Prior, Sampler
+from getdist import IniFile
 from getdist import loadMCSamples
+from schwimmbad import MPIPool
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
-parser = argparse.ArgumentParser(prog='EXAMPLE_PROJECT_NAUTILUS1')
-parser.add_argument("--root",
-                    dest="root",
-                    help="Name of the Output File",
-                    nargs='?',
-                    const=1,
-                    default="./projects/lsst_y1/")
-parser.add_argument("--outroot",
-                    dest="outroot",
-                    help="Name of the Output File",
-                    nargs='?',
-                    const=1,
-                    default="example_nautilus1")
-parser.add_argument("--nlive",
-                    dest="nlive",
-                    help="Number of live points ",
-                    type=int,
-                    nargs='?',
-                    const=1,
-                    default=1000)
+parser = argparse.ArgumentParser(prog='EXAMPLE_EMUL_EMCEE')
+
 parser.add_argument("--maxfeval",
                     dest="maxfeval",
                     help="Minimizer: maximum number of likelihood evaluations",
                     type=int,
                     nargs='?',
                     const=1,
-                    default=100000)
-parser.add_argument("--neff",
-                    dest="neff",
-                    help="Minimum effective sample size. ",
-                    type=int,
+                    default=5000)
+parser.add_argument("--root",
+                    dest="root",
+                    help="Name of the Output File",
                     nargs='?',
                     const=1,
-                    default=10000)
-parser.add_argument("--flive",
-                    dest="flive",
-                    help="Maximum fraction of the evidence contained in the live set before building the initial shells terminates",
+                    default="./projects/example/")
+parser.add_argument("--outroot",
+                    dest="outroot",
+                    help="Name of the Output File",
+                    nargs='?',
+                    const=1,
+                    default="test.dat")
+parser.add_argument("--cov",
+                    dest="cov",
+                    help="Chain Covariance Matrix",
+                    nargs='?',
+                    default=None)
+parser.add_argument("--burn_in",
+                    dest="burn_in",
+                    help="Burn-in fraction",
+                    nargs='?',
                     type=float,
+                    default=0.3)
+parser.add_argument("--progress",
+                    dest="progress",
+                    help="Show Emcee Progress",
                     nargs='?',
-                    const=1,
-                    default=0.01)
-parser.add_argument("--nnetworks",
-                    dest="nnetworks",
-                    help="Number of Neural Networks",
-                    type=int,
-                    nargs='?',
-                    const=1,
-                    default=4)
+                    type=bool,
+                    default=False)
 args, unknown = parser.parse_known_args()
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
@@ -326,81 +318,143 @@ theory:
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 model = get_model(yaml_load(yaml_string))
-def likelihood(p):
+def chi2(p):
     p = [float(v) for v in p.values()] if isinstance(p, dict) else p
     point = dict(zip(model.parameterization.sampled_params(), p))
-    res1 = model.logprior(point, 
-                          make_finite=False)
-    if np.isinf(res1):
-      return 1e20
-    res2 = model.loglike(point,
-                         make_finite=True,
-                         cached=False,
-                         return_derived=False)
-    return res1+res2
+    res1 = model.logprior(point,make_finite=True)
+    res2 = model.loglike(point,make_finite=True,cached=False,return_derived=False)
+    return -2.0*(res1+res2)
+def chi2v2(p):
+    p = [float(v) for v in p.values()] if isinstance(p, dict) else p
+    point = dict(zip(model.parameterization.sampled_params(), p))
+    logposterior = model.logposterior(point, as_dict=True)
+    chi2likes=-2*np.array(list(logposterior["loglikes"].values()))
+    chi2prior=-2*np.atleast_1d(model.logprior(point,make_finite=False))
+    return np.concatenate((chi2likes, chi2prior))
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
-from mpi4py.futures import MPIPoolExecutor
+def chain(x0,
+          ndim,
+          nwalkers,
+          cov,
+          names,
+          burn_in=0.3,
+          maxfeval=3000, 
+          pool=None):    
+    def logprob(params, *args):
+        return -0.5*chi2(params)
+
+    sampler = emcee.EnsembleSampler(nwalkers=nwalkers, 
+                                    ndim=ndim, 
+                                    log_prob_fn=logprob, 
+                                    parameter_names=names,
+                                    moves=[(emcee.moves.DEMove(), 0.8),
+                                           (emcee.moves.DESnookerMove(), 0.2)],
+                                    pool=pool)
+    sampler.run_mcmc(x0, 
+                     maxfeval, 
+                     skip_initial_state_check=True, 
+                     progress=args.progress)
+    
+    tau = sampler.get_autocorr_time(quiet=True, has_walkers=True)
+    print(f"Partial Result: tau = {tau}, nwalkers={nwalkers}")
+
+    burn_in = int(abs(burn_in)*maxfeval) if abs(burn_in) < 1 else 0
+    thin    = int(0.5 * np.min(tau))
+    xf      = sampler.get_chain(flat=True, discard=burn_in, thin=thin)
+    lnpf    = sampler.get_log_prob(flat=True, discard=burn_in, thin=thin)
+    weights = np.ones((len(xf),1), dtype='float64')
+    local_chi2    = -2*lnpf
+    
+    return [np.concatenate([weights,
+                           lnpf[:,None], 
+                           xf, 
+                           local_chi2[:,None]], axis=1), 
+            tau]
+
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 if __name__ == '__main__':
-    print(f"nlive={args.nlive}, output={args.root}chains/{args.outroot}")
-    # Build Nautilus Prior from Cobaya
-    NautilusPrior = Prior()                                       # Nautilus Call 
-    dim    = model.prior.d()                                      # Cobaya call
-    bounds = model.prior.bounds(confidence=0.999999)              # Cobaya call
-    names  = list(model.parameterization.sampled_params().keys()) # Cobaya Call
-    for b, name in zip(bounds, names):
-      NautilusPrior.add_parameter(name, dist=(b[0], b[1]))
-    
-    sampler = Sampler(NautilusPrior, 
-                      likelihood,  
-                      filepath=f"{args.root}chains/{args.outroot}_checkpoint.hdf5", 
-                      n_dim=dim,
-                      pool=MPIPoolExecutor(),
-                      n_live=args.nlive,
-                      n_networks=args.nnetworks,
-                      resume=True)
-    sampler.run(f_live=args.flive,
-                n_eff=args.neff,
-                n_like_max=args.maxfeval,
-                verbose=True,
-                discard_exploration=True)
-    points, log_w, log_l = sampler.posterior()
-    
-    # Save output file ---------------------------------------------------------
-    os.makedirs(os.path.dirname(f"{args.root}chains/"),exist_ok=True)
-    np.savetxt(f"{args.root}chains/{args.outroot}.1.txt",
-               np.column_stack((np.exp(log_w), log_l, points, -2*log_l)),
-               fmt="%.5e",
-               header=f"nlive={args.nlive}, maxfeval={args.maxfeval}, log-Z ={sampler.log_z}\n"+' '.join(names),
-               comments="# ")
-    
-    # Save a range files -------------------------------------------------------
-    rows = [(str(n),float(l),float(h)) for n,l,h in zip(names,bounds[:,0],bounds[:,1])]
-    with open(f"{args.root}chains/{args.outroot}.ranges", "w") as f: 
-      f.writelines(f"{n} {l:.5e} {h:.5e}\n" for n, l, h in rows)
+    with MPIPool() as pool:
+        if not pool.is_master():
+            pool.wait()
+            sys.exit(0)
+        
+        dim      = model.prior.d()                                      # Cobaya call
+        bounds   = model.prior.bounds(confidence=0.999999)              # Cobaya call
+        names    = list(model.parameterization.sampled_params().keys()) # Cobaya Call
+        nwalkers = max(3*dim,pool.comm.Get_size())
+        maxevals = int(args.maxfeval/(nwalkers))
+        print(f"\n\n\n"
+              f"maxfeval={args.maxfeval}, "
+              f"nwalkers={nwalkers}, "
+              f"maxfeval per walker = {maxevals}"
+              f"\n\n\n")
+        # get initial points ---------------------------------------------------
+        x0 = [] # Initial point x0
+        for j in range(nwalkers):
+          (tmp_x0, tmp) = model.get_valid_point(max_tries=10000, 
+                                                ignore_fixed_ref=False,
+                                                logposterior_as_dict=True)
+          x0.append(tmp_x0[0:dim])
+        x0 = np.array(x0, dtype='float64')
+        # get covariance -------------------------------------------------------
+        if args.cov is None:
+          cov = model.prior.covmat(ignore_external=False) # cov from prior
+        else:
+          cov = np.loadtxt(args.root+args.cov)[0:model.prior.d(),0:model.prior.d()]
+        
+        # run the chains -------------------------------------------------------
+        res = chain(x0=np.array(x0, dtype='float64'),
+                    ndim=dim,
+                    nwalkers=nwalkers,
+                    cov=cov, 
+                    names=names,
+                    maxfeval=maxevals,
+                    pool=pool,
+                    burn_in=args.burn_in if abs(args.burn_in) < 1 else 0)
 
-    # Save a paramname files ---------------------------------------------------
-    param_info = model.info()['params']
-    latex  = [param_info[x]['latex'] for x in names]
-    names.append("chi2*")
-    latex.append("\\chi^2")
-    np.savetxt(f"{args.root}chains/{args.outroot}.paramnames", 
-               np.column_stack((names,latex)),
-               fmt="%s")
+        # saving file begins ---------------------------------------------------
+        header=f"nwalkers={nwalkers}, maxfeval={args.maxfeval}, max tau={res[1]}\n"
+        np.savetxt(f"{args.root}chains/{args.outroot}.1.txt",
+                   res[0],
+                   fmt="%.5e",
+                   header=header+' '.join(names),
+                   comments="# ")
+        # Now we need to save a range files ----------------------------------------
+        comment = ["weights","lnp"]+names+["chi2*"]
+        rows = [(str(n),float(l),float(h)) for n,l,h in zip(names,bounds[:,0],bounds[:,1])]
+        with open(f"{args.root}chains/{args.outroot}.ranges", "w") as f: 
+          f.write(f"# {' '.join(comment)}\n")
+          f.writelines(f"{n} {l:.5e} {h:.5e}\n" for n, l, h in rows)
 
-    # Save a cov matrix --------------------------------------------------------
-    samples = loadMCSamples(f"{args.root}chains/{args.outroot}",
-                            settings={'ignore_rows': u'0.0'})
-    np.savetxt(f"{args.root}chains/{args.outroot}.covmat",
-               np.array(samples.cov(), dtype='float64'),
-               fmt="%.5e",
-               header=' '.join(names),
-               comments="# ")
+        # Now we need to save a paramname files --------------------------------
+        param_info = model.info()['params']
+        latex  = [param_info[x]['latex'] for x in names]
+        names.append("chi2*")
+        latex.append("\\chi^2")
+        np.savetxt(f"{args.root}chains/{args.outroot}.paramnames", 
+                   np.column_stack((names,latex)),
+                   fmt="%s")
+    
+        # Now we need to save a cov matrix -----------------------------------------
+        samples = loadMCSamples(f"{args.root}chains/{args.outroot}",
+                                settings={'ignore_rows': u'0.0'})
+        np.savetxt(f"{args.root}chains/{args.outroot}.covmat",
+                   np.array(samples.cov(), dtype='float64'),
+                   fmt="%.5e",
+                   header=' '.join(names),
+                   comments="# ")
+        # --- saving file ends -------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
