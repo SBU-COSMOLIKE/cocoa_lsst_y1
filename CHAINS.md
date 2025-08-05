@@ -216,3 +216,5 @@
 - 215 | EE2proj | wlow_walow | M2
 - 216 | EE2proj | wlow_walow | M3
 - 217 | EE2proj | wlow_walow | M4
+- 218 | EE2 | EE2REF | M2 | NOISE
+- 219 | COLA | EE2REF | M2 | NOISE
