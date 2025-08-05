@@ -1,4 +1,5 @@
 import warnings
+import os
 from sklearn.exceptions import InconsistentVersionWarning
 warnings.filterwarnings("ignore", category=InconsistentVersionWarning)
 warnings.filterwarnings(
@@ -9,13 +10,17 @@ warnings.filterwarnings(
 warnings.filterwarnings(
     "ignore",
     category=RuntimeWarning,
-    message=r".*invalid value encountered in subtract.*",
-    module=r"emcee\.moves\.mh"
+    message=r".*invalid value encountered in subtract.*"
 )
 warnings.filterwarnings(
     "ignore",
     category=RuntimeWarning,
-    message=r".*overflow encountered in exp.*"
+    message=r".*overflow encountered*"
+)
+warnings.filterwarnings(
+    "ignore",
+    category=UserWarning,
+    message=r".*Hartlap correction*"
 )
 import functools, iminuit, copy, argparse, random, time 
 import emcee, itertools
@@ -31,41 +36,25 @@ from schwimmbad import MPIPool
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 parser = argparse.ArgumentParser(prog='EXAMPLE_MINIMIZE1')
-
-parser.add_argument("--maxfeval",
-                    dest="maxfeval",
-                    help="Minimizer: maximum number of likelihood evaluations",
+parser.add_argument("--nstw",
+                    dest="nstw",
+                    help="Number of likelihood evaluations (steps) per temperature per walker",
                     type=int,
                     nargs='?',
                     const=1,
-                    default=5000)
-
+                    default=200)
 parser.add_argument("--root",
                     dest="root",
                     help="Name of the Output File",
                     nargs='?',
                     const=1,
                     default="./projects/lsst_y1/")
-
 parser.add_argument("--outroot",
                     dest="outroot",
                     help="Name of the Output File",
                     nargs='?',
                     const=1,
                     default="example_min1")
-
-parser.add_argument("--cov",
-                    dest="cov",
-                    help="Chain Covariance Matrix",
-                    nargs='?',
-                    const=1) # zero or one
-
-parser.add_argument("--nwalkers",
-                    dest="nwalkers",
-                    help="Number of emcee walkers",
-                    nargs='?',
-                    const=1)
-
 # need to use parse_known_args because of mpifuture 
 args, unknown = parser.parse_known_args()
 # ------------------------------------------------------------------------------
@@ -309,8 +298,13 @@ model = get_model(yaml_load(yaml_string))
 def chi2(p):
     p = [float(v) for v in p.values()] if isinstance(p, dict) else p
     point = dict(zip(model.parameterization.sampled_params(), p))
-    res1 = model.logprior(point,make_finite=True)
-    res2 = model.loglike(point,make_finite=True,cached=False,return_derived=False)
+    res1 = model.logprior(point,make_finite=False)
+    if np.isinf(res1):
+      return 1e20
+    res2 = model.loglike(point,
+                         make_finite=True,
+                         cached=False,
+                         return_derived=False)
     return -2.0*(res1+res2)
 def chi2v2(p):
     p = [float(v) for v in p.values()] if isinstance(p, dict) else p
@@ -328,7 +322,7 @@ def chi2v2(p):
 def min_chi2(x0, 
              cov, 
              fixed=-1, 
-             maxfeval=3000,
+             nstw=200,
              nwalkers=5,
              pool=None):
     def mychi2(params, *args):
@@ -366,36 +360,30 @@ def min_chi2(x0,
     
     ndim        = int(x0.shape[0])
     nwalkers    = int(nwalkers)
-    nsteps      = np.array([  maxfeval, 
-                            2*maxfeval, 
-                              maxfeval, 
-                            int(0.5*maxfeval)], dtype='int')
+    nstw        = int(nstw)
     temperature = np.array([1.0, 0.25, 0.1, 0.005, 0.001], dtype='float64')
-    stepsz      = temperature/5.0
+    stepsz      = temperature/3.0
 
     partial_samples = []
     partial = []
     for i in range(len(temperature)):
         x = [] # Initial point
         for j in range(nwalkers):
-            x.append(GaussianStep(stepsize=stepsz[i])(x0)[0,:])
-        x = np.array(x,dtype='float64')
-
-        GScov  = copy.deepcopy(cov)
-        GScov *= temperature[i]*stepsz[i] 
-  
+            x.append(GaussianStep(stepsize=stepsz[i])(x0)[0,:])  
         sampler = emcee.EnsembleSampler(nwalkers, 
                                         ndim, 
                                         logprob, 
                                         args=(args[0], args[1], temperature[i]),
-                                        moves=[(emcee.moves.GaussianMove(cov=GScov),1.)],
+                                        moves=[(emcee.moves.DEMove(), 0.8),
+                                               (emcee.moves.DESnookerMove(), 0.2)],
                                         pool=pool)    
-        sampler.run_mcmc(x, nsteps[i], skip_initial_state_check=True)
-        samples = sampler.get_chain(flat=True, thin=1, discard=0)
+        sampler.run_mcmc(np.array(x, dtype='float64'), 
+                         nstw, 
+                         skip_initial_state_check=True)
+        samples = sampler.get_chain(flat=True, discard=0)
         j = np.argmin(-1.0*np.array(sampler.get_log_prob(flat=True)))
         partial_samples.append(samples[j])
-        tchi2 = mychi2(samples[j], *args)
-        partial.append(tchi2)
+        partial.append(mychi2(samples[j], *args))
         x0 = copy.deepcopy(samples[j])
         sampler.reset()    
         j = np.argmin(np.array(partial))
@@ -431,42 +419,38 @@ if __name__ == '__main__':
         if not pool.is_master():
             pool.wait()
             sys.exit(0)
-        nwalkers = pool.comm.Get_size()
-        maxevals = int(args.maxfeval/(5.0*nwalkers))
-
+        dim      = model.prior.d()     
+        nwalkers = max(3*dim,pool.comm.Get_size())
+        nstw = args.nstw
         (x0, results) = model.get_valid_point(max_tries=1000, 
                                              ignore_fixed_ref=False,
                                              logposterior_as_dict=True)
-        # get covariance -------------------------------------------------------
-        if args.cov is None:
-          cov = model.prior.covmat(ignore_external=False) # cov from prior
-        else:
-          cov = np.loadtxt(args.root+args.cov)[0:model.prior.d(),0:model.prior.d()]
+        # 1st: Get covariance --------------------------------------------------
+        cov = model.prior.covmat(ignore_external=False) # cov from prior
         
-        # run the chains -------------------------------------------------------
+        # 2nd: Run Procoli -----------------------------------------------------
         res = np.array(list(prf(np.array(x0, dtype='float64'), 
-                               index=-1, 
-                               maxfeval=maxevals,
+                               fixed=-1, 
+                               nstw=nstw,
                                nwalkers=nwalkers,
                                pool=pool,
                                cov=cov)), dtype="object")
         xf = np.array([res[0]],dtype='float64')
         
-        # Append derived (begins) ----------------------------------------------
+        # 3rd Append derived parameters ----------------------------------------
         xf = np.column_stack((xf, 
                               np.array([chi2v2(d) for d in xf], dtype='float64'),
                               res[1]))
-        # Append derived (ends) ------------------------------------------------
         
-        # --- saving file begins -----------------------------------------------
+        # 4th Save output file -------------------------------------------------
         names = list(model.parameterization.sampled_params().keys()) # Cobaya Call
         names = names+list(model.info()['likelihood'].keys())+["prior"]+["chi2"]
+        os.makedirs(os.path.dirname(f"{args.root}chains/"),exist_ok=True)
         np.savetxt(f"{args.root}chains/{args.outroot}.txt", 
                    xf,
-                   fmt="%.6e",
-                   header=f"maxfeval={args.maxfeval}\n"+' '.join(names),
+                   fmt="%.7e",
+                   header=f"nswt (evals/Temp/walker)={nstw}\n"+' '.join(names),
                    comments="# ")
-        # --- saving file ends -------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
