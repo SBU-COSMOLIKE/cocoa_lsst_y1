@@ -333,14 +333,18 @@ theory:
 model = get_model(yaml_load(yaml_string))
 def chi2(p):
     p = [float(v) for v in p.values()] if isinstance(p, dict) else p
+    if np.any(np.isinf(p)) or  np.any(np.isnan(p)):
+      raise ValueError(f"At least one parameter value was infinite (CoCoa) param = {p}")
     point = dict(zip(model.parameterization.sampled_params(), p))
     res1 = model.logprior(point,make_finite=False)
-    if np.isinf(res1):
+    if np.isinf(res1) or  np.any(np.isnan(res1)):
       return 1e20
     res2 = model.loglike(point,
-                         make_finite=True,
+                         make_finite=False,
                          cached=False,
                          return_derived=False)
+    if np.isinf(res2) or  np.any(np.isnan(res2)):
+      return 1e20
     return -2.0*(res1+res2)
 def chi2v2(p):
     p = [float(v) for v in p.values()] if isinstance(p, dict) else p
@@ -570,27 +574,17 @@ if __name__ == '__main__':
             print(f"Partial ({i+1}/{numpts}): params={tmp}, and chi2={chi2res[i]}")
         
         # 8th Append derived parameters ----------------------------------------
-        tmp = [
-            etheta.calculate({
-                'thetastar': row[2],
-                'omegabh2':  row[3],
-                'omegach2':  row[4],
-                'omegamh2':  row[3] + row[4] + (0.06*(3.046/3)**0.75)/94.0708
-            })
-            for row in xf
-          ]
         xf = np.column_stack((xf, 
-                              np.array([d['H0'] for d in tmp], dtype='float64'), 
-                              np.array([d['omegam'] for d in tmp], dtype='float64'),
                               np.array([chi2v2(d) for d in xf], dtype='float64')))
 
         # 9th Save output file -------------------------------------------------    
-        comment = [names[args.profile],"chi2"]+names+["rdrag"]+list(model.info()['likelihood'].keys())+["prior"]
         os.makedirs(os.path.dirname(f"{args.root}chains/"),exist_ok=True)
+        hd = [names[args.profile],"chi2"] + names
+        hd = hd + list(model.info()['likelihood'].keys()) + ["prior"]
         np.savetxt(f"{args.root}chains/{args.outroot}.{names[args.profile]}.txt",
-                   np.concatenate([np.c_[param,chi2res],xf],axis=1),
-                   fmt="%.6e",
-                   header=f"nstw={args.nstw}, param={names[args.profile]}\n"+' '.join(comment),
+                   np.concatenate([np.c_[param, chi2res],xf], axis=1),
+                   fmt="%.9e",
+                   header=f"nstw={args.nstw}, param={names[args.profile]}\n"+' '.join(hd),
                    comments="# ")
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------

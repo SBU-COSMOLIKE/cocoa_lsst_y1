@@ -3,12 +3,12 @@ debug: False
 stop_at_error: True
 
 likelihood:
-  planck_2018_highl_plik.TTTEEE_lite:
+  planck_2018_highl_plik.TTTEEE:
     path: ./external_modules/
-    clik_file: plc_3.0/hi_l/plik_lite/plik_lite_v22_TTTEEE.clik
+    clik_file: plc_3.0/hi_l/plik/plik_rd12_HM_v22b_TTTEEE_33_396.clik
+  planck_2020_lollipop.lowlE:
+    data_folder: planck/lollipop
   planck_2018_lowl.TT:
-    path: ./external_modules
-  planck_2018_lowl.EE:
     path: ./external_modules
   bao.desi_dr2.desi_bao_all:
     path: ./external_modules/data/
@@ -16,7 +16,7 @@ likelihood:
     path: ./external_modules/data/sn_data 
   lsst_y1.cosmic_shear:
     path: ./external_modules/data/lsst_y1
-    data_file: lsst_y1_M1_GGL0.05.dataset   # 705 non-masked elements  (EE2 delta chi^2 ~ 11.8)
+    data_file: lsst_y1_M1_GGL0.05.dataset # 705 non-masked elements  (EE2 delta chi^2 ~ 11.8)
     use_emulator: True
     print_datavector: False
     print_datavector_file: "./projects/lsst_y1/chains/example1_lsst_y1_theory_emul.modelvector"
@@ -187,7 +187,6 @@ sampler:
       omegach2: 0.1201075
       thetastar: 1.04165
       tau: 0.05430842
-      A_planck: 1.00138
       LSST_DZ_S1: 0.0414632
       LSST_DZ_S2: 0.00147332
       LSST_DZ_S3: 0.0237035
@@ -200,4 +199,26 @@ sampler:
       LSST_M5: -0.0158096
       LSST_A1_1: 0.606102
       LSST_A1_2: -1.51541
+      A_planck: 1.00138
+      calib_100T: 1.00085
+      calib_217T: 0.99875
+      A_cib_217: 73.0911
+      xi_sz_cib: 0.0355977
+      A_sz: 8.21126
+      ksz_norm: 0.579585
+      gal545_A_100: 4.65916
+      gal545_A_143: 7.55786
+      gal545_A_143_217: 25.0557
+      gal545_A_217: 76.7346
+      ps_A_100_100: 271.783
+      ps_A_143_143: 33.1183
+      ps_A_143_217: 53.498
+      ps_A_217_217: 104.2
+      galf_TE_A_100: 0.166101
+      galf_TE_A_100_143: 0.253315
+      galf_TE_A_100_217: 0.741851
+      galf_TE_A_143: 0.0852018
+      galf_TE_A_143_217: 0.803256
+      galf_TE_A_217: 1.91798
+
 output: ./projects/lsst_y1/chains/EXAMPLE_EMUL_EVALUATE2

@@ -1,4 +1,5 @@
 import warnings
+import os
 from sklearn.exceptions import InconsistentVersionWarning
 warnings.filterwarnings("ignore", category=InconsistentVersionWarning)
 warnings.filterwarnings(
@@ -62,11 +63,6 @@ parser.add_argument("--outroot",
                     nargs='?',
                     const=1,
                     default="test.dat")
-parser.add_argument("--cov",
-                    dest="cov",
-                    help="Chain Covariance Matrix",
-                    nargs='?',
-                    default=None)
 parser.add_argument("--burn_in",
                     dest="burn_in",
                     help="Burn-in fraction",
@@ -200,7 +196,6 @@ params:
   rdrag:
     derived: true
     latex: r_\mathrm{drag}
-
 theory:
   emultheta:
     path: ./cobaya/cobaya/theories/
@@ -239,18 +234,6 @@ theory:
                  {'ellmax' : 5000, 'MLA': 'CNN', 'INTDIM': 4, 'INTCNN': 5120},
                  {'ellmax' : 5000, 'MLA': 'CNN', 'INTDIM': 4, 'INTCNN': 5120}, 
                  None]
-      #file: ['external_modules/data/emultrf/CMB_TRF/emul_lcdm_CMBTT_TRF.pt',
-      #       'external_modules/data/emultrf/CMB_TRF/emul_lcdm_CMBTE_TRF.pt',
-      #       'external_modules/data/emultrf/CMB_TRF/emul_lcdm_CMBEE_TRF.pt',
-      #       None] 
-      #extra: ['external_modules/data/emultrf/CMB_TRF/extra_lcdm_CMBTT_TRF.npy',
-      #        'external_modules/data/emultrf/CMB_TRF/extra_lcdm_CMBTE_TRF.npy',
-      #        'external_modules/data/emultrf/CMB_TRF/extra_lcdm_CMBEE_TRF.npy',
-      #        None]
-      #extrapar: [{'ellmax' : 5000, 'MLA': 'TRF', 'NCTRF': 16, 'INTDIM': 4, 'INTTRF': 5120},
-      #           {'ellmax' : 5000, 'MLA': 'TRF', 'NCTRF': 16, 'INTDIM': 4, 'INTTRF': 5120},
-      #           {'ellmax' : 5000, 'MLA': 'TRF', 'NCTRF': 16, 'INTDIM': 4, 'INTTRF': 5120},
-      #           None]
   emulbaosn:
     path: ./cobaya/cobaya/theories/
     stop_at_error: True
@@ -285,9 +268,18 @@ theory:
 model = get_model(yaml_load(yaml_string))
 def chi2(p):
     p = [float(v) for v in p.values()] if isinstance(p, dict) else p
+    if np.any(np.isinf(p)) or  np.any(np.isnan(p)):
+      raise ValueError(f"At least one parameter value was infinite (CoCoa) param = {p}")
     point = dict(zip(model.parameterization.sampled_params(), p))
-    res1 = model.logprior(point,make_finite=True)
-    res2 = model.loglike(point,make_finite=True,cached=False,return_derived=False)
+    res1 = model.logprior(point,make_finite=False)
+    if np.isinf(res1) or  np.any(np.isnan(res1)):
+      return 1.e20
+    res2 = model.loglike(point,
+                         make_finite=False,
+                         cached=False,
+                         return_derived=False)
+    if np.isinf(res2) or  np.any(np.isnan(res2)):
+      return 1e20
     return -2.0*(res1+res2)
 def chi2v2(p):
     p = [float(v) for v in p.values()] if isinstance(p, dict) else p
@@ -309,9 +301,14 @@ def chain(x0,
           names,
           burn_in=0.3,
           maxfeval=3000, 
-          pool=None):    
+          pool=None):  
+  
     def logprob(params, *args):
-        return -0.5*chi2(params)
+        res = chi2(params)
+        if (res > 1.e19 or np.isinf(res) or  np.isnan(res)):
+          return -np.inf
+        else:
+          return -0.5*res
 
     sampler = emcee.EnsembleSampler(nwalkers=nwalkers, 
                                     ndim=ndim, 
