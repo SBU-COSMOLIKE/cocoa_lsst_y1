@@ -112,7 +112,6 @@ params:
   rdrag:
     derived: true
     latex: r_\mathrm{drag}
-
 theory:
   emultheta:
     path: ./cobaya/cobaya/theories/
