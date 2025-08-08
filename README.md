@@ -176,3 +176,15 @@ Now, users must follow all the steps below.
       mpirun -n 90 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --rank-by slot \
           --bind-to core:overload-allowed --map-by slot --mca mpi_yield_when_idle 1 \
           cobaya-run ./projects/lsst_y1/EXAMPLE_EMUL_POLY1.yaml -f
+
+> [!Note]
+> The `Nautilis`, `Minimizer`, `Profile`, and `Emcee` scripts below contain an internally defined `yaml_string` that specifies priors, 
+> likelihoods, and the theory code, all following Cobaya Conventions.
+
+- **Nautilus**:
+
+      mpirun -n 90 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --rank-by slot \
+          --bind-to core:overload-allowed --map-by slot --mca mpi_yield_when_idle 1 \
+          python -m mpi4py.futures ./projects/example/EXAMPLE_EMUL_NAUTILUS1.py \
+              --root ./projects/lsst_y1/ --outroot "EXAMPLE_EMUL_NAUTILUS1"  \
+              --maxfeval 750000 --nlive 2048 --neff 15000 --flive 0.01 --nnetworks 5
