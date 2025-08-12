@@ -84,9 +84,9 @@ args, unknown = parser.parse_known_args()
 # ------------------------------------------------------------------------------
 yaml_string=r"""
 likelihood:
-  planck_2018_highl_plik.TTTEEE_lite:
+  planck_2018_highl_plik.TTTEEE:
     path: ./external_modules/
-    clik_file: plc_3.0/hi_l/plik_lite/plik_lite_v22_TTTEEE.clik
+    clik_file: plc_3.0/hi_l/plik/plik_rd12_HM_v22b_TTTEEE_33_396.clik
   planck_2018_lowl.TT:
     path: ./external_modules
   planck_2020_lollipop.lowlE:
@@ -369,7 +369,7 @@ if __name__ == '__main__':
         x0 = np.array(x0, dtype='float64')
         
         # get covariance -------------------------------------------------------
-        cov = model.prior.covmat(ignore_external=False) # cov from prior
+        cov = model.prior.covmat(ignore_external=True) # cov from prior
         
         # run the chains -------------------------------------------------------
         res = chain(x0=np.array(x0, dtype='float64'),

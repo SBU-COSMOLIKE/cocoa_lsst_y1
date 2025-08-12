@@ -27,8 +27,8 @@ matplotlib.rcParams['legend.labelspacing'] = 0.77
 matplotlib.rcParams['savefig.bbox'] = 'tight'
 matplotlib.rcParams['savefig.format'] = 'pdf'
 
-parameter = [u'LSST_DZ_S1', u'LSST_DZ_S2', u'LSST_DZ_S3', u'LSST_DZ_S4', 
-             u'LSST_M1', u'LSST_M2', u'LSST_M3', u'LSST_M4']
+parameter = [u'logA', u'ns', u'thetastar', u'omegabh2', u'omegach2', u'tau', 
+             u'LSST_A1_1', u'LSST_A1_2', u'chi2v2']
 chaindir  = os.environ['ROOTDIR'] + "/projects/lsst_y1/chains/"
 
 analysissettings={'smooth_scale_1D':0.25, 
@@ -42,38 +42,38 @@ analysissettings2={'smooth_scale_1D':0.25,
                    'range_confidence' : u'0.005'}
 
 root_chains = (
-  'EXAMPLE_MCMC1',
-  'EXAMPLE_EMUL_MCMC1',
-  'EXAMPLE_EMUL_NAUTILUS1',
-  'EXAMPLE_EMUL_EMCEE1',
-  'EXAMPLE_EMUL_POLY1',
+  'EXAMPLE_EMUL_MCMC2',
+  'EXAMPLE_EMUL_MCMC2',
+  'EXAMPLE_EMUL_NAUTILUS2',
+  'EXAMPLE_EMUL_EMCEE2',
+  'EXAMPLE_EMUL_POLY2',
 )
 
 # --------------------------------------------------------------------------------
 samples=loadMCSamples(chaindir + root_chains[0],settings=analysissettings)
 p = samples.getParams()
 samples.addDerived(p.chi2+2*p.minuslogprior,name='chi2v2', label='{\\chi^2_{\\rm post}}')
-samples.saveAsText(chaindir + '/.VM_P1_TMP1')
+samples.saveAsText(chaindir + '/.VM_P2_TMP1')
 # --------------------------------------------------------------------------------
 samples=loadMCSamples(chaindir + root_chains[1],settings=analysissettings)
 p = samples.getParams()
 samples.addDerived(p.chi2+2*p.minuslogprior,name='chi2v2', label='{\\chi^2_{\\rm post}}')
-samples.saveAsText(chaindir + '/.VM_P1_TMP2')
+samples.saveAsText(chaindir + '/.VM_P2_TMP2')
 # --------------------------------------------------------------------------------
 samples=loadMCSamples(chaindir+ root_chains[2], settings=analysissettings2)
 p = samples.getParams()
 samples.addDerived(p.chi2, name='chi2v2',label='{\\chi^2_{\\rm post}}')
-samples.saveAsText(chaindir + '/.VM_P1_TMP3')
+samples.saveAsText(chaindir + '/.VM_P2_TMP3')
 # --------------------------------------------------------------------------------
 samples=loadMCSamples(chaindir+ root_chains[3],settings=analysissettings2)
 p = samples.getParams()
 samples.addDerived(p.chi2, name='chi2v2', label='{\\chi^2_{\\rm post}}')
-samples.saveAsText(chaindir + '/.VM_P1_TMP4')
+samples.saveAsText(chaindir + '/.VM_P2_TMP4')
 # --------------------------------------------------------------------------------
 samples=loadMCSamples(chaindir+ root_chains[4],settings=analysissettings2)
 p = samples.getParams()
 samples.addDerived(p.chi2+2*p.minuslogprior,name='chi2v2',label='{\\chi^2_{\\rm post}}')
-samples.saveAsText(chaindir + '/.VM_P1_TMP5')
+samples.saveAsText(chaindir + '/.VM_P2_TMP5')
 # --------------------------------------------------------------------------------
 
 #GET DIST PLOT SETUP
@@ -92,11 +92,11 @@ g.legend_labels=False
 
 g.triangle_plot(
   params=parameter,
-  roots=[chaindir + '/.VM_P1_TMP1',
-         chaindir + '/.VM_P1_TMP2',
-         chaindir + '/.VM_P1_TMP3',
-         chaindir + '/.VM_P1_TMP4',
-         chaindir + '/.VM_P1_TMP5'],
+  roots=[chaindir + '/.VM_P2_TMP1',
+         chaindir + '/.VM_P2_TMP2',
+         chaindir + '/.VM_P2_TMP3',
+         chaindir + '/.VM_P2_TMP4',
+         chaindir + '/.VM_P2_TMP5'],
   plot_3d_with_param=None,
   line_args=[ {'lw': 1.0,'ls': 'solid', 'color': 'cornflowerblue'},
               {'lw': 1.0,'ls': 'solid', 'color': 'lightcoral'},
