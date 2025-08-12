@@ -185,6 +185,49 @@ Now, users must follow all the steps below.
 
       mpirun -n 90 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --rank-by slot \
           --bind-to core:overload-allowed --map-by slot --mca mpi_yield_when_idle 1 \
-          python -m mpi4py.futures ./projects/example/EXAMPLE_EMUL_NAUTILUS1.py \
+          python -m mpi4py.futures ./projects/lsst_y1/EXAMPLE_EMUL_NAUTILUS1.py \
               --root ./projects/lsst_y1/ --outroot "EXAMPLE_EMUL_NAUTILUS1"  \
               --maxfeval 750000 --nlive 2048 --neff 15000 --flive 0.01 --nnetworks 5
+
+or (Example with Planck-2018-Lite CMB + SN + BAO + LSST-Y1)
+
+      mpirun -n 90 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --rank-by slot \
+          --bind-to core:overload-allowed --map-by slot --mca mpi_yield_when_idle 1 \
+          python -m mpi4py.futures ./projects/lsst_y1/EXAMPLE_EMUL_NAUTILUS2.py \
+              --root ./projects/lsst_y1/ --outroot "EXAMPLE_EMUL_NAUTILUS2"  \
+              --maxfeval 750000 --nlive 2048 --neff 15000 --flive 0.01 --nnetworks 5
+        
+- **Emcee**:
+
+      mpirun -n 51 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --rank-by slot \
+          --bind-to core:overload-allowed --map-by slot --mca mpi_yield_when_idle 1 \
+          python ./projects/lsst_y1/EXAMPLE_EMUL_EMCEE1.py --root ./projects/lsst_y1/ \
+              --outroot "EXAMPLE_EMUL_EMCEE1" --maxfeval 450000 --burn_in 0.3
+
+or (Example with Planck-2018-Lite CMB + SN + BAO + LSST-Y1)
+
+      mpirun -n 51 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --rank-by slot \
+        --bind-to core:overload-allowed --map-by slot --mca mpi_yield_when_idle 1 \
+        python ./projects/lsst_y1/EXAMPLE_EMUL_EMCEE2.py --root ./projects/lsst_y1/ \
+            --outroot "EXAMPLE_EMUL_EMCEE2" --maxfeval 550000 --burn_in 0.3
+      
+  The number of steps per MPI worker is $n_{\\rm sw} =  {\\rm maxfeval}/n_{\\rm w}$,
+  with the number of walkers being $n_{\\rm w}={\\rm max}(3n_{\\rm params},n_{\\rm MPI})$.
+  For proper convergence, each walker should traverse 50 times the auto-correlation length,
+  which is provided in the header of the output chain file.
+  
+  The script of the plot below is provided at `projects/lsst_y1/script/EXAMPLE_PLOT_COMPARE_CHAINS_EMUL.py`
+
+- **Global Minimizer**:
+
+      mpirun -n 51 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --rank-by slot \
+          --bind-to core:overload-allowed --map-by slot --mca mpi_yield_when_idle 1 \
+          python ./projects/lsst_y1/EXAMPLE_EMUL_MINIMIZE1.py --root ./projects/lsst_y1/ \
+              --outroot "EXAMPLE_EMUL_MIN1" --nstw 150
+
+  The number of steps per Emcee walker per temperature is $n_{\\rm stw}$,
+  and the number of walkers is $n_{\\rm w}={\\rm max}(3n_{\\rm params},n_{\\rm MPI})$.
+  Do maintain $n_{\\rm sw} > 150$ for reliable results (see plot below).
+  The same rule applies to *Profile* and *Scan* codes, as they are all based on the same minimization strategy.
+
+  The script of the plot below is provided at `projects/lsst_y1/script/EXAMPLE_MIN_COMPARE_CONV.py`
