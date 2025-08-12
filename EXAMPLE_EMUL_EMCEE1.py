@@ -88,8 +88,6 @@ likelihood:
     path: ./external_modules/data/lsst_y1
     data_file: lsst_y1_M1_GGL0.05.dataset   # 705 non-masked elements  (EE2 delta chi^2 ~ 11.8)
     use_emulator: True
-    print_datavector: False
-    print_datavector_file: "./projects/lsst_y1/chains/example1_lsst_y1_theory_emul.modelvector"
 params:
   As_1e9:
     prior:
@@ -319,7 +317,7 @@ def chi2(p):
     if np.any(np.isinf(p)) or  np.any(np.isnan(p)):
       raise ValueError(f"At least one parameter value was infinite (CoCoa) param = {p}")
     point = dict(zip(model.parameterization.sampled_params(), p))
-    res1 = model.logprior(point,make_finite=False)
+    res1 = model.logprior(point, make_finite=False)
     if np.isinf(res1) or  np.any(np.isnan(res1)):
       return 1.e20
     res2 = model.loglike(point,
@@ -378,7 +376,7 @@ def chain(x0,
     xf      = sampler.get_chain(flat=True, discard=burn_in, thin=thin)
     lnpf    = sampler.get_log_prob(flat=True, discard=burn_in, thin=thin)
     weights = np.ones((len(xf),1), dtype='float64')
-    local_chi2    = -2*lnpf
+    local_chi2  = -2*lnpf
     
     return [np.concatenate([weights,
                            lnpf[:,None], 
