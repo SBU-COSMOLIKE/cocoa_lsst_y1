@@ -109,7 +109,7 @@ likelihood:
     path: ./external_modules/data/sn_data 
   lsst_y1.cosmic_shear:
     path: ./external_modules/data/lsst_y1
-    data_file: lsst_y1_M1_GGL0.05.dataset   # 705 non-masked elements  (EE2 delta chi^2 ~ 11.8)
+    data_file: lsst_y1_M1_GGL0.05.dataset
     use_emulator: True
 params:
   logA:

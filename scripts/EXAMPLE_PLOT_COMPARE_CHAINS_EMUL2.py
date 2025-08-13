@@ -112,9 +112,9 @@ g.triangle_plot(
   legend_labels=[
     'Cosmolike, MH, 4-walkers, $(R-1)_{\\rm median}$=0.02, $(R-1)_{\\rm std dev}$ = 0.2, burn-in=0.3',
     'MH, 4-walkers, $(R-1)_{\\rm median}$=0.02, $(R-1)_{\\rm std dev}$ = 0.2, burn-in=0.3',
-    'Nautilus, $n_{\\rm live}=2048$, $\\log(Z)=9.82$ ',
+    'Nautilus, $n_{\\rm live}=2048$, $\\log(Z)=-1193.63$ ',
     'EMCEE $n_{\\rm eval}=450k$, $n_{\\rm walkers}=21$, burn-in=0.3',
-    'PolyChord $n_{\\rm live}=512$, $n_{\\rm repeat}=3D$, $\\log(Z)=-20.472 \\pm 0.22$',
+    'PolyChord $n_{\\rm live}=512$, $n_{\\rm repeat}={\\rm 3D}$, $\\log(Z)=-1199.27 \\pm 0.32$',
   ],
   legend_loc=(0.375, 0.8))
 
