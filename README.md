@@ -234,8 +234,12 @@ Now, users must follow all the steps below.
   <img width="750" height="750" alt="Screenshot 2025-08-03 at 4 19 17 PM" src="https://github.com/user-attachments/assets/fe4c4dd8-ec60-43d9-bc15-a297f67bd620" />
   </p>
 
+  or (Example with `Planck CMB (l < 396) + SN + BAO + LSST-Y1` - $n_{\rm param} = 38$)
 
-
+  <p align="center">
+  <img width="750" height="750" alt="Screenshot 2025-08-03 at 4 19 17 PM" src="https://github.com/user-attachments/assets/fe4c4dd8-ec60-43d9-bc15-a297f67bd620" />
+  </p>
+  
 - **Global Minimizer**:
 
       mpirun -n 51 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --rank-by slot \
@@ -259,16 +263,9 @@ Now, users must follow all the steps below.
   <img width="750" height="750" alt="Screenshot 2025-08-12 at 8 36 33 PM" src="https://github.com/user-attachments/assets/31c36592-2d6c-4232-b5b4-5f686f9f2b8e" />
   </p>
 
-  or (Example with `Planck CMB (l < 396) + SN + BAO + LSST-Y1` - $n_{\rm param} = 38$)
-
-  <p align="center">
-  <img width="750" height="750" alt="Screenshot 2025-08-13 at 5 29 59 PM" src="https://github.com/user-attachments/assets/12130055-9697-4326-8ffe-83654e9b564d" />
-  </p>
-
   In our testing, the recommendation $n_{\rm stw} \sim 200$ worked reasonably well up to $n_{\rm param} \sim 15$. The plot below 
   illustrate that users must test the convergence of the minimizers on a case-by-case basis.
 
   <p align="center">
-  <img width="750" height="750" alt="Screenshot 2025-08-03 at 4 19 17 PM" src="https://github.com/user-attachments/assets/fe4c4dd8-ec60-43d9-bc15-a297f67bd620" />
+  <img width="750" height="750" alt="Screenshot 2025-08-13 at 5 29 59 PM" src="https://github.com/user-attachments/assets/12130055-9697-4326-8ffe-83654e9b564d" />
   </p>
-  
