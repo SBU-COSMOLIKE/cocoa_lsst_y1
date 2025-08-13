@@ -228,7 +228,7 @@ Now, users must follow all the steps below.
   For proper convergence, each walker should traverse 50 times the autocorrelation length,
   which is provided in the header of the output chain file.
   
-  The scripts that made the plots below are provided at `projects/lsst_y1/script/EXAMPLE_PLOT_COMPARE_CHAINS_EMUL[2].py`
+  The scripts that made the plots below are provided at `scripts/EXAMPLE_PLOT_COMPARE_CHAINS_EMUL[2].py`
 
   <p align="center">
   <img width="750" height="750" alt="Screenshot 2025-08-03 at 4 19 17 PM" src="https://github.com/user-attachments/assets/fe4c4dd8-ec60-43d9-bc15-a297f67bd620" />
@@ -257,7 +257,7 @@ Now, users must follow all the steps below.
   The number of steps per Emcee walker per temperature is $n_{\\rm stw}$,
   and the number of walkers is $n_{\\rm w}={\\rm max}(3n_{\\rm params},n_{\\rm MPI})$.
 
-  The script of the plot below is provided at `projects/lsst_y1/script/EXAMPLE_PLOT_MIN_COMPARE_CONV[2].py`
+  The script of the plot below is provided at `scripts/EXAMPLE_PLOT_MIN_COMPARE_CONV[2].py`
 
   <p align="center">
   <img width="750" height="750" alt="Screenshot 2025-08-12 at 8 36 33 PM" src="https://github.com/user-attachments/assets/31c36592-2d6c-4232-b5b4-5f686f9f2b8e" />
