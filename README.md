@@ -166,7 +166,7 @@ Now, users must follow all the steps below.
           --bind-to core:overload-allowed --map-by slot --mca mpi_yield_when_idle 1 \
           cobaya-run ./projects/lsst_y1/EXAMPLE_EMUL_MCMC1.yaml -f
 
-  or (Example with `Planck CMB (l < 396) + SN + BAO + LSST-Y1`)
+  or (Example with `Planck CMB (l < 396) + SN + BAO + LSST-Y1` - $n_{\rm param} = 38$)
 
       mpirun -n 4 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --rank-by slot \
           --bind-to core:overload-allowed --map-by slot --mca mpi_yield_when_idle 1 \
@@ -183,7 +183,7 @@ Now, users must follow all the steps below.
           --bind-to core:overload-allowed --map-by slot --mca mpi_yield_when_idle 1 \
           cobaya-run ./projects/lsst_y1/EXAMPLE_EMUL_POLY1.yaml -f
 
-  or (Example with `Planck CMB (l < 396) + SN + BAO + LSST-Y1` -  $n_{\rm param} \sim 38$)
+  or (Example with `Planck CMB (l < 396) + SN + BAO + LSST-Y1` -  $n_{\rm param} = 38$)
 
       mpirun -n 90 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --rank-by slot \
           --bind-to core:overload-allowed --map-by slot --mca mpi_yield_when_idle 1 \
@@ -201,7 +201,7 @@ Now, users must follow all the steps below.
               --root ./projects/lsst_y1/ --outroot "EXAMPLE_EMUL_NAUTILUS1"  \
               --maxfeval 750000 --nlive 2048 --neff 15000 --flive 0.01 --nnetworks 5
 
-  or (Example with `Planck CMB (l < 396) + SN + BAO + LSST-Y1` -  $n_{\rm param} \sim 38$)
+  or (Example with `Planck CMB (l < 396) + SN + BAO + LSST-Y1` -  $n_{\rm param} = 38$)
 
       mpirun -n 90 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --rank-by slot \
           --bind-to core:overload-allowed --map-by slot --mca mpi_yield_when_idle 1 \
@@ -216,7 +216,7 @@ Now, users must follow all the steps below.
           python ./projects/lsst_y1/EXAMPLE_EMUL_EMCEE1.py --root ./projects/lsst_y1/ \
               --outroot "EXAMPLE_EMUL_EMCEE1" --maxfeval 500000 --burn_in 0.3
 
-  or (Example with `Planck CMB (l < 396) + SN + BAO + LSST-Y1` -  $n_{\rm param} \sim 38$)
+  or (Example with `Planck CMB (l < 396) + SN + BAO + LSST-Y1` -  $n_{\rm param} = 38$)
 
       mpirun -n 90 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --rank-by slot \
         --bind-to core:overload-allowed --map-by slot --mca mpi_yield_when_idle 1 \
@@ -243,7 +243,7 @@ Now, users must follow all the steps below.
           python ./projects/lsst_y1/EXAMPLE_EMUL_MINIMIZE1.py --root ./projects/lsst_y1/ \
               --outroot "EXAMPLE_EMUL_MIN1" --nstw 250
   
-  or (Example with `Planck CMB (l < 396) + SN + BAO + LSST-Y1` -  $n_{\rm param} \sim 38$)
+  or (Example with `Planck CMB (l < 396) + SN + BAO + LSST-Y1` -  $n_{\rm param} = 38$)
 
       mpirun -n 90 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --rank-by slot \
           --bind-to core:overload-allowed --map-by slot --mca mpi_yield_when_idle 1 \
@@ -259,7 +259,7 @@ Now, users must follow all the steps below.
   <img width="750" height="750" alt="Screenshot 2025-08-12 at 8 36 33 PM" src="https://github.com/user-attachments/assets/31c36592-2d6c-4232-b5b4-5f686f9f2b8e" />
   </p>
 
-  or (Example with `Planck CMB (l < 396) + SN + BAO + LSST-Y1` - $n_{\rm param} \sim 38$)
+  or (Example with `Planck CMB (l < 396) + SN + BAO + LSST-Y1` - $n_{\rm param} = 38$)
 
   <p align="center">
   <img width="750" height="750" alt="Screenshot 2025-08-13 at 5 29 59 PM" src="https://github.com/user-attachments/assets/12130055-9697-4326-8ffe-83654e9b564d" />
