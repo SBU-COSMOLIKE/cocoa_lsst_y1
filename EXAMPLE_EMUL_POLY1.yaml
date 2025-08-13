@@ -226,7 +226,7 @@ theory:
 sampler:
   polychord:
     path: null
-    nlive: 512
+    nlive: 1024
     num_repeats: 3d
     do_clustering: false
     measure_speeds: False
