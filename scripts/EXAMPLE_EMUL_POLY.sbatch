@@ -3,9 +3,9 @@
 #SBATCH --job-name=EMPOLY
 #SBATCH --output=EMPOLY-%A-%a.out
 #SBATCH --nodes=1
-#SBATCH --ntasks=90
-#SBATCH --ntasks-per-node=90
-#SBATCH --ntasks-per-socket=45 
+#SBATCH --ntasks=92
+#SBATCH --ntasks-per-node=92
+#SBATCH --ntasks-per-socket=46 
 #SBATCH --cpus-per-task=1  
 #SBATCH --time=24:00:00
 #SBATCH --partition=high_priority
@@ -21,8 +21,7 @@ echo Slurm job ID is $SLURM_JOBID
 echo Number of task is $SLURM_NTASKS
 echo Number of cpus per task is $SLURM_CPUS_PER_TASK
 
-sleep $(( RANDOM%61 + SLURM_ARRAY_TASK_ID*10 )) # avoid different scripts running start_cocoa.sh 
-                                                # at the same time
+sleep $(( 10 + SLURM_ARRAY_TASK_ID*20 )) # avoid different scripts running start_cocoa.sh at the same time
 
 cd $SLURM_SUBMIT_DIR
 source ~/.bashrc

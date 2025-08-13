@@ -424,7 +424,7 @@ if __name__ == '__main__':
                                              ignore_fixed_ref=False,
                                              logposterior_as_dict=True)
         # 1st: Get covariance --------------------------------------------------
-        cov = model.prior.covmat(ignore_external=False) # cov from prior
+        cov = model.prior.covmat(ignore_external=True) # cov from prior
         
         # 2nd: Run Procoli -----------------------------------------------------
         res = np.array(list(prf(np.array(x0, dtype='float64'), 

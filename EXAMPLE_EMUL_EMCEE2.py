@@ -153,9 +153,8 @@ params:
     latex: \Omega_\mathrm{c} h^2
   tau:
     prior:
-      dist: norm
-      loc: 0.0544
-      scale: 0.0073
+      min: 0.04
+      max: 0.1
     ref:
       dist: norm
       loc: 0.055

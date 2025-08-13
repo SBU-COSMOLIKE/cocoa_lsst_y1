@@ -99,10 +99,10 @@ likelihood:
   planck_2018_highl_plik.TTTEEE:
     path: ./external_modules/
     clik_file: plc_3.0/hi_l/plik/plik_rd12_HM_v22b_TTTEEE_33_396.clik
-  planck_2018_lowl.TT:
-    path: ./external_modules
   planck_2020_lollipop.lowlE:
     data_folder: planck/lollipop
+  planck_2018_lowl.TT:
+    path: ./external_modules
   bao.desi_dr2.desi_bao_all:
     path: ./external_modules/data/
   sn.desy5: 
@@ -165,9 +165,8 @@ params:
     latex: \Omega_\mathrm{c} h^2
   tau:
     prior:
-      dist: norm
-      loc: 0.0544
-      scale: 0.0073
+      min: 0.04
+      max: 0.1
     ref:
       dist: norm
       loc: 0.055

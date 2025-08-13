@@ -43,7 +43,6 @@ analysissettings2={'smooth_scale_1D':0.25,
 
 root_chains = (
   'EXAMPLE_EMUL_MCMC2',
-  'EXAMPLE_EMUL_MCMC2',
   'EXAMPLE_EMUL_NAUTILUS2',
   'EXAMPLE_EMUL_EMCEE2',
   'EXAMPLE_EMUL_POLY2',
@@ -53,24 +52,19 @@ root_chains = (
 samples=loadMCSamples(chaindir + root_chains[0],settings=analysissettings)
 p = samples.getParams()
 samples.addDerived(p.chi2+2*p.minuslogprior,name='chi2v2', label='{\\chi^2_{\\rm post}}')
-samples.saveAsText(chaindir + '/.VM_P2_TMP1')
-# --------------------------------------------------------------------------------
-samples=loadMCSamples(chaindir + root_chains[1],settings=analysissettings)
-p = samples.getParams()
-samples.addDerived(p.chi2+2*p.minuslogprior,name='chi2v2', label='{\\chi^2_{\\rm post}}')
 samples.saveAsText(chaindir + '/.VM_P2_TMP2')
 # --------------------------------------------------------------------------------
-samples=loadMCSamples(chaindir+ root_chains[2], settings=analysissettings2)
+samples=loadMCSamples(chaindir+ root_chains[1], settings=analysissettings2)
 p = samples.getParams()
 samples.addDerived(p.chi2, name='chi2v2',label='{\\chi^2_{\\rm post}}')
 samples.saveAsText(chaindir + '/.VM_P2_TMP3')
 # --------------------------------------------------------------------------------
-samples=loadMCSamples(chaindir+ root_chains[3],settings=analysissettings2)
+samples=loadMCSamples(chaindir+ root_chains[2],settings=analysissettings2)
 p = samples.getParams()
 samples.addDerived(p.chi2, name='chi2v2', label='{\\chi^2_{\\rm post}}')
 samples.saveAsText(chaindir + '/.VM_P2_TMP4')
 # --------------------------------------------------------------------------------
-samples=loadMCSamples(chaindir+ root_chains[4],settings=analysissettings2)
+samples=loadMCSamples(chaindir+ root_chains[3],settings=analysissettings2)
 p = samples.getParams()
 samples.addDerived(p.chi2+2*p.minuslogprior,name='chi2v2',label='{\\chi^2_{\\rm post}}')
 samples.saveAsText(chaindir + '/.VM_P2_TMP5')
@@ -95,26 +89,24 @@ g.triangle_plot(
   roots=[chaindir + '/.VM_P2_TMP1',
          chaindir + '/.VM_P2_TMP2',
          chaindir + '/.VM_P2_TMP3',
-         chaindir + '/.VM_P2_TMP4',
-         chaindir + '/.VM_P2_TMP5'],
+         chaindir + '/.VM_P2_TMP4'],
   plot_3d_with_param=None,
-  line_args=[ {'lw': 1.0,'ls': 'solid', 'color': 'cornflowerblue'},
+  line_args=[ 
               {'lw': 1.0,'ls': 'solid', 'color': 'lightcoral'},
               {'lw': 1.2,'ls': '--', 'color': 'black'},
               {'lw': 2.1,'ls': 'dotted', 'color': 'maroon'},
               {'lw': 1.6,'ls': '-.', 'color': 'indigo'}
             ],
-  contour_colors=['cornflowerblue', 'lightcoral','black','maroon', 'indigo'],
+  contour_colors=['lightcoral','black','maroon', 'indigo'],
   contour_ls=['solid', 'solid','--','dotted','-.'], 
-  contour_lws=[1.0,1.0,1.2,2.1,1.6],
-  filled=[True,True,False,False,True],
+  contour_lws=[1.4,0.7,2.1,1.6],
+  filled=[True,False,False,True],
   shaded=False,
   legend_labels=[
-    'Cosmolike, MH, 4-walkers, $(R-1)_{\\rm median}$=0.02, $(R-1)_{\\rm std dev}$ = 0.2, burn-in=0.3',
     'MH, 4-walkers, $(R-1)_{\\rm median}$=0.02, $(R-1)_{\\rm std dev}$ = 0.2, burn-in=0.3',
-    'Nautilus, $n_{\\rm live}=2048$, $\\log(Z)=-1193.63$ ',
-    'EMCEE $n_{\\rm eval}=450k$, $n_{\\rm walkers}=21$, burn-in=0.3',
-    'PolyChord $n_{\\rm live}=512$, $n_{\\rm repeat}={\\rm 3D}$, $\\log(Z)=-1199.27 \\pm 0.32$',
+    'Nautilus, $n_{\\rm live}=3072$, $\\log(Z)=-1193.63$ ',
+    'EMCEE $n_{\\rm eval}=1,2kk$, $n_{\\rm walkers}=21$, burn-in=0.3',
+    'PolyChord $n_{\\rm live}=1024$, $n_{\\rm repeat}={\\rm 3D}$, $\\log(Z)=-1200.02 \\pm 0.23$',
   ],
   legend_loc=(0.375, 0.8))
 
