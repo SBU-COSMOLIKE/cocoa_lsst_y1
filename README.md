@@ -183,7 +183,7 @@ Now, users must follow all the steps below.
           --bind-to core:overload-allowed --map-by slot --mca mpi_yield_when_idle 1 \
           cobaya-run ./projects/lsst_y1/EXAMPLE_EMUL_POLY1.yaml -f
 
-  or (Example with `Planck CMB (l < 396) + SN + BAO + LSST-Y1` > 30 dim)
+  or (Example with `Planck CMB (l < 396) + SN + BAO + LSST-Y1` - 38 parameters)
 
       mpirun -n 90 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --rank-by slot \
           --bind-to core:overload-allowed --map-by slot --mca mpi_yield_when_idle 1 \
@@ -201,13 +201,13 @@ Now, users must follow all the steps below.
               --root ./projects/lsst_y1/ --outroot "EXAMPLE_EMUL_NAUTILUS1"  \
               --maxfeval 750000 --nlive 2048 --neff 15000 --flive 0.01 --nnetworks 5
 
-  or (Example with `Planck CMB (l < 396) + SN + BAO + LSST-Y1` > 30 dim)
+  or (Example with `Planck CMB (l < 396) + SN + BAO + LSST-Y1` - 38 parameters)
 
       mpirun -n 90 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --rank-by slot \
           --bind-to core:overload-allowed --map-by slot --mca mpi_yield_when_idle 1 \
           python -m mpi4py.futures ./projects/lsst_y1/EXAMPLE_EMUL_NAUTILUS2.py \
               --root ./projects/lsst_y1/ --outroot "EXAMPLE_EMUL_NAUTILUS2"  \
-              --maxfeval 850000 --nlive 3072 --neff 15000 --flive 0.01 --nnetworks 5
+              --maxfeval 850000 --nlive 2048 --neff 15000 --flive 0.01 --nnetworks 5
         
 - **Emcee**:
 
@@ -216,25 +216,26 @@ Now, users must follow all the steps below.
           python ./projects/lsst_y1/EXAMPLE_EMUL_EMCEE1.py --root ./projects/lsst_y1/ \
               --outroot "EXAMPLE_EMUL_EMCEE1" --maxfeval 500000 --burn_in 0.3
 
-  or (Example with `Planck CMB (l < 396) + SN + BAO + LSST-Y1` > 30 dim)
+  or (Example with `Planck CMB (l < 396) + SN + BAO + LSST-Y1` - 38 parameters)
 
       mpirun -n 90 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --rank-by slot \
         --bind-to core:overload-allowed --map-by slot --mca mpi_yield_when_idle 1 \
         python ./projects/lsst_y1/EXAMPLE_EMUL_EMCEE2.py --root ./projects/lsst_y1/ \
-            --outroot "EXAMPLE_EMUL_EMCEE2" --maxfeval 1200000 --burn_in 0.3
+            --outroot "EXAMPLE_EMUL_EMCEE2" --maxfeval 1400000 --burn_in 0.3
       
   The number of steps per MPI worker is $n_{\\rm sw} =  {\\rm maxfeval}/n_{\\rm w}$,
   with the number of walkers being $n_{\\rm w}={\\rm max}(3n_{\\rm params},n_{\\rm MPI})$.
   For proper convergence, each walker should traverse 50 times the auto-correlation length,
   which is provided in the header of the output chain file.
   
-  The scripts that made the plots below are provided at `projects/lsst_y1/script/EXAMPLE_PLOT_COMPARE_CHAINS_EMUL[1v2].py`
+  The scripts that made the plots below are provided at `projects/lsst_y1/script/EXAMPLE_PLOT_COMPARE_CHAINS_EMUL[2].py`
 
 <p align="center">
 <img width="750" height="750" alt="Screenshot 2025-08-03 at 4 19 17 PM" src="https://github.com/user-attachments/assets/fe4c4dd8-ec60-43d9-bc15-a297f67bd620" />
 </p>
+
 <p align="center">
-<img width="750" height="750" alt="Screenshot 2025-08-03 at 4 19 17 PM" src="https://github.com/user-attachments/assets/27952ced-654c-4e6e-8841-bd38c0b49fdf" />
+<img width="750" height="750" alt="Screenshot 2025-08-03 at 4 19 17 PM" src="https://github.com/user-attachments/assets/fe4c4dd8-ec60-43d9-bc15-a297f67bd620" />
 </p>
 
 - **Global Minimizer**:
@@ -243,12 +244,25 @@ Now, users must follow all the steps below.
           --bind-to core:overload-allowed --map-by slot --mca mpi_yield_when_idle 1 \
           python ./projects/lsst_y1/EXAMPLE_EMUL_MINIMIZE1.py --root ./projects/lsst_y1/ \
               --outroot "EXAMPLE_EMUL_MIN1" --nstw 250
+  
+  or (Example with `Planck CMB (l < 396) + SN + BAO + LSST-Y1` - 38 parameters)
+
+      mpirun -n 90 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --rank-by slot \
+          --bind-to core:overload-allowed --map-by slot --mca mpi_yield_when_idle 1 \
+          python ./projects/lsst_y1/EXAMPLE_EMUL_MINIMIZE2.py --root ./projects/lsst_y1/ \
+              --outroot "EXAMPLE_EMUL_MIN2" --nstw 250
 
   The number of steps per Emcee walker per temperature is $n_{\\rm stw}$,
   and the number of walkers is $n_{\\rm w}={\\rm max}(3n_{\\rm params},n_{\\rm MPI})$.
 
-  The script of the plot below is provided at `projects/lsst_y1/script/EXAMPLE_MIN_COMPARE_CONV.py`
+  The script of the plot below is provided at `projects/lsst_y1/script/EXAMPLE_PLOT_MIN_COMPARE_CONV[2].py`
 
 <p align="center">
 <img width="750" height="750" alt="Screenshot 2025-08-12 at 8 36 33 PM" src="https://github.com/user-attachments/assets/31c36592-2d6c-4232-b5b4-5f686f9f2b8e" />
+</p>
+
+  or (Example with `Planck CMB (l < 396) + SN + BAO + LSST-Y1` - 38 parameters)
+
+<p align="center">
+<img width="750" height="750" alt="Screenshot 2025-08-13 at 5 29 59 PM" src="https://github.com/user-attachments/assets/12130055-9697-4326-8ffe-83654e9b564d" />
 </p>
