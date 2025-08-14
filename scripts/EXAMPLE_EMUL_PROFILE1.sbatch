@@ -7,7 +7,7 @@
 #SBATCH --ntasks-per-node=52
 #SBATCH --ntasks-per-socket=26
 #SBATCH --cpus-per-task=1
-#SBATCH --time=48:00:00
+#SBATCH --time=9:00:00
 #SBATCH --partition=high_priority
 #SBATCH --qos=user_qos_timeifler
 #SBATCH --account=timeifler
