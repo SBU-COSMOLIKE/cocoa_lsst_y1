@@ -228,6 +228,13 @@ Now, users must follow all the steps below.
   For proper convergence, each walker should traverse 50 times the autocorrelation length ($\tau$),
   which is provided in the header of the output chain file. A reasonable rule of thumb is to assume
   $\tau > 200$ and therefore set ${\\rm maxfeval} > 10,000 \times n_{\\rm w}$. 
+
+  With these numbers, the user may ask when `Emcee` is preferable to `Metropolis-Hastings`?
+  Here are a few numbers based on our `Planck CMB (l < 396) + SN + BAO + LSST-Y1` test case.
+  In example 2, `MH` achieves convergence with $n_{\\rm sw} \sim 120,000$ (number of steps per walker), but only requires four walkers.
+  On the other hand, `Emcee` has $\tau \sim 300$, so it requires $n_{\\rm sw} \sim 15,000$ when running with $n_{\\rm w}=114$.
+  Although `Emcee` total number of evaluations is significantly higher compared to `MH` (by $\sim 10$ in our case), the number of evaluations per MPI walker (assuming one MPI worker per walker) is reduced $\sim 10$.
+  Therefore, `Emcee` seems well-suited for cases where the evaluation of a single cosmology is time-consuming.  
   
   The scripts that made the plots below are provided at `scripts/EXAMPLE_PLOT_COMPARE_CHAINS_EMUL[2].py`
 
