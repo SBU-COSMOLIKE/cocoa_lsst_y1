@@ -257,10 +257,10 @@ Now, users must follow all the steps below.
               --outroot "EXAMPLE_EMUL_MIN2" --nstw 250
 
   The number of steps per Emcee walker per temperature is $n_{\\rm stw}$,
-  and the number of walkers is $n_{\\rm w}={\\rm max}(3n_{\\rm params},n_{\\rm MPI})$. The total number of evaluations is
-  $n_{\rm param} \times n_{\\rm w} \times n_{\rm T} \times n_{\\rm stw}$, distributed, in our first example, among $n_{\\rm MPI} = 3n_{\\rm params}$ MPI processes.
+  and the number of walkers is $n_{\\rm w}={\\rm max}(3n_{\\rm params},n_{\\rm MPI})$.
+  The minimum number of total evaluations is $3n_{\\rm params} \times n_{\rm T} \times n_{\\rm stw}$, which can be distributed among $n_{\\rm MPI} = 3n_{\\rm params}$ MPI processes for faster results.
 
-  The script of the plot below is provided at `scripts/EXAMPLE_PLOT_MIN_COMPARE_CONV[2].py`
+  The scripts that generated the plots below are provided at `scripts/EXAMPLE_PLOT_MIN_COMPARE_CONV[2].py`
 
   <p align="center">
   <img width="750" height="750" alt="Screenshot 2025-08-12 at 8 36 33 PM" src="https://github.com/user-attachments/assets/31c36592-2d6c-4232-b5b4-5f686f9f2b8e" />
