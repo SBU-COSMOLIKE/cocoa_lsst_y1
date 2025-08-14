@@ -239,8 +239,8 @@ Now, users must follow all the steps below.
   Therefore, `Emcee` seems well-suited for chains where the evaluation of a single cosmology is time-consuming (and there is no slow/fast decomposition).
 
   What if the user runs an `Emcee` chain with `maxeval` insufficient for convergence? `Emcee` saves the chain checkpoint at `chains/outroot.h5` file.
-  
-  The scripts that made the plots below are provided at `scripts/EXAMPLE_PLOT_COMPARE_CHAINS_EMUL[2].py`
+
+- **Sampler Comparison** The scripts that made the plots below are provided at `scripts/EXAMPLE_PLOT_COMPARE_CHAINS_EMUL[2].py`
 
   <p align="center">
   <img width="750" height="750" alt="Screenshot 2025-08-03 at 4 19 17 PM" src="https://github.com/user-attachments/assets/fe4c4dd8-ec60-43d9-bc15-a297f67bd620" />
