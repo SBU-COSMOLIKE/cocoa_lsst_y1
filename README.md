@@ -214,19 +214,20 @@ Now, users must follow all the steps below.
       mpirun -n 51 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --rank-by slot \
           --bind-to core:overload-allowed --map-by slot --mca mpi_yield_when_idle 1 \
           python ./projects/lsst_y1/EXAMPLE_EMUL_EMCEE1.py --root ./projects/lsst_y1/ \
-              --outroot "EXAMPLE_EMUL_EMCEE1" --maxfeval 500000 --burn_in 0.3
+              --outroot "EXAMPLE_EMUL_EMCEE1" --maxfeval 500000
 
   or (Example with `Planck CMB (l < 396) + SN + BAO + LSST-Y1` -  $n_{\rm param} = 38$)
 
       mpirun -n 90 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --rank-by slot \
         --bind-to core:overload-allowed --map-by slot --mca mpi_yield_when_idle 1 \
         python ./projects/lsst_y1/EXAMPLE_EMUL_EMCEE2.py --root ./projects/lsst_y1/ \
-            --outroot "EXAMPLE_EMUL_EMCEE2" --maxfeval 1400000 --burn_in 0.3
+            --outroot "EXAMPLE_EMUL_EMCEE2" --maxfeval 2000000
       
   The number of steps per MPI worker is $n_{\\rm sw} =  {\\rm maxfeval}/n_{\\rm w}$,
   with the number of walkers being $n_{\\rm w}={\\rm max}(3n_{\\rm params},n_{\\rm MPI})$.
-  For proper convergence, each walker should traverse 50 times the autocorrelation length,
-  which is provided in the header of the output chain file.
+  For proper convergence, each walker should traverse 50 times the autocorrelation length ($\tau$),
+  which is provided in the header of the output chain file. A reasonable rule of thumb is to assume
+  $\tau > 200$ and therefore set ${\\rm maxfeval} > 10,000 \times n_{\\rm w}$. 
   
   The scripts that made the plots below are provided at `scripts/EXAMPLE_PLOT_COMPARE_CHAINS_EMUL[2].py`
 
