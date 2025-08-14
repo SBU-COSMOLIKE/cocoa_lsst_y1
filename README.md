@@ -220,7 +220,7 @@ Now, users must follow all the steps below.
 
   or (Example with `Planck CMB (l < 396) + SN + BAO + LSST-Y1` -  $n_{\rm param} = 38$)
 
-      mpirun -n 90 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --rank-by slot \
+      mpirun -n 114 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --rank-by slot \
         --bind-to core:overload-allowed --map-by slot --mca mpi_yield_when_idle 1 \
         python ./projects/lsst_y1/EXAMPLE_EMUL_EMCEE2.py --root ./projects/lsst_y1/ \
             --outroot "EXAMPLE_EMUL_EMCEE2" --maxfeval 2000000
@@ -245,15 +245,16 @@ Now, users must follow all the steps below.
 - **Sampler Comparison** The scripts that made the plots below are provided at `scripts/EXAMPLE_PLOT_COMPARE_CHAINS_EMUL[2].py`
 
   <p align="center">
-  <img width="750" height="750" alt="Screenshot 2025-08-03 at 4 19 17 PM" src="https://github.com/user-attachments/assets/fe4c4dd8-ec60-43d9-bc15-a297f67bd620" />
+  <img width="750" height="750" alt="project_lsst_plot_sampler_comparison_1" src="https://github.com/user-attachments/assets/ffc72bb0-1843-4a55-9a69-ca4c7d6b34c2" />
   </p>
 
   or (Example with `Planck CMB (l < 396) + SN + BAO + LSST-Y1` - $n_{\rm param} = 38$)
 
   <p align="center">
-  <img width="750" height="750" alt="Screenshot 2025-08-03 at 4 19 17 PM" src="https://github.com/user-attachments/assets/fe4c4dd8-ec60-43d9-bc15-a297f67bd620" />
+  <img width="750" height="750" alt="project_lsst_plot_sampler_comparison_2" src="https://github.com/user-attachments/assets/5bd7318e-864e-439d-9c3c-eaf07e267654" />
   </p>
-  
+
+
 - **Global Minimizer**:
 
   Our minimizer is a reimplementation of `Procoli`, developed by Karwal et al (arXiv:2401.14225) 
@@ -265,7 +266,7 @@ Now, users must follow all the steps below.
   
   or (Example with `Planck CMB (l < 396) + SN + BAO + LSST-Y1` -  $n_{\rm param} = 38$)
 
-      mpirun -n 90 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --rank-by slot \
+      mpirun -n 114 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --rank-by slot \
           --bind-to core:overload-allowed --map-by slot --mca mpi_yield_when_idle 1 \
           python ./projects/lsst_y1/EXAMPLE_EMUL_MINIMIZE2.py --root ./projects/lsst_y1/ \
               --outroot "EXAMPLE_EMUL_MIN2" --nstw 250
@@ -274,7 +275,7 @@ Now, users must follow all the steps below.
   and the number of walkers is $n_{\\rm w}={\\rm max}(3n_{\\rm params},n_{\\rm MPI})$.
   The minimum number of total evaluations is $3n_{\\rm params} \times n_{\rm T} \times n_{\\rm stw}$, which can be distributed among $n_{\\rm MPI} = 3n_{\\rm params}$ MPI processes for faster results.
 
-  The scripts that generated the plots below are provided at `scripts/EXAMPLE_PLOT_MIN_COMPARE_CONV[2].py`
+  The scripts that generated the plots below are provided at `scripts/EXAMPLE_PLOT_MIN_COMPARE_CONV_EMUL[2].py`
 
   <p align="center">
   <img width="750" height="750" alt="Screenshot 2025-08-12 at 8 36 33 PM" src="https://github.com/user-attachments/assets/31c36592-2d6c-4232-b5b4-5f686f9f2b8e" />
@@ -288,3 +289,35 @@ Now, users must follow all the steps below.
   <p align="center">
   <img width="750" height="750" alt="Screenshot 2025-08-13 at 5 29 59 PM" src="https://github.com/user-attachments/assets/c43b8eea-ee2e-443d-a497-cb9b2dae2fc3" />
   </p>
+
+
+- **Profile**: 
+
+      mpirun -n 51 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
+        --bind-to core:overload-allowed --rank-by slot \
+        --map-by slot:pe=${OMP_NUM_THREADS} --mca mpi_yield_when_idle 1 \
+        python ./projects/lsst_y1/EXAMPLE_EMUL_PROFILE1.py \
+          --root ./projects/lsst_y1/ --cov 'chains/EXAMPLE_EMUL_MCMC1.covmat' \
+          --outroot "EXAMPLE_EMUL_PROFILE1" --factor 3 --nstw 250 --numpts 10 \
+          --profile ${SLURM_ARRAY_TASK_ID} \
+          --minfile="./projects/lsst_y1/chains/EXAMPLE_EMUL_MIN1.txt"
+
+  or (Example with `Planck CMB (l < 396) + SN + BAO + LSST-Y1` -  $n_{\rm param} = 38$)
+
+      mpirun -n 114 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
+        --bind-to core:overload-allowed --rank-by slot \
+      --map-by slot:pe=${OMP_NUM_THREADS} --mca mpi_yield_when_idle 1 \
+      python ./projects/lsst_y1/EXAMPLE_EMUL_PROFILE2.py \
+        --root ./projects/lsst_y1/ --cov 'chains/EXAMPLE_EMUL_MCMC2.covmat' \
+        --outroot "EXAMPLE_EMUL_PROFILE2" --factor 3 --nstw 700 --numpts 10 \
+        --profile ${SLURM_ARRAY_TASK_ID} \
+        --minfile="./projects/lsst_y1/chains/EXAMPLE_EMUL_MIN2.txt"
+  
+  The argument `factor` specifies the start and end of the parameter being profiled:
+
+      start value ~ mininum value - factor*np.sqrt(np.diag(cov))
+      end   value ~ mininum value + factor*np.sqrt(np.diag(cov))
+
+  We advise ${\rm factor} \sim 3$ for parameters that are well constrained by the data when a covariance matrix is provided.
+  If `cov` is not supplied, the code estimates one internally from the prior.
+  If a parameter is poorly constrained or `cov` is not given, we recommend ${\rm factor} \ll 1$.
