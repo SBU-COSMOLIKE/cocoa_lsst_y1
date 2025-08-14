@@ -63,12 +63,6 @@ parser.add_argument("--outroot",
                     nargs='?',
                     const=1,
                     default="test.dat")
-parser.add_argument("--burn_in",
-                    dest="burn_in",
-                    help="Burn-in fraction",
-                    nargs='?',
-                    type=float,
-                    default=0.3)
 parser.add_argument("--progress",
                     dest="progress",
                     help="Show Emcee Progress",
@@ -345,9 +339,9 @@ def chain(x0,
           nwalkers,
           cov,
           names,
-          burn_in=0.3,
           maxfeval=3000, 
-          pool=None): 
+          pool=None,
+          checkpoint=None): 
 
     def logprob(params, *args):
         res = chi2(params)
@@ -356,13 +350,16 @@ def chain(x0,
         else:
           return -0.5*res
 
+    backend = emcee.backends.HDFBackend(checkpoint)
+    
     sampler = emcee.EnsembleSampler(nwalkers=nwalkers, 
                                     ndim=ndim, 
                                     log_prob_fn=logprob, 
                                     parameter_names=names,
                                     moves=[(emcee.moves.DEMove(), 0.8),
                                            (emcee.moves.DESnookerMove(), 0.2)],
-                                    pool=pool)
+                                    pool=pool,
+                                    backend=backend)
     sampler.run_mcmc(x0, 
                      maxfeval, 
                      skip_initial_state_check=True, 
@@ -371,12 +368,12 @@ def chain(x0,
     tau = sampler.get_autocorr_time(quiet=True, has_walkers=True)
     print(f"Partial Result: tau = {tau}, nwalkers={nwalkers}")
 
-    burn_in = int(abs(burn_in)*maxfeval) if abs(burn_in) < 1 else 0
-    thin    = int(0.5 * np.min(tau))
+    burn_in = int(5*np.max(tau))
+    thin    = int(0.5*np.min(tau))
     xf      = sampler.get_chain(flat=True, discard=burn_in, thin=thin)
     lnpf    = sampler.get_log_prob(flat=True, discard=burn_in, thin=thin)
     weights = np.ones((len(xf),1), dtype='float64')
-    local_chi2  = -2*lnpf
+    local_chi2 = -2*lnpf
     
     return [np.concatenate([weights,
                            lnpf[:,None], 
@@ -418,6 +415,10 @@ if __name__ == '__main__':
         # get covariance -------------------------------------------------------
         cov = model.prior.covmat(ignore_external=False) # cov from prior
         
+        # get checkpint -------------------------------------------------------
+        checkpoint = f"{args.root}chains/{args.outroot}.h5"
+      
+        #emcee.backends.HDFBackend(filename)
         # run the chains -------------------------------------------------------
         res = chain(x0=np.array(x0, dtype='float64'),
                     ndim=dim,
@@ -426,7 +427,7 @@ if __name__ == '__main__':
                     names=names,
                     maxfeval=maxevals,
                     pool=pool,
-                    burn_in=args.burn_in if abs(args.burn_in) < 1 else 0)
+                    checkpoint=checkpoint)
 
         # saving file begins ---------------------------------------------------
         os.makedirs(os.path.dirname(f"{args.root}chains/"),exist_ok=True)

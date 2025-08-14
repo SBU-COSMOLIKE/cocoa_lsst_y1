@@ -41,7 +41,7 @@ linestyles = ['solid',
               (0,(3,5,1,5)), 
               (0,(1,10)), 
               (0,(5,1))]
-sz=31
+sz=30
 data = np.array([[100+25*i,np.loadtxt(f"{rt}{i}.txt")[-1]] for i in range(sz)])
 plt.plot(data[1:sz-1,0], 
          abs(data[1:sz-1,1]-data[-1,1]), 

@@ -34,12 +34,16 @@ chaindir  = os.environ['ROOTDIR'] + "/projects/lsst_y1/chains/"
 analysissettings={'smooth_scale_1D':0.25, 
                   'smooth_scale_2D':0.25,
                   'ignore_rows': u'0.3',
-                  'range_confidence' : u'0.005'}
+                  'range_confidence' : u'0.005',
+                  'fine_bins_2D': 1024,
+                  'fine_bins_1D': 1024}
 
 analysissettings2={'smooth_scale_1D':0.25,
                    'smooth_scale_2D':0.25,
                    'ignore_rows': u'0.0',
-                   'range_confidence' : u'0.005'}
+                   'range_confidence' : u'0.005',
+                   'fine_bins_2D': 1024,
+                   'fine_bins_1D': 1024}
 
 root_chains = (
   'EXAMPLE_EMUL_MCMC2',
@@ -51,12 +55,12 @@ root_chains = (
 # --------------------------------------------------------------------------------
 samples=loadMCSamples(chaindir + root_chains[0],settings=analysissettings)
 p = samples.getParams()
-samples.addDerived(p.chi2+2*p.minuslogprior,name='chi2v2', label='{\\chi^2_{\\rm post}}')
+samples.addDerived(p.chi2+2*p.minuslogprior,name='chi2v2',label='{\\chi^2_{\\rm post}}')
 samples.saveAsText(chaindir + '/.VM_P2_TMP2')
 # --------------------------------------------------------------------------------
 samples=loadMCSamples(chaindir+ root_chains[1], settings=analysissettings2)
 p = samples.getParams()
-samples.addDerived(p.chi2, name='chi2v2',label='{\\chi^2_{\\rm post}}')
+samples.addDerived(p.chi2,name='chi2v2',label='{\\chi^2_{\\rm post}}')
 samples.saveAsText(chaindir + '/.VM_P2_TMP3')
 # --------------------------------------------------------------------------------
 samples=loadMCSamples(chaindir+ root_chains[2],settings=analysissettings2)
@@ -86,10 +90,10 @@ g.legend_labels=False
 
 g.triangle_plot(
   params=parameter,
-  roots=[chaindir + '/.VM_P2_TMP1',
-         chaindir + '/.VM_P2_TMP2',
+  roots=[chaindir + '/.VM_P2_TMP2',
          chaindir + '/.VM_P2_TMP3',
-         chaindir + '/.VM_P2_TMP4'],
+         chaindir + '/.VM_P2_TMP4',
+         chaindir + '/.VM_P2_TMP5'],
   plot_3d_with_param=None,
   line_args=[ 
               {'lw': 1.0,'ls': 'solid', 'color': 'lightcoral'},
@@ -103,10 +107,10 @@ g.triangle_plot(
   filled=[True,False,False,True],
   shaded=False,
   legend_labels=[
-    'MH, 4-walkers, $(R-1)_{\\rm median}$=0.02, $(R-1)_{\\rm std dev}$ = 0.2, burn-in=0.3',
-    'Nautilus, $n_{\\rm live}=2048$, $\\log(Z)=-1194.38$ ',
-    'EMCEE $n_{\\rm eval}=1.4kk$, $n_{\\rm walkers}=117$, burn-in=0.3',
-    'PolyChord $n_{\\rm live}=1024$, $n_{\\rm repeat}={\\rm 3D}$, $\\log(Z)=-1200.02 \\pm 0.23$',
+    'MH, 4-walkers, $(R-1)_{\\rm median}$=0.02, $(R-1)_{\\rm std dev}$ = 0.2, burn-in=0.3, $n_{\\rm eval} \\sim 600,000$',
+    'Nautilus, $n_{\\rm live}=3072$, $\\log(Z)=-1088.75$, $n_{\\rm eval} \\sim 436,000$',
+    'EMCEE $n_{\\rm eval}=2kk$, $n_{\\rm walkers}=117$, burn-in=0.3',
+    'PolyChord $n_{\\rm live}=1024$, $n_{\\rm repeat}={\\rm 3D}$, $\\log(Z)=-1094.243 \\pm 0.22$',
   ],
   legend_loc=(0.375, 0.8))
 

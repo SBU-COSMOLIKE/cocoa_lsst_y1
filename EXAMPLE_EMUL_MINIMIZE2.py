@@ -174,6 +174,138 @@ params:
   rdrag:
     derived: true
     latex: r_\mathrm{drag}
+  # WL photo-z errors
+  LSST_DZ_S1:
+    prior:
+      dist: norm
+      loc: 0.0414632
+      scale: 0.002
+    ref:
+      dist: norm
+      loc: 0.0414632
+      scale: 0.002
+    proposal: 0.002
+    latex: \Delta z_\mathrm{s,LSST}^1
+  LSST_DZ_S2:
+    prior:
+      dist: norm
+      loc: 0.00147332
+      scale: 0.002
+    ref:
+      dist: norm
+      loc: 0.00147332
+      scale: 0.002
+    proposal: 0.002
+    latex: \Delta z_\mathrm{s,LSST}^2
+  LSST_DZ_S3:
+    prior:
+      dist: norm
+      loc: 0.0237035
+      scale: 0.002
+    ref:
+      dist: norm
+      loc: 0.0237035
+      scale: 0.002
+    proposal: 0.002
+    latex: \Delta z_\mathrm{s,LSST}^3
+  LSST_DZ_S4:
+    prior:
+      dist: norm
+      loc: -0.0773436
+      scale: 0.002
+    ref:
+      dist: norm
+      loc: -0.0773436
+      scale: 0.002
+    proposal: 0.002
+    latex: \Delta z_\mathrm{s,LSST}^4
+  LSST_DZ_S5:
+    prior:
+      dist: norm
+      loc: -8.67127e-05
+      scale: 0.002
+    ref:
+      dist: norm
+      loc: -8.67127e-05
+      scale: 0.002
+    proposal: 0.002
+    latex: \Delta z_\mathrm{s,LSST}^5
+  # Intrinsic alignment
+  LSST_A1_1:
+    prior:
+      min: -5
+      max:  5
+    ref:
+      dist: norm
+      loc: 0.7
+      scale: 0.5
+    proposal: 0.5
+    latex: A_\mathrm{1-IA,LSST}^1
+  LSST_A1_2:
+    prior:
+      min: -5
+      max:  5
+    ref:
+      dist: norm
+      loc: -1.7
+      scale: 0.5
+    proposal: 0.5
+  # Shear calibration parameters
+  LSST_M1:
+    prior:
+      dist: norm
+      loc: 0.0191832
+      scale: 0.005
+    ref:
+      dist: norm
+      loc: 0.0191832
+      scale: 0.005
+    proposal: 0.005
+    latex: m_\mathrm{LSST}^1
+  LSST_M2:
+    prior:
+      dist: norm
+      loc: -0.0431752
+      scale: 0.005
+    ref:
+      dist: norm
+      loc: -0.0431752
+      scale: 0.005
+    proposal: 0.005
+    latex: m_\mathrm{LSST}^2
+  LSST_M3:
+    prior:
+      dist: norm
+      loc: -0.034961
+      scale: 0.005
+    ref:
+      dist: norm
+      loc: -0.034961
+      scale: 0.005
+    proposal: 0.005
+    latex: m_\mathrm{LSST}^3
+  LSST_M4:
+    prior:
+      dist: norm
+      loc: -0.0158096
+      scale: 0.005
+    ref:
+      dist: norm
+      loc: -0.0158096
+      scale: 0.005
+    proposal: 0.005
+    latex: m_\mathrm{LSST}^4
+  LSST_M5:
+    prior:
+      dist: norm
+      loc: -0.0158096
+      scale: 0.005
+    ref:
+      dist: norm
+      loc: -0.0158096
+      scale: 0.005
+    proposal: 0.005
+    latex: m_\mathrm{LSST}^5
 theory:
   emultheta:
     path: ./cobaya/cobaya/theories/

@@ -381,15 +381,12 @@ def min_chi2(x0,
     else:
         args = (0.0, -2.0, 1.0)
 
-    def log_prior(params):
-        return 1.0
-    
     def logprob(params, *args):
-        lp = log_prior(params)
-        if not np.isfinite(lp):
-            return -np.inf
+        res = mychi2(params, *args)
+        if (res > 1.e19 or np.isinf(res) or  np.isnan(res)):
+          return -np.inf
         else:
-            return -0.5*mychi2(params, *args) + lp
+          return -0.5*res
     
     class GaussianStep:
        def __init__(self, stepsize=0.2):
