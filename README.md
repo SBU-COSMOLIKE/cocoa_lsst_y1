@@ -207,28 +207,42 @@ Now, users must follow all the steps below.
           --bind-to core:overload-allowed --map-by slot --mca mpi_yield_when_idle 1 \
           python -m mpi4py.futures ./projects/lsst_y1/EXAMPLE_EMUL_NAUTILUS2.py \
               --root ./projects/lsst_y1/ --outroot "EXAMPLE_EMUL_NAUTILUS2"  \
-              --maxfeval 850000 --nlive 2048 --neff 15000 --flive 0.01 --nnetworks 5
-        
+              --maxfeval 850000 --nlive 3072 --neff 15000 --flive 0.01 --nnetworks 5
+
+  What if the user runs an `Nautilus` chain with `maxeval` insufficient for producing `neff` samples? `Nautilus` saves the chain checkpoint at `chains/outroot_checkpoint.hdf5`.
+
 - **Emcee**:
 
       mpirun -n 51 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --rank-by slot \
           --bind-to core:overload-allowed --map-by slot --mca mpi_yield_when_idle 1 \
           python ./projects/lsst_y1/EXAMPLE_EMUL_EMCEE1.py --root ./projects/lsst_y1/ \
-              --outroot "EXAMPLE_EMUL_EMCEE1" --maxfeval 500000 --burn_in 0.3
+              --outroot "EXAMPLE_EMUL_EMCEE1" --maxfeval 1000000
 
   or (Example with `Planck CMB (l < 396) + SN + BAO + LSST-Y1` -  $n_{\rm param} = 38$)
 
       mpirun -n 90 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --rank-by slot \
         --bind-to core:overload-allowed --map-by slot --mca mpi_yield_when_idle 1 \
         python ./projects/lsst_y1/EXAMPLE_EMUL_EMCEE2.py --root ./projects/lsst_y1/ \
-            --outroot "EXAMPLE_EMUL_EMCEE2" --maxfeval 1400000 --burn_in 0.3
+            --outroot "EXAMPLE_EMUL_EMCEE2" --maxfeval 2000000
       
   The number of steps per MPI worker is $n_{\\rm sw} =  {\\rm maxfeval}/n_{\\rm w}$,
   with the number of walkers being $n_{\\rm w}={\\rm max}(3n_{\\rm params},n_{\\rm MPI})$.
-  For proper convergence, each walker should traverse 50 times the autocorrelation length,
-  which is provided in the header of the output chain file.
+  For proper convergence, each walker should traverse 50 times the autocorrelation length ($\tau$),
+  which is provided in the header of the output chain file. A reasonable rule of thumb is to assume
+  $\tau > 200$ and therefore set ${\\rm maxfeval} > 10,000 \times n_{\\rm w}$.
+  Finally, our code sets burn-in (per walker) at $5 \times \tau$.
+
+  With these numbers, users may ask when `Emcee` is preferable to `Metropolis-Hastings`?
+  Here are a few numbers based on our `Planck CMB (l < 396) + SN + BAO + LSST-Y1` test case.
+  1) `MH` achieves convergence with $n_{\\rm sw} \sim 150,000$ (number of steps per walker), but only requires four walkers.
+  2) `Emcee` has $\tau \sim 300$, so it requires $n_{\\rm sw} \sim 15,000$ when running with $n_{\\rm w}=114$.
   
-  The scripts that made the plots below are provided at `scripts/EXAMPLE_PLOT_COMPARE_CHAINS_EMUL[2].py`
+  Conclusion: `Emcee` requires $\sim 3$ more evaluations in this case, but the number of evaluations per MPI worker (assuming one MPI worker per walker) is reduced by $\sim 10$.
+  Therefore, `Emcee` seems well-suited for chains where the evaluation of a single cosmology is time-consuming (and there is no slow/fast decomposition).
+
+  What if the user runs an `Emcee` chain with `maxeval` insufficient for convergence? `Emcee` saves the chain checkpoint at `chains/outroot.h5`.
+
+- **Sampler Comparison** The scripts that made the plots below are provided at `scripts/EXAMPLE_PLOT_COMPARE_CHAINS_EMUL[2].py`
 
   <p align="center">
   <img width="750" height="750" alt="Screenshot 2025-08-03 at 4 19 17 PM" src="https://github.com/user-attachments/assets/fe4c4dd8-ec60-43d9-bc15-a297f67bd620" />
@@ -241,6 +255,8 @@ Now, users must follow all the steps below.
   </p>
   
 - **Global Minimizer**:
+
+  Our minimizer is a reimplementation of `Procoli`, developed by Karwal et al (arXiv:2401.14225) 
 
       mpirun -n 51 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --rank-by slot \
           --bind-to core:overload-allowed --map-by slot --mca mpi_yield_when_idle 1 \
@@ -256,16 +272,19 @@ Now, users must follow all the steps below.
 
   The number of steps per Emcee walker per temperature is $n_{\\rm stw}$,
   and the number of walkers is $n_{\\rm w}={\\rm max}(3n_{\\rm params},n_{\\rm MPI})$.
+  The minimum number of total evaluations is $3n_{\\rm params} \times n_{\rm T} \times n_{\\rm stw}$, which can be distributed among $n_{\\rm MPI} = 3n_{\\rm params}$ MPI processes for faster results.
 
-  The script of the plot below is provided at `scripts/EXAMPLE_PLOT_MIN_COMPARE_CONV[2].py`
+  The scripts that generated the plots below are provided at `scripts/EXAMPLE_PLOT_MIN_COMPARE_CONV[2].py`
 
   <p align="center">
   <img width="750" height="750" alt="Screenshot 2025-08-12 at 8 36 33 PM" src="https://github.com/user-attachments/assets/31c36592-2d6c-4232-b5b4-5f686f9f2b8e" />
   </p>
 
-  In our testing, the recommendation $n_{\rm stw} \sim 200$ worked reasonably well up to $n_{\rm param} \sim 15$. The plot below ($n_{\rm param} = 38$)
-  illustrate that users must test the convergence of the minimizers on a case-by-case basis.
+  In our testing, $n_{\\rm stw} \sim 200$ worked reasonably well up to $n_{\rm param} \sim \mathcal{O}(10)$.
+  Below we show a case with $n_{\rm param} = 38$ that illustrates the need for performing convergence tests on a case-by-case basis.
+  In this example, the total number of evaluations for a reliable minimum is approximately $319,200$ ($n_{\\rm stw} \sim 700$), distributed among $n_{\\rm MPI} = 114$ processes for faster results.
+  With the use of emulators, such minima can be computed with $\mathcal{O}(1)$ MPI workers.
 
   <p align="center">
-  <img width="750" height="750" alt="Screenshot 2025-08-13 at 5 29 59 PM" src="https://github.com/user-attachments/assets/12130055-9697-4326-8ffe-83654e9b564d" />
+  <img width="750" height="750" alt="Screenshot 2025-08-13 at 5 29 59 PM" src="https://github.com/user-attachments/assets/c43b8eea-ee2e-443d-a497-cb9b2dae2fc3" />
   </p>
