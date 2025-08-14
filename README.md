@@ -267,5 +267,5 @@ Now, users must follow all the steps below.
   illustrate that users must test the convergence of the minimizers on a case-by-case basis.
 
   <p align="center">
-  <img width="750" height="750" alt="Screenshot 2025-08-13 at 5 29 59 PM" src="https://github.com/user-attachments/assets/12130055-9697-4326-8ffe-83654e9b564d" />
+  <img width="750" height="750" alt="Screenshot 2025-08-13 at 5 29 59 PM" src="https://github.com/user-attachments/assets/c43b8eea-ee2e-443d-a497-cb9b2dae2fc3" />
   </p>
