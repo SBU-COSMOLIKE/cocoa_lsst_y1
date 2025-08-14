@@ -220,7 +220,7 @@ Now, users must follow all the steps below.
 
   or (Example with `Planck CMB (l < 396) + SN + BAO + LSST-Y1` -  $n_{\rm param} = 38$)
 
-      mpirun -n 117 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --rank-by slot \
+      mpirun -n 114 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --rank-by slot \
         --bind-to core:overload-allowed --map-by slot --mca mpi_yield_when_idle 1 \
         python ./projects/lsst_y1/EXAMPLE_EMUL_EMCEE2.py --root ./projects/lsst_y1/ \
             --outroot "EXAMPLE_EMUL_EMCEE2" --maxfeval 2000000
@@ -265,7 +265,7 @@ Now, users must follow all the steps below.
   
   or (Example with `Planck CMB (l < 396) + SN + BAO + LSST-Y1` -  $n_{\rm param} = 38$)
 
-      mpirun -n 117 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --rank-by slot \
+      mpirun -n 114 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --rank-by slot \
           --bind-to core:overload-allowed --map-by slot --mca mpi_yield_when_idle 1 \
           python ./projects/lsst_y1/EXAMPLE_EMUL_MINIMIZE2.py --root ./projects/lsst_y1/ \
               --outroot "EXAMPLE_EMUL_MIN2" --nstw 250
@@ -302,7 +302,7 @@ Now, users must follow all the steps below.
 
   or (Example with `Planck CMB (l < 396) + SN + BAO + LSST-Y1` -  $n_{\rm param} = 38$)
 
-      mpirun -n 117 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
+      mpirun -n 114 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
         --bind-to core:overload-allowed --rank-by slot \
       --map-by slot:pe=${OMP_NUM_THREADS} --mca mpi_yield_when_idle 1 \
       python ./projects/lsst_y1/EXAMPLE_EMUL_PROFILE2.py \
