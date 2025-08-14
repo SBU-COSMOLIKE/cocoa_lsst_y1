@@ -254,6 +254,7 @@ Now, users must follow all the steps below.
   <img width="750" height="750" alt="Screenshot 2025-08-03 at 4 19 17 PM" src="https://github.com/user-attachments/assets/cf5ee4bf-b9fb-4658-88e7-78ab3c4b7352" />
   </p>
 
+
 - **Global Minimizer**:
 
   Our minimizer is a reimplementation of `Procoli`, developed by Karwal et al (arXiv:2401.14225) 
