@@ -245,13 +245,13 @@ Now, users must follow all the steps below.
 - **Sampler Comparison** The scripts that made the plots below are provided at `scripts/EXAMPLE_PLOT_COMPARE_CHAINS_EMUL[2].py`
 
   <p align="center">
-  <img width="750" height="750" alt="Screenshot 2025-08-03 at 4 19 17 PM" src="https://github.com/user-attachments/assets/ffc72bb0-1843-4a55-9a69-ca4c7d6b34c2" />
+  <img width="750" height="750" alt="project_lsst_plot_sampler_comparison_1" src="https://github.com/user-attachments/assets/ffc72bb0-1843-4a55-9a69-ca4c7d6b34c2" />
   </p>
 
   or (Example with `Planck CMB (l < 396) + SN + BAO + LSST-Y1` - $n_{\rm param} = 38$)
 
   <p align="center">
-  <img width="750" height="750" alt="Screenshot 2025-08-03 at 4 19 17 PM" src="https://github.com/user-attachments/assets/5bd7318e-864e-439d-9c3c-eaf07e267654" />
+  <img width="750" height="750" alt="project_lsst_plot_sampler_comparison_2" src="https://github.com/user-attachments/assets/5bd7318e-864e-439d-9c3c-eaf07e267654" />
   </p>
 
 
