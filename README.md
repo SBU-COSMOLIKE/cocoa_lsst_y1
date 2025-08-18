@@ -262,14 +262,14 @@ Now, users must follow all the steps below.
       mpirun -n 51 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --rank-by slot \
           --bind-to core:overload-allowed --map-by slot --mca mpi_yield_when_idle 1 \
           python ./projects/lsst_y1/EXAMPLE_EMUL_MINIMIZE1.py --root ./projects/lsst_y1/ \
-              --outroot "EXAMPLE_EMUL_MIN1" --nstw 250
+              --outroot "EXAMPLE_EMUL_MIN1" --nstw 350
   
   or (Example with `Planck CMB (l < 396) + SN + BAO + LSST-Y1` -  $n_{\rm param} = 38$)
 
       mpirun -n 114 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --rank-by slot \
           --bind-to core:overload-allowed --map-by slot --mca mpi_yield_when_idle 1 \
           python ./projects/lsst_y1/EXAMPLE_EMUL_MINIMIZE2.py --root ./projects/lsst_y1/ \
-              --outroot "EXAMPLE_EMUL_MIN2" --nstw 250
+              --outroot "EXAMPLE_EMUL_MIN2" --nstw 750
 
   The number of steps per Emcee walker per temperature is $n_{\\rm stw}$,
   and the number of walkers is $n_{\\rm w}={\\rm max}(3n_{\\rm params},n_{\\rm MPI})$.
@@ -298,7 +298,7 @@ Now, users must follow all the steps below.
         --map-by slot:pe=${OMP_NUM_THREADS} --mca mpi_yield_when_idle 1 \
         python ./projects/lsst_y1/EXAMPLE_EMUL_PROFILE1.py \
           --root ./projects/lsst_y1/ --cov 'chains/EXAMPLE_EMUL_MCMC1.covmat' \
-          --outroot "EXAMPLE_EMUL_PROFILE1" --factor 3 --nstw 250 --numpts 10 \
+          --outroot "EXAMPLE_EMUL_PROFILE1" --factor 3 --nstw 350 --numpts 10 \
           --profile ${SLURM_ARRAY_TASK_ID} \
           --minfile="./projects/lsst_y1/chains/EXAMPLE_EMUL_MIN1.txt"
 
@@ -309,7 +309,7 @@ Now, users must follow all the steps below.
       --map-by slot:pe=${OMP_NUM_THREADS} --mca mpi_yield_when_idle 1 \
       python ./projects/lsst_y1/EXAMPLE_EMUL_PROFILE2.py \
         --root ./projects/lsst_y1/ --cov 'chains/EXAMPLE_EMUL_MCMC2.covmat' \
-        --outroot "EXAMPLE_EMUL_PROFILE2" --factor 3 --nstw 700 --numpts 10 \
+        --outroot "EXAMPLE_EMUL_PROFILE2" --factor 3 --nstw 750 --numpts 10 \
         --profile ${SLURM_ARRAY_TASK_ID} \
         --minfile="./projects/lsst_y1/chains/EXAMPLE_EMUL_MIN2.txt"
   
@@ -321,3 +321,17 @@ Now, users must follow all the steps below.
   We advise ${\rm factor} \sim 3$ for parameters that are well constrained by the data when a covariance matrix is provided.
   If `cov` is not supplied, the code estimates one internally from the prior.
   If a parameter is poorly constrained or `cov` is not given, we recommend ${\rm factor} \ll 1$.
+
+  The script of the plot below is provided at `projects/lsst_y1/scripts/EXAMPLE_PLOT_PROFILE1[2].py
+
+  Profile 1: `LSST-Y1 Cosmic Shear only`
+  
+  <p align="center">
+  <img width="1156" height="858" alt="example_lssty1_profile1" src="https://github.com/user-attachments/assets/11f0f0dd-23e6-4875-bd8e-afbb11ac4e48" />
+  </p>
+
+  Profile 2: `Planck CMB (l < 396) + SN + BAO + LSST-Y1 Cosmic Shear`
+
+  <p align="center">
+  <img width="1156" height="858" alt="example_lssty1_profile2" src="https://github.com/user-attachments/assets/cd041f96-dc42-426e-84a7-2d6498218b5f" />
+  </p>
