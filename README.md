@@ -322,7 +322,16 @@ Now, users must follow all the steps below.
   If `cov` is not supplied, the code estimates one internally from the prior.
   If a parameter is poorly constrained or `cov` is not given, we recommend ${\rm factor} \ll 1$.
 
+  The script of the plot below is provided at `projects/lsst_y1/scripts/EXAMPLE_PLOT_PROFILE1[2].py
+
+  Profile 1: `LSST-Y1 Cosmic Shear only`
+  
   <p align="center">
-  <img width="1156" height="858" alt="example_lssty1_profile" src="https://github.com/user-attachments/assets/311413be-8033-4509-8efd-b9c1c5727356" />
+  <img width="1156" height="858" alt="example_lssty1_profile1" src="https://github.com/user-attachments/assets/311413be-8033-4509-8efd-b9c1c5727356" />
   </p>
  
+  Profile 2: `Planck CMB (l < 396) + SN + BAO + LSST-Y1 Cosmic Shear`
+
+  <p align="center">
+  <img width="1156" height="858" alt="example_lssty1_profile2" src="https://github.com/user-attachments/assets/cd041f96-dc42-426e-84a7-2d6498218b5f" />
+  </p>
