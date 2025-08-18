@@ -321,3 +321,8 @@ Now, users must follow all the steps below.
   We advise ${\rm factor} \sim 3$ for parameters that are well constrained by the data when a covariance matrix is provided.
   If `cov` is not supplied, the code estimates one internally from the prior.
   If a parameter is poorly constrained or `cov` is not given, we recommend ${\rm factor} \ll 1$.
+
+  <p align="center">
+  <img width="1156" height="858" alt="example_lssty1_profile" src="https://github.com/user-attachments/assets/311413be-8033-4509-8efd-b9c1c5727356" />
+  </p>
+ 
