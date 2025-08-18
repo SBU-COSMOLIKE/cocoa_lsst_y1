@@ -327,9 +327,9 @@ Now, users must follow all the steps below.
   Profile 1: `LSST-Y1 Cosmic Shear only`
   
   <p align="center">
-  <img width="1156" height="858" alt="example_lssty1_profile1" src="https://github.com/user-attachments/assets/311413be-8033-4509-8efd-b9c1c5727356" />
+  <img width="1156" height="858" alt="example_lssty1_profile1" src="https://github.com/user-attachments/assets/11f0f0dd-23e6-4875-bd8e-afbb11ac4e48" />
   </p>
- 
+
   Profile 2: `Planck CMB (l < 396) + SN + BAO + LSST-Y1 Cosmic Shear`
 
   <p align="center">
