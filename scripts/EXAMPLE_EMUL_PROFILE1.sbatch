@@ -7,7 +7,7 @@
 #SBATCH --ntasks-per-node=52
 #SBATCH --ntasks-per-socket=26
 #SBATCH --cpus-per-task=1
-#SBATCH --time=5:00:00
+#SBATCH --time=9:00:00
 #SBATCH --partition=high_priority
 #SBATCH --qos=user_qos_timeifler
 #SBATCH --account=timeifler
@@ -41,7 +41,7 @@ fi
 # We advise factor ~ 3 for parameters that are well constrained by the data (...) 
 # If a parameter is poorly constrained or cov is not given, we recommend factor ~< 1
 
-declare -a factor=( "3" "0.5" "0.5" "0.5" "3" 
+declare -a factor=( "3" "1.0" "1.0" "1.0" "3" 
                     "3" "3" "3" "3" "3" 
                     "3" "3" "3" "3" "3" 
                     "3" "3" )
@@ -55,5 +55,5 @@ mpirun -n ${SLURM_NTASKS} --oversubscribe --mca pml ^ucx --mca btl vader,tcp,sel
   python ./projects/lsst_y1/EXAMPLE_EMUL_PROFILE1.py \
     --root ./projects/lsst_y1/ --cov 'chains/EXAMPLE_EMUL_MCMC1.covmat' \
     --outroot "EXAMPLE_EMUL_PROFILE1" --factor ${factor[$SLURM_ARRAY_TASK_ID]} \
-    --nstw 250 --numpts 10 --profile ${SLURM_ARRAY_TASK_ID} \
+    --nstw 400 --numpts 15 --profile ${SLURM_ARRAY_TASK_ID} \
     --minfile="./projects/lsst_y1/chains/EXAMPLE_EMUL_MIN1.txt"
