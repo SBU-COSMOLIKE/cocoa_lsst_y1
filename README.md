@@ -322,7 +322,7 @@ Now, users must follow all the steps below.
   If `cov` is not supplied, the code estimates one internally from the prior.
   If a parameter is poorly constrained or `cov` is not given, we recommend ${\rm factor} \ll 1$.
 
-  The script of the plot below is provided at `projects/lsst_y1/scripts/EXAMPLE_PLOT_PROFILE1[2].py
+  The script of the plot below is provided at `projects/lsst_y1/scripts/EXAMPLE_PLOT_PROFILE1[2].py`
 
   Profile 1: `LSST-Y1 Cosmic Shear only`
   
@@ -334,4 +334,12 @@ Now, users must follow all the steps below.
 
   <p align="center">
   <img width="1156" height="858" alt="example_lssty1_profile2" src="https://github.com/user-attachments/assets/cd041f96-dc42-426e-84a7-2d6498218b5f" />
+  </p>
+
+- **Fisher**:
+
+  The jupyter notebook `projects/lsst_y1/EXAMPLE_EVALUATE1.ipynb` provides code to compute Fisher Matrix (Cosmic Shear).
+
+  <p align="center">
+  <img width="1156" height="858" alt="example_lssty1_profile2" src="https://github.com/user-attachments/assets/800ef452-1e19-46df-8d2b-bcb3398fcb13" />
   </p>
