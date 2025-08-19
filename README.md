@@ -341,5 +341,5 @@ Now, users must follow all the steps below.
   The jupyter notebook `projects/lsst_y1/EXAMPLE_EVALUATE1.ipynb` provides code to compute Fisher Matrix (Cosmic Shear).
 
   <p align="center">
-  <img width="1156" height="858" alt="example_lssty1_profile2" src="https://github.com/user-attachments/assets/c089bc5f-f5ce-4583-8a96-403f86677c0a" />
+  <img width="1156" height="858" alt="example_lssty1_profile2" src="https://github.com/user-attachments/assets/46b513c8-d853-4dac-9ef4-f7bde5b54544" />
   </p>
