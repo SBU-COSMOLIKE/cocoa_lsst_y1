@@ -338,7 +338,8 @@ Now, users must follow all the steps below.
 
 - **Fisher**:
 
-  The jupyter notebook `projects/lsst_y1/EXAMPLE_EVALUATE1.ipynb` provides code to compute Fisher Matrix (Cosmic Shear).
+  The Jupyter notebook `projects/lsst_y1/EXAMPLE_EVALUATE1.ipynb` provides code to compute the Fisher Matrix (Cosmic Shear), as well as a preliminary study on how
+  the 5-stencil finite difference formula offers less precision than the polynomial fit implemented in the [derivkit](https://github.com/nikosarcevic/derivkit) package.
 
   <p align="center">
   <img width="1156" height="858" alt="example_lssty1_profile2" src="https://github.com/user-attachments/assets/46b513c8-d853-4dac-9ef4-f7bde5b54544" />
