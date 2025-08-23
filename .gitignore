@@ -7,3 +7,8 @@ chains/
 .ipynb_checkpoints/
 .ipynb_*
 .VM*
+interface/.DS_Store
+.DS_Store
+likelihood/.DS_Store
+scripts/.DS_Store
+data/.DS_Store
