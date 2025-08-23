@@ -47,15 +47,22 @@ PYBIND11_MODULE(cosmolike_lsst_y1_interface, m)
   // --------------------------------------------------------------------
   // INIT FUNCTIONS
   // --------------------------------------------------------------------
-
-  m.def("init_accuracy_boost",
-      &cosmolike_interface::init_accuracy_boost,
+  m.def("init_ntable_lmax",
+      &cosmolike_interface::init_ntable_lmax,
       "Init accuracy and sampling Boost (may slow down Cosmolike a lot)",
-      py::arg("accuracy_boost").none(false),
-      py::arg("sampling_boost").none(false),
-      py::arg("integration_accuracy").none(false)
+      (py::arg("lmax") = 50000).none(false)
     );
-
+  m.def("init_accuracy_boost",
+      [](const double accuracy_boost,
+         const int integration_accuracy) {
+        using namespace cosmolike_interface;
+        init_accuracy_boost(accuracy_boost, integration_accuracy);
+        spdlog::debug("\x1b[90m{}\x1b[0m: Ends", "set_cosmology");
+      },
+      "Init accuracy and sampling Boost (may slow down Cosmolike a lot)",
+      (py::arg("accuracy_boost") = 1.0).none(false),
+      (py::arg("integration_accuracy") = 1).none(false)
+    );
   m.def("init_baryons_contamination",
       &cosmolike_interface::init_baryons_contamination,
       "Init data vector contamination (on the matter power spectrum) with baryons",
@@ -160,6 +167,20 @@ PYBIND11_MODULE(cosmolike_lsst_y1_interface, m)
   // --------------------------------------------------------------------
   // SET FUNCTIONS
   // --------------------------------------------------------------------
+  m.def("set_distances",
+      [](arma::Col<double> z, 
+         arma::Col<double> chi)
+      {
+        spdlog::debug("\x1b[90m{}\x1b[0m: Begins", "set_distances");
+        using namespace cosmolike_interface;
+        set_distances(z, chi);
+        spdlog::debug("\x1b[90m{}\x1b[0m: Ends", "set_distances");
+      },
+      "Set Distance (Cosmology)",
+       py::arg("z").none(false),
+       py::arg("chi").none(false),
+       py::return_value_policy::move
+    );
 
   m.def("set_cosmology",
       [](const double omega_matter,
@@ -289,17 +310,63 @@ PYBIND11_MODULE(cosmolike_lsst_y1_interface, m)
     );
   
   // --------------------------------------------------------------------
+  // COMPUTE FUNCTIONS (relevant for emulators)
+  // --------------------------------------------------------------------
+  m.def("compute_add_fpm_3x2pt_real_any_order",
+      [](arma::Col<double> dv, 
+         const int force_exclude_pm)->std::vector<double> 
+      {
+        using namespace cosmolike_interface;
+        arma::Col<int>::fixed<3> ord = {0, 1, 2};
+        arma::Col<double> res = compute_add_fpm_3x2pt_real_any_order(dv,
+                                                                     ord,
+                                                                     force_exclude_pm);
+        return arma::conv_to<std::vector<double>>::from(res);
+      },
+      "Add fast shear calibration parameters to the theoretical data vector.",
+      py::arg("datavector").none(false),
+      py::arg("force_exclude_pm").none(false),
+      py::return_value_policy::move
+    );
+
+  m.def("compute_add_fpm_3x2pt_real_any_order_with_pcs",
+      [](arma::Col<double> dv, 
+         arma::Col<double> Q, 
+         const int force_exclude_pm)->std::vector<double> 
+      {
+        using namespace cosmolike_interface;
+        arma::Col<int>::fixed<3> ord = {0, 1, 2};
+        arma::Col<double> res = compute_add_baryons_pcs(
+            Q,
+            compute_add_fpm_3x2pt_real_any_order(dv, ord, force_exclude_pm)
+          );
+        return arma::conv_to<std::vector<double>>::from(res);
+      },
+      "Add fast shear calibration parameters to the theoretical data vector.",
+      py::arg("datavector").none(false),
+      py::arg("Q").none(false),
+      py::arg("force_exclude_pm").none(false),
+      py::return_value_policy::move
+    );
+
+  m.def("compute_data_vector_3x2pt_real_sizes",
+      []()->std::vector<int> {
+        using namespace cosmolike_interface;
+        arma::Col<int>::fixed<3> res = compute_data_vector_3x2pt_real_sizes();
+        return arma::conv_to<std::vector<int>>::from(res);
+      },
+      "Add PCs to DM data vector. Masked dimensions are filled w/ zeros",
+      py::return_value_policy::move
+    );
+
+  // --------------------------------------------------------------------
   // COMPUTE FUNCTIONS
   // --------------------------------------------------------------------
-
   m.def("compute_data_vector_masked",
-      // Why return an STL vector?
-      // The conversion between STL vector and python np array is cleaner
-      // arma:Col is cast to 2D np array with 1 column (not as nice!)
       []()->std::vector<double> {
         using namespace cosmolike_interface;
-        arma::Col<int>::fixed<3> order = {0, 1, 2};
-        arma::Col<double> res = compute_data_vector_3x2pt_real_masked_any_order(order);
+        arma::Col<int>::fixed<3> ord = {0, 1, 2};
+        arma::Col<double> res = compute_data_vector_3x2pt_real_masked_any_order(ord);
         return arma::conv_to<std::vector<double>>::from(res);
       },
       "Compute theoretical data vector. Masked dimensions are filled w/ zeros",
@@ -307,13 +374,13 @@ PYBIND11_MODULE(cosmolike_lsst_y1_interface, m)
     );
 
   m.def("compute_data_vector_masked_with_baryon_pcs",
-      // Why return an STL vector?
-      // The conversion between STL vector and python np array is cleaner
-      // arma:Col is cast to 2D np array with 1 column (not as nice!)
       [](std::vector<double> Q)->std::vector<double> {
         using namespace cosmolike_interface;
-        arma::Col<int>::fixed<3> O = {0, 1, 2};
-        arma::Col<double> res = compute_data_vector_3x2pt_real_masked_any_order(Q,O);
+        arma::Col<int>::fixed<3> ord = {0, 1, 2};
+        arma::Col<double> res = compute_add_baryons_pcs(
+            Q,
+            compute_data_vector_3x2pt_real_masked_any_order(ord)
+          );
         return arma::conv_to<std::vector<double>>::from(res);
       },
       "Compute theoretical data vector, including contributions from baryonic"
@@ -349,9 +416,6 @@ PYBIND11_MODULE(cosmolike_lsst_y1_interface, m)
   // --------------------------------------------------------------------
 
   m.def("get_binning_real_space",
-      // Why return an STL vector?
-      // The conversion between STL vector and python np array is cleaner
-      // arma:Col is cast to 2D np array with 1 column (not as nice!)
       []()->std::vector<double> {
         arma::Col<double> res = cosmolike_interface::get_binning_real_space();
         return arma::conv_to<std::vector<double>>::from(res);
@@ -488,9 +552,6 @@ PYBIND11_MODULE(cosmolike_lsst_y1_interface, m)
   // Miscellaneous
   // --------------------------------------------------------------------
   m.def("get_mask",
-      // Why return an STL vector?
-      // The conversion between STL vector and python np array is cleaner
-      // arma:Col is cast to 2D np array with 1 column (not as nice!)
       []()->std::vector<int>{
         using namespace cosmolike_interface;
         arma::Col<int> res = IP::get_instance().get_mask();
@@ -501,9 +562,6 @@ PYBIND11_MODULE(cosmolike_lsst_y1_interface, m)
     );
 
   m.def("get_dv_masked",
-      // Why return an STL vector?
-      // The conversion between STL vector and python np array is cleaner
-      // arma:Col is cast to 2D np array with 1 column (not as nice!)
       []()->std::vector<double> {
         using namespace cosmolike_interface;
         arma::Col<double> res = IP::get_instance().get_dv_masked();

@@ -6,4 +6,9 @@
 chains/
 .ipynb_checkpoints/
 .ipynb_*
-EXAMPLE_PROFILE1_UOFA.sbatch
+.VM*
+interface/.DS_Store
+.DS_Store
+likelihood/.DS_Store
+scripts/.DS_Store
+data/.DS_Store
