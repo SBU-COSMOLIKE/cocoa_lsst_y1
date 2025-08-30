@@ -241,7 +241,9 @@ likelihoods, and the theory code, all following Cobaya Conventions.
         mpirun -n 12 --oversubscribe python -m mpi4py.futures ./projects/lsst_y1/EXAMPLE_EMUL_NAUTILUS1.py \
                 --root ./projects/lsst_y1/ --outroot "EXAMPLE_EMUL_NAUTILUS1"  \
                 --maxfeval 750000 --nlive 2048 --neff 15000 --flive 0.01 --nnetworks 5
-    
+
+  Here, we provide the Colab example [Test Nautilus](https://github.com/CosmoLike/CoCoAGoogleColabExamples/blob/main/Cocoa_Example_(LSSTY1)_Test_Nautilus.ipynb) to illustrate how stable Nautilus results are as a function of `nlive` 
+
   or (Example with `Planck CMB (l < 396) + SN + BAO + LSST-Y1` -  $n_{\rm param} = 38$)
 
   - Linux
@@ -311,12 +313,16 @@ likelihoods, and the theory code, all following Cobaya Conventions.
   <img width="750" height="750" alt="project_lsst_plot_sampler_comparison_1" src="https://github.com/user-attachments/assets/ffc72bb0-1843-4a55-9a69-ca4c7d6b34c2" />
   </p>
 
+  (This figure can also be reconstructed using Google Colab, as we provide the notebook [Example Sampler Comparison (LSST-Y1 only)](https://github.com/CosmoLike/CoCoAGoogleColabExamples/blob/main/Cocoa_Example_(LSSTY1).ipynb)).
+
   or (Example with `Planck CMB (l < 396) + SN + BAO + LSST-Y1` - $n_{\rm param} = 38$)
 
   <p align="center">
   <img width="750" height="750" alt="project_lsst_plot_sampler_comparison_2" src="https://github.com/user-attachments/assets/5bd7318e-864e-439d-9c3c-eaf07e267654" />
   </p>
 
+  A similar version of this figure can be reconstructed using Google Colab, as we provide the notebook [Example Sampler Comparison (LSST+Others)](https://github.com/CosmoLike/CoCoAGoogleColabExamples/blob/main/Cocoa_Example_(LSSTY1)_Sampler_Comparison_2.ipynb). 
+  The only difference between Colab and the plot above is the choice of low $\ell$ CMB EE likelihood (`planck_2020_lollipop.lowlE` vs `planck_2018_lowl.EE_sroll2`).
 
 - **Global Minimizer**:
 
