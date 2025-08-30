@@ -242,7 +242,7 @@ likelihoods, and the theory code, all following Cobaya Conventions.
                 --root ./projects/lsst_y1/ --outroot "EXAMPLE_EMUL_NAUTILUS1"  \
                 --maxfeval 750000 --nlive 2048 --neff 15000 --flive 0.01 --nnetworks 5
 
-  Here, we provide the Colab example [Test Nautilus](https://github.com/CosmoLike/CoCoAGoogleColabExamples/blob/main/Cocoa_Example_(LSSTY1)_Test_Nautilus.ipynb) to illustrate how stable Nautilus results are as a function of `nlive` 
+  The Colab example [Test Nautilus](https://github.com/CosmoLike/CoCoAGoogleColabExamples/blob/main/Cocoa_Example_(LSSTY1)_Test_Nautilus.ipynb) illustrates how stable Nautilus results are as a function of `nlive` 
 
   or (Example with `Planck CMB (l < 396) + SN + BAO + LSST-Y1` -  $n_{\rm param} = 38$)
 
