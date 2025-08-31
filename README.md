@@ -425,13 +425,13 @@ likelihoods, and the theory code, all following Cobaya Conventions.
   The script of the plot below is provided at `projects/lsst_y1/scripts/EXAMPLE_PLOT_PROFILE1[2].py`
 
   Profile 1: `LSST-Y1 Cosmic Shear only`
+
+  The Google Colab [Profile Likelihood (LSST-Y1 only)](https://github.com/CosmoLike/CoCoAGoogleColabExamples/blob/main/Cocoa_Example_(LSST_Y1)_Profile_Likelihoods.ipynb) can be used to reconstruct a similar figure.
   
   <p align="center">
   <img width="1156" height="858" alt="example_lssty1_profile1" src="https://github.com/user-attachments/assets/11f0f0dd-23e6-4875-bd8e-afbb11ac4e48" />
   </p>
 
-  The Google Colab [Profile Likelihood (LSST-Y1 only)](https://github.com/CosmoLike/CoCoAGoogleColabExamples/blob/main/Cocoa_Example_(LSST_Y1)_Profile_Likelihoods.ipynb) can reconstruct a similar figure.
-  
   Profile 2: `Planck CMB (l < 396) + SN + BAO + LSST-Y1 Cosmic Shear`
 
   <p align="center">
