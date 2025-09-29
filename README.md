@@ -102,17 +102,29 @@ and
 
 - **One model evaluation**:
 
-      mpirun -n 1 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
-         --bind-to core:overload-allowed --mca mpi_yield_when_idle 1 --report-bindings  \
-         --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} \
-         cobaya-run ./projects/lsst_y1/EXAMPLE_EVALUATE1.yaml -f
+  - Linux
+
+        mpirun -n 1 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
+           --bind-to core:overload-allowed --mca mpi_yield_when_idle 1 --report-bindings  \
+           --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} \
+           cobaya-run ./projects/lsst_y1/EXAMPLE_EVALUATE1.yaml -f
+
+  - macOS (arm)
+
+        mpirun -n 1 --oversubscribe  cobaya-run ./projects/lsst_y1/EXAMPLE_EVALUATE1.yaml -f
 
 - **MCMC (Metropolis-Hastings Algorithm)**:
 
-      mpirun -n 4 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
-         --bind-to core:overload-allowed --mca mpi_yield_when_idle 1 --report-bindings  \
-         --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} \
-         cobaya-run ./projects/lsst_y1/EXAMPLE_MCMC1.yaml -f
+  - Linux
+    
+        mpirun -n 4 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
+           --bind-to core:overload-allowed --mca mpi_yield_when_idle 1 --report-bindings  \
+           --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} \
+           cobaya-run ./projects/lsst_y1/EXAMPLE_MCMC1.yaml -f
+
+  - macOS (arm)
+
+        mpirun -n 4 --oversubscribe cobaya-run ./projects/lsst_y1/EXAMPLE_MCMC1.yaml -f
 
 # Running ML emulators <a name="cobaya_base_code_examples_emul"></a>
 
@@ -130,11 +142,24 @@ Cocoa contains a few transformer- and CNN-based neural network emulators capable
       #export IGNORE_POLYCHORD_SAMPLER_CODE=1    # to run PROJECTS/EXAMPLE/EXAMPLE_EMUL_POLY1.yaml
       #export IGNORE_GETDIST_CODE=1              # to run EXAMPLE_TENSION_METRICS.ipynb
       #export IGNORE_TENSIOMETER_CODE=1          # to run EXAMPLE_TENSION_METRICS.ipynb
-      
+
+      [Adapted from Cocoa/set_installation_options.sh shell script] 
+      # insert the # symbol (i.e., unset these environmental keys  on `set_installation_options.sh`)
+      #export IGNORE_EMULTRF_CODE=1              #SaraivanovZhongZhu (SZZ) transformer/CNN-based emulators
+      #export IGNORE_EMULTRF_DATA=1            
+      #export IGNORE_LIPOP_LIKELIHOOD_CODE=1     # to run EXAMPLE_EMUL_(EVALUATE/MCMC/NAUTILUS/EMCEE1).yaml
+      #export IGNORE_LIPOP_CMB_DATA=1           
+      #export IGNORE_ACTDR6_CODE=1               # to run EXAMPLE_EMUL_(EVALUATE/MCMC/NAUTILUS/EMCEE1).yaml
+      #export IGNORE_ACTDR6_DATA=1         
+      #export IGNORE_NAUTILUS_SAMPLER_CODE=1     # to run PROJECTS/EXAMPLE/EXAMPLE_EMUL_NAUTILUS1.py
+      #export IGNORE_POLYCHORD_SAMPLER_CODE=1    # to run PROJECTS/EXAMPLE/EXAMPLE_EMUL_POLY1.yaml
+      #export IGNORE_GETDIST_CODE=1              # to run EXAMPLE_TENSION_METRICS.ipynb
+      #export IGNORE_TENSIOMETER_CODE=1          # to run EXAMPLE_TENSION_METRICS.ipynb
+    
 > [!TIP]
 > What if users have not configured ML-related keys before sourcing `setup_cocoa.sh`?
 > 
-> Answer: comment the keys below before rerunning `setup_cocoa.sh`.
+> Answer: Comment the keys below before rerunning `setup_cocoa.sh`.
 > 
 >     [Adapted from Cocoa/set_installation_options.sh shell script]
 >     # These keys are only relevant if you run setup_cocoa multiple times
