@@ -66,10 +66,13 @@ class _cosmolike_prototype_base(DataSetLikelihood):
     # ------------------------------------------------------------------------
 
     ci.initial_setup()
-    
     ci.init_probes(possible_probes=self.probe)
-
     ci.init_binning(int(self.ntheta), self.theta_min_arcmin, self.theta_max_arcmin)
+
+    if self.debug:
+      ci.set_log_level_debug()
+    else:
+      ci.set_log_level_info()
 
     if self.use_emulator:
       ci.init_redshift_distributions_from_files(

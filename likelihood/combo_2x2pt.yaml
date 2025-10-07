@@ -8,7 +8,7 @@ speed: 1
 non_linear_emul: 2
 external_nz_modeling: 0
 use_emulator: False
-
+debug: false
 # IA REDSHIFT EVOLUTION: 0 = NO_IA (AMPLITUDES SET TO ZERO), 
 #                        1 = IA_NLA_LF
 #                        2 = IA_REDSHIFT_BINNING, 
