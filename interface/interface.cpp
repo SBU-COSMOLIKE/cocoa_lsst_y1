@@ -63,10 +63,13 @@ PYBIND11_MODULE(cosmolike_lsst_y1_interface, m)
       (py::arg("accuracy_boost") = 1.0).none(false),
       (py::arg("integration_accuracy") = 1).none(false)
     );
+
   m.def("init_baryons_contamination",
-      &cosmolike_interface::init_baryons_contamination,
+      py::overload_cast<std::string, std::string>(
+         &cosmolike_interface::init_baryons_contamination),
       "Init data vector contamination (on the matter power spectrum) with baryons",
-      py::arg("sim").none(false)
+      py::arg("sim").none(false),
+      py::arg("allsims").none(false)
     );
 
   m.def("init_bias", 
@@ -93,8 +96,7 @@ PYBIND11_MODULE(cosmolike_lsst_y1_interface, m)
   m.def("init_data_real",
       [](std::string cov, std::string mask, std::string data) {
         using namespace cosmolike_interface;
-        arma::Col<int>::fixed<3> order = {0, 1, 2};
-        init_data_3x2pt_real_space(cov, mask, data, order);
+        init_data_Mx2pt_N<0,3>(cov, mask, data, {0, 1, 2});
       },
       "Load covariance matrix, mask (vec of 0/1s) and data vector",
       py::arg("COV").none(false),
@@ -317,10 +319,13 @@ PYBIND11_MODULE(cosmolike_lsst_y1_interface, m)
          const int force_exclude_pm)->std::vector<double> 
       {
         using namespace cosmolike_interface;
-        arma::Col<int>::fixed<3> ord = {0, 1, 2};
-        arma::Col<double> res = compute_add_fpm_3x2pt_real_any_order(dv,
-                                                                     ord,
-                                                                     force_exclude_pm);
+        arma::Col<double> res;
+        if (force_exclude_pm == 1) {
+          res = compute_add_calib_and_set_mask_Mx2pt_N<0,3,0>(dv,{0, 1, 2});
+        } 
+        else {
+          res = compute_add_calib_and_set_mask_Mx2pt_N<0,3,1>(dv,{0, 1, 2});
+        }
         return arma::conv_to<std::vector<double>>::from(res);
       },
       "Add fast shear calibration parameters to the theoretical data vector.",
@@ -335,12 +340,15 @@ PYBIND11_MODULE(cosmolike_lsst_y1_interface, m)
          const int force_exclude_pm)->std::vector<double> 
       {
         using namespace cosmolike_interface;
-        arma::Col<int>::fixed<3> ord = {0, 1, 2};
-        arma::Col<double> res = compute_add_baryons_pcs(
-            Q,
-            compute_add_fpm_3x2pt_real_any_order(dv, ord, force_exclude_pm)
-          );
-        return arma::conv_to<std::vector<double>>::from(res);
+        using stlvec = std::vector<double>;
+        arma::Col<double> res;
+        if (force_exclude_pm == 1) {
+          res = compute_add_calib_and_set_mask_Mx2pt_N<0,3,0>(dv,{0, 1, 2});
+        } 
+        else {
+          res = compute_add_calib_and_set_mask_Mx2pt_N<0,3,1>(dv,{0, 1, 2});
+        }
+        return arma::conv_to<stlvec>::from(compute_add_baryons_pcs(Q,res));
       },
       "Add fast shear calibration parameters to the theoretical data vector.",
       py::arg("datavector").none(false),
@@ -352,10 +360,11 @@ PYBIND11_MODULE(cosmolike_lsst_y1_interface, m)
   m.def("compute_data_vector_3x2pt_real_sizes",
       []()->std::vector<int> {
         using namespace cosmolike_interface;
-        arma::Col<int>::fixed<3> res = compute_data_vector_3x2pt_real_sizes();
-        return arma::conv_to<std::vector<int>>::from(res);
+        using namespace arma;
+        using stlvec = std::vector<int>;
+        return conv_to<stlvec>::from(compute_data_vector_Mx2pt_N_sizes<0,3>());
       },
-      "Add PCs to DM data vector. Masked dimensions are filled w/ zeros",
+      "Returns the data vector sizes of each 2pt correlation function",
       py::return_value_policy::move
     );
 
@@ -365,9 +374,8 @@ PYBIND11_MODULE(cosmolike_lsst_y1_interface, m)
   m.def("compute_data_vector_masked",
       []()->std::vector<double> {
         using namespace cosmolike_interface;
-        arma::Col<int>::fixed<3> ord = {0, 1, 2};
-        arma::Col<double> res = compute_data_vector_3x2pt_real_masked_any_order(ord);
-        return arma::conv_to<std::vector<double>>::from(res);
+        using stlvec = std::vector<double>;
+        return arma::conv_to<stlvec>::from(compute_Mx2pt_N_masked<0,3>({0,1,2}));
       },
       "Compute theoretical data vector. Masked dimensions are filled w/ zeros",
       py::return_value_policy::move
@@ -376,12 +384,9 @@ PYBIND11_MODULE(cosmolike_lsst_y1_interface, m)
   m.def("compute_data_vector_masked_with_baryon_pcs",
       [](std::vector<double> Q)->std::vector<double> {
         using namespace cosmolike_interface;
-        arma::Col<int>::fixed<3> ord = {0, 1, 2};
-        arma::Col<double> res = compute_add_baryons_pcs(
-            Q,
-            compute_data_vector_3x2pt_real_masked_any_order(ord)
-          );
-        return arma::conv_to<std::vector<double>>::from(res);
+        using stlvec = std::vector<double>;
+        arma::Col<double> res = compute_Mx2pt_N_masked<0,3>({0,1,2});
+        return arma::conv_to<stlvec>::from(compute_add_baryons_pcs(Q,res));
       },
       "Compute theoretical data vector, including contributions from baryonic"
       " principal components. Masked dimensions are filled w/ zeros",
@@ -399,15 +404,15 @@ PYBIND11_MODULE(cosmolike_lsst_y1_interface, m)
     );
 
   m.def("compute_baryon_pcas",
-      [](std::string scenarios) {
+      [](std::string scenarios, std::string allsims) {
         using namespace cosmolike_interface;
-        arma::Col<int>::fixed<3> order = {0, 1, 2};
-        BaryonScenario::get_instance().set_scenarios(scenarios);
-        return cosmolike_interface::compute_baryon_pcas_3x2pt_real(order);
+        BaryonScenario::get_instance().set_scenarios(allsims, scenarios);
+        return compute_baryon_pcas_Mx2pt_N<0,3>({0, 1, 2});
       },
       "Compute baryonic principal components given a list of scenarios" 
       "that contaminate the matter power spectrum",
       py::arg("scenarios").none(false),
+      py::arg("allsims").none(false),
       py::return_value_policy::move
     );
 
@@ -537,7 +542,6 @@ PYBIND11_MODULE(cosmolike_lsst_y1_interface, m)
       py::arg("l").none(false),
       py::return_value_policy::move
     );
-
 
   m.def("C_gg_tomo",
       py::overload_cast<arma::Col<double>>(
