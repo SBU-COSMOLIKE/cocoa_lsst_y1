@@ -20,12 +20,13 @@ likelihood:
     kmax_boltzmann: 5.0
     # 1 EE2, 2 Halofit
     non_linear_emul: 2
-    IA_model: 1
+    IA_model: 0
     IA_redshift_evolution: 3
     debug: false
     use_baryon_pca: false
     create_baryon_pca: false
     baryon_pca_select_sims: "antilles-2-99/antilles-101-378/antilles-380-400"
+    filename_baryon_pca: "./projects/lsst_y1/chains/pca.txt"
 params:
   As_1e9:
     prior:
@@ -213,7 +214,6 @@ theory:
     extra_args:
       halofit_version: takahashi
       AccuracyBoost: 1.0 # AB=1.2 suggested in jupyter w(\theta) stability large theta
-                         # maybe worth postprocessing a chain on 1.2
       num_massive_neutrinos: 1
       nnu: 3.046
       dark_energy_model: ppf
@@ -262,5 +262,4 @@ sampler:
       LSST_B1_4: 1.92886
       LSST_B1_5: 2.11633
   
-
 output: ./projects/lsst_y1/chains/EXAMPLE_EVALUATE2
