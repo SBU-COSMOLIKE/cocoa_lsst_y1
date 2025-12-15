@@ -224,7 +224,7 @@ class _cosmolike_prototype_base(DataSetLikelihood):
           'h'    : h,
           'mnu'  : self.provider.get_param("mnu"), 
           'w'    : self.provider.get_param("w"),
-          'wa'   : 0.0
+          'wa'   : self.provider.get_param("wa"),
         }
         # Euclid Emulator only works on z<10.0
         kbt, tmp_bt = ee2.get_boost2(params, 
