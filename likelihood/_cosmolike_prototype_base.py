@@ -142,7 +142,7 @@ class _cosmolike_prototype_base(DataSetLikelihood):
   # ------------------------------------------------------------------------
 
   def get_requirements(self):
-    if self.use_emulator:
+    if self.use_emulator == 1:
       if self.probe == "xi":
         return {
           'cosmic_shear': None
@@ -180,6 +180,25 @@ class _cosmolike_prototype_base(DataSetLikelihood):
             "z": self.z_interp_1D 
           } # in Mpc
         }     
+    elif self.use_emulator == 2:
+      return {
+        "As": None,
+        "H0": None,
+        "omegam": None,
+        "omegab": None,
+        "mnu": None,
+        "w": None,
+        "wa": None,
+        "Pk_interpolator": {
+          "z": self.z_interp_2D,
+          "k_max": self.kmax_boltzmann * self.accuracyboost,
+          "nonlinear": (True,False),
+          "vars_pairs": ([("delta_tot", "delta_tot")])
+        },
+        "comoving_radial_distance": {
+          "z": self.z_interp_1D 
+        }, # in Mpc
+      }
     else:
       return {
         "As": None,
@@ -188,6 +207,7 @@ class _cosmolike_prototype_base(DataSetLikelihood):
         "omegab": None,
         "mnu": None,
         "w": None,
+        "wa": None,
         "Pk_interpolator": {
           "z": self.z_interp_2D,
           "k_max": self.kmax_boltzmann * self.accuracyboost,
@@ -201,7 +221,6 @@ class _cosmolike_prototype_base(DataSetLikelihood):
           'tt': 0
         }
       }
-
   # ------------------------------------------------------------------------
   # ------------------------------------------------------------------------
   # ------------------------------------------------------------------------

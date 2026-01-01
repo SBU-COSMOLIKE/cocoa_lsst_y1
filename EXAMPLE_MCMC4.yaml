@@ -79,6 +79,9 @@ params:
       scale: 0.05
     proposal: 0.05
     latex: w_{0,\mathrm{DE}}
+  wa:
+    value: 0.0
+    latex: w_{a,\mathrm{DE}}
   mnu:
     value: 0.06
   tau:
