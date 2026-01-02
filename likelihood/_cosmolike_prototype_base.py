@@ -58,10 +58,12 @@ class _cosmolike_prototype_base(DataSetLikelihood):
 
     tmp=int(min(120 + 20*self.accuracyboost,250))
     self.z_interp_2D = np.concatenate((np.linspace(0,3.0,max(50,int(0.75*tmp))), 
-                                       np.linspace(3.01,50.1,max(30,int(0.25*tmp)))),axis=0)
+                                       np.linspace(3.01,49.99,max(30,int(0.25*tmp)))),axis=0)
     self.len_z_interp_2D = len(self.z_interp_2D)
     
-    self.log10k_interp_2D = np.linspace(-4.99,2.0,int(1250+250*self.accuracyboost))
+    #self.log10k_interp_2D = np.linspace(-4.99,2.0,int(1250+250*self.accuracyboost))
+    # for now Vic will fix the emulator to allow extrapolation
+    self.log10k_interp_2D = np.linspace(-4.8,2.0,int(1250+250*self.accuracyboost))
     self.len_log10k_interp_2D = len(self.log10k_interp_2D)
     # ------------------------------------------------------------------------
 
@@ -74,7 +76,7 @@ class _cosmolike_prototype_base(DataSetLikelihood):
     else:
       ci.set_log_level_info()
 
-    if self.use_emulator:
+    if self.use_emulator == 1:
       ci.init_redshift_distributions_from_files(
           lens_multihisto_file=self.lens_file,
           lens_ntomo=int(self.lens_ntomo), 
@@ -193,6 +195,7 @@ class _cosmolike_prototype_base(DataSetLikelihood):
           "z": self.z_interp_2D,
           "k_max": self.kmax_boltzmann * self.accuracyboost,
           "nonlinear": (True,False),
+          #"nonlinear": False, # for now - TODO
           "vars_pairs": ([("delta_tot", "delta_tot")])
         },
         "comoving_radial_distance": {
@@ -227,7 +230,7 @@ class _cosmolike_prototype_base(DataSetLikelihood):
 
   def set_cosmo_related(self):
     h = self.provider.get_param("H0")/100.0
-    if not self.use_emulator:
+    if not (self.use_emulator == 1):
       PKL  = self.provider.get_Pk_interpolator(("delta_tot", "delta_tot"), 
                                                nonlinear=False, 
                                                extrap_kmax=2.5e2*self.accuracyboost)
@@ -261,8 +264,10 @@ class _cosmolike_prototype_base(DataSetLikelihood):
         lnbt = np.zeros((self.len_z_interp_2D, self.len_log10k_interp_2D))
         lnbt[self.z_interp_2D < 10.0, :] = tmp
         # Use Halofit first that works on all redshifts
+        # TMP CHANGE - VIC NEEDS TO ADD NONLINEAR
         lnPNL = self.provider.get_Pk_interpolator(("delta_tot", "delta_tot"),
-          nonlinear=True, extrap_kmax =2.5e2*self.accuracyboost).logP(self.z_interp_2D,
+          nonlinear=False, extrap_kmax =2.5e2*self.accuracyboost).logP(self.z_interp_2D,
+          #nonlinear=True, extrap_kmax =2.5e2*self.accuracyboost).logP(self.z_interp_2D,
           np.power(10.0,self.log10k_interp_2D)).flatten(order='F')+np.log(h**3) 
         # on z < 10.0, replace it with EE2
         lnPNL = np.where((self.z_interp_2D<10)[:,None], 
@@ -304,7 +309,7 @@ class _cosmolike_prototype_base(DataSetLikelihood):
     ci.set_nuisance_shear_calib(
       M=[params.get(p,0) for p in [survey+"_M"+str(i+1) for i in range(ntomo)]]
     )
-    if not self.use_emulator:
+    if not (self.use_emulator == 1):
       if self.external_nz_modeling: 
         # here we send n(z) at every point in the chain as the user may
         # modify it using an external function (example: adding outliers)
@@ -343,7 +348,7 @@ class _cosmolike_prototype_base(DataSetLikelihood):
     ci.set_point_mass(
       PMV = [params.get(p, 0) for p in [survey+"_PM"+str(i+1) for i in range(ntomo)]]
     )
-    if not self.use_emulator:
+    if not (self.use_emulator == 1):
       ci.set_nuisance_bias(
         B1=[params.get(p,1) for p in [survey+"_B1_"+str(i+1) for i in range(ntomo)]],
         B2=[params.get(p,0) for p in [survey+"_B2_"+str(i+1) for i in range(ntomo)]],
@@ -388,7 +393,7 @@ class _cosmolike_prototype_base(DataSetLikelihood):
   # ------------------------------------------------------------------------
 
   def get_datavector(self, **params):        
-    if self.use_emulator:
+    if self.use_emulator == 1:
       dv = self.internal_get_datavector_emulator(**params)
     else:
       dv = self.internal_get_datavector(**params)

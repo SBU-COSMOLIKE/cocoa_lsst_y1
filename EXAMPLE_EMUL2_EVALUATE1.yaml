@@ -3,22 +3,27 @@ debug: False
 stop_at_error: True
 
 likelihood:
+  sn.desy5: 
+    path: ./external_modules/data/sn_data
+  bao.desi_dr2.desi_bao_all:
+    path: ./external_modules/data/ 
   lsst_y1.cosmic_shear:
     path: ./external_modules/data/lsst_y1
     data_file: lsst_y1_M1_GGL0.05.dataset   # 705 non-masked elements  (EE2 delta chi^2 ~ 11.8)
     use_emulator: 2
+    non_linear_emul: 1
     print_datavector: False
     print_datavector_file: "./projects/lsst_y1/chains/example1_lsst_y1_theory_emul.modelvector"
 params:
   As_1e9:
     prior:
-      min: 0.5
-      max: 5
+      min: 1.7
+      max: 2.5
     ref:
       dist: norm
       loc: 2.1
-      scale: 0.65
-    proposal: 0.4
+      scale: 0.25
+    proposal: 0.2
     latex: 10^9 A_\mathrm{s})
     renames: A
   ns:
@@ -62,12 +67,26 @@ params:
     proposal: 0.02
     latex: \Omega_\mathrm{m}
   w0pwa:
-    value: -1.0
-    latex: 'w_{0,\mathrm{DE}}+w_{a,\mathrm{DE}}'
+    prior:
+      min: -5 
+      max: -0.01
+    ref:
+      dist: norm
+      loc: -0.99
+      scale: 0.05
+    proposal: 0.05
+    latex: w_{0,\mathrm{DE}}+w_{a,\mathrm{DE}}
     drop: true
   w:
-    value: -1.0
-    latex: 'w_{0,\mathrm{DE}}'
+    prior:
+      min: -3
+      max: -0.01
+    ref:
+      dist: norm
+      loc: -0.99
+      scale: 0.05
+    proposal: 0.05
+    latex: w_{0,\mathrm{DE}}
   wa:
     value: 'lambda w0pwa, w: w0pwa - w'
     derived: false
@@ -92,23 +111,24 @@ theory:
       file: ['external_modules/data/emultrf/BAO_SN_RES/emul_lcdm_rdrag_GP.joblib'] 
       extra: ['external_modules/data/emultrf/BAO_SN_RES/extra_lcdm_rdrag.npy'] 
       ord: [['omegabh2','omegach2']]
-  emulbaosn:
+  emulbaosn: # TODO: Yijie needs to fix extrapolation for z>3
     path: ./cobaya/cobaya/theories/
     stop_at_error: True
+    provides: ['comoving_radial_distance', 'angular_diameter_distance', 'Hubble']
     extra_args:
       device: "cuda"
-      file:  [None, 'external_modules/data/emultrf/BAO_SN_RES/emul_lcdm_H.pt']
-      extra: [None, 'external_modules/data/emultrf/BAO_SN_RES/extra_lcdm_H.npy']    
-      ord: [None, ['omegam','H0']]
+      file:  [None, 'external_modules/data/emultrf/BAO_SN_RES/w0wa/emul_w0wa_H.pt']
+      extra: [None, 'external_modules/data/emultrf/BAO_SN_RES/w0wa/extra_w0wa_H.npy']    
+      ord: [None, ['omegam','H0','w','wa']]
       extrapar: [{'MLA': 'INT', 'ZMIN' : 0.0001, 'ZMAX' : 3, 'NZ' : 600},
-                 {'MLA': 'ResMLP', 'offset' : 0.0, 'INTDIM' : 1, 'NLAYER' : 1,
-                  'TMAT': 'external_modules/data/emultrf/BAO_SN_RES/PCA_lcdm_H.npy',
-                  'ZLIN': 'external_modules/data/emultrf/BAO_SN_RES/z_lin_lcdm.npy'}]
+                 {'MLA': 'ResMLP', 'offset' : 0.0, 'INTDIM' : 4, 'NLAYER' : 6,
+                  'TMAT': 'external_modules/data/emultrf/BAO_SN_RES/w0wa/PCA_w0wa_H.npy',
+                  'ZLIN': 'external_modules/data/emultrf/BAO_SN_RES/w0wa/z_lin_w0wa.npy'}]
   emulmps:
     path: ./cobaya/cobaya/theories/
     stop_at_error: True
     extra_args:
-      param_order: ["As_1e9", "ns", "H0", "omegab", "omegam", 'w']
+      param_order: ["As_1e9", "ns", "H0", "omegab", "omegam", 'w', 'wa']
 
 sampler:
   evaluate:
@@ -119,6 +139,8 @@ sampler:
       H0: 67.32
       omegab: 0.04
       omegam: 0.3
+      w0pwa: -0.9
+      w: -0.9
       LSST_DZ_S1: 0.0414632
       LSST_DZ_S2: 0.00147332
       LSST_DZ_S3: 0.0237035

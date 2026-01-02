@@ -83,7 +83,7 @@ likelihood:
   lsst_y1.cosmic_shear:
     path: ./external_modules/data/lsst_y1
     data_file: lsst_y1_M1_GGL0.05.dataset
-    use_emulator: True
+    use_emulator: 1
 params:
   logA:
     prior:
@@ -351,6 +351,7 @@ theory:
   emulbaosn:
     path: ./cobaya/cobaya/theories/
     stop_at_error: True
+    provides: ['comoving_radial_distance', 'angular_diameter_distance', 'Hubble']
     extra_args:
       device: "cuda"
       file:  [None, 'external_modules/data/emultrf/BAO_SN_RES/emul_lcdm_H.pt']

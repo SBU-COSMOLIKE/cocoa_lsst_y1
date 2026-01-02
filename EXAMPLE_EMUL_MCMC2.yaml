@@ -6,12 +6,7 @@ likelihood:
   planck_2018_highl_plik.TTTEEE:
     path: ./external_modules/
     clik_file: plc_3.0/hi_l/plik/plik_rd12_HM_v22b_TTTEEE_33_396.clik
-  # choose only one low ell EE likelihood
-  #planck_2018_lowl.EE:
-  #  path: ./external_modules
   planck_2018_lowl.EE_sroll2: null 
-  #planck_2020_lollipop.lowlE:
-  #  data_folder: planck/lollipop
   planck_2018_lowl.TT:
     path: ./external_modules
   bao.desi_dr2.desi_bao_all:
@@ -21,7 +16,7 @@ likelihood:
   lsst_y1.cosmic_shear:
     path: ./external_modules/data/lsst_y1
     data_file: lsst_y1_M1_GGL0.05.dataset
-    use_emulator: True
+    use_emulator: 1
 params:
   logA:
     prior:
