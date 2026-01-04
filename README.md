@@ -102,11 +102,15 @@ and
 
 - **One model evaluation**:
 
-      mpirun -n 1 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
-         --bind-to core:overload-allowed --mca mpi_yield_when_idle 1 --report-bindings  \
-         --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} \
-         cobaya-run ./projects/lsst_y1/EXAMPLE_EVALUATE1.yaml -f
+  - Linux
 
+        mpirun -n 1 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
+           --bind-to core:overload-allowed --mca mpi_yield_when_idle 1 --report-bindings  \
+           --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} \
+           cobaya-run ./projects/lsst_y1/EXAMPLE_EVALUATE1.yaml -f
+
+  - Linux
+    
 - **MCMC (Metropolis-Hastings Algorithm)**:
 
       mpirun -n 4 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
@@ -177,6 +181,12 @@ Now, users must follow all the steps below.
   - macOS (arm)
 
         mpirun -n 4 --oversubscribe cobaya-run ./projects/lsst_y1/EXAMPLE_EMUL_MCMC1.yaml -r
+
+> [!Note]
+> Below is the cobaya timing of the average data vector computation time
+> in a Metropolis-Hastings chain (`EXAMPLE_EMUL_MCMC1`, no slow/fast decomposition) on a macOS M2 Pro. Our emulators do take advantage of the CPU-GPU integration on Apple MX chips.
+>
+> Cobaya output: `lsst_y1.cosmic_shear : 0.00423518 s (200828 evaluations, 850.543 s total)`
     
   or (Example with `Planck CMB (l < 396) + SN + BAO + LSST-Y1` - $n_{\rm param} = 38$)
 
