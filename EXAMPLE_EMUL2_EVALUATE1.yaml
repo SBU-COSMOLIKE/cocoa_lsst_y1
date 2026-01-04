@@ -3,22 +3,18 @@ debug: False
 stop_at_error: True
 
 likelihood:
-  sn.desy5: 
-    path: ./external_modules/data/sn_data
-  bao.desi_dr2.desi_bao_all:
-    path: ./external_modules/data/ 
   lsst_y1.cosmic_shear:
     path: ./external_modules/data/lsst_y1
     data_file: lsst_y1_M1_GGL0.05.dataset   # 705 non-masked elements  (EE2 delta chi^2 ~ 11.8)
     use_emulator: 2
-    non_linear_emul: 1
+    non_linear_emul: 2
     print_datavector: False
     print_datavector_file: "./projects/lsst_y1/chains/example1_lsst_y1_theory_emul.modelvector"
-params:
+params: # EE2 PRIORS
   As_1e9:
     prior:
-      min: 1.7
-      max: 2.5
+      min: 0.5
+      max: 5
     ref:
       dist: norm
       loc: 2.1
@@ -111,7 +107,7 @@ theory:
       file: ['external_modules/data/emultrf/BAO_SN_RES/emul_lcdm_rdrag_GP.joblib'] 
       extra: ['external_modules/data/emultrf/BAO_SN_RES/extra_lcdm_rdrag.npy'] 
       ord: [['omegabh2','omegach2']]
-  emulbaosn: # TODO: Yijie needs to fix extrapolation for z>3
+  emulbaosn:
     path: ./cobaya/cobaya/theories/
     stop_at_error: True
     provides: ['comoving_radial_distance', 'angular_diameter_distance', 'Hubble']

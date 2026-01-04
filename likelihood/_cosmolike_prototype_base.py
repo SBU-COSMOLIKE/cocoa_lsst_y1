@@ -61,9 +61,7 @@ class _cosmolike_prototype_base(DataSetLikelihood):
                                        np.linspace(3.01,49.99,max(30,int(0.25*tmp)))),axis=0)
     self.len_z_interp_2D = len(self.z_interp_2D)
     
-    #self.log10k_interp_2D = np.linspace(-4.99,2.0,int(1250+250*self.accuracyboost))
-    # for now Vic will fix the emulator to allow extrapolation
-    self.log10k_interp_2D = np.linspace(-4.8,2.0,int(1250+250*self.accuracyboost))
+    self.log10k_interp_2D = np.linspace(-4.99,2.0,int(1250+250*self.accuracyboost))
     self.len_log10k_interp_2D = len(self.log10k_interp_2D)
     # ------------------------------------------------------------------------
 
@@ -195,7 +193,6 @@ class _cosmolike_prototype_base(DataSetLikelihood):
           "z": self.z_interp_2D,
           "k_max": self.kmax_boltzmann * self.accuracyboost,
           "nonlinear": (True,False),
-          #"nonlinear": False, # for now - TODO
           "vars_pairs": ([("delta_tot", "delta_tot")])
         },
         "comoving_radial_distance": {
@@ -264,10 +261,8 @@ class _cosmolike_prototype_base(DataSetLikelihood):
         lnbt = np.zeros((self.len_z_interp_2D, self.len_log10k_interp_2D))
         lnbt[self.z_interp_2D < 10.0, :] = tmp
         # Use Halofit first that works on all redshifts
-        # TMP CHANGE - VIC NEEDS TO ADD NONLINEAR
         lnPNL = self.provider.get_Pk_interpolator(("delta_tot", "delta_tot"),
-          nonlinear=False, extrap_kmax =2.5e2*self.accuracyboost).logP(self.z_interp_2D,
-          #nonlinear=True, extrap_kmax =2.5e2*self.accuracyboost).logP(self.z_interp_2D,
+          nonlinear=True, extrap_kmax =2.5e2*self.accuracyboost).logP(self.z_interp_2D,
           np.power(10.0,self.log10k_interp_2D)).flatten(order='F')+np.log(h**3) 
         # on z < 10.0, replace it with EE2
         lnPNL = np.where((self.z_interp_2D<10)[:,None], 
