@@ -230,6 +230,7 @@ class _cosmolike_prototype_base(DataSetLikelihood):
     if not (self.use_emulator == 1):
       PKL  = self.provider.get_Pk_interpolator(("delta_tot", "delta_tot"), 
                                                nonlinear=False, 
+                                               extrap_kmin=5e-6,
                                                extrap_kmax=2.5e2*self.accuracyboost)
       lnPL = PKL.logP(self.z_interp_2D,
                       np.power(10.0,self.log10k_interp_2D)).flatten(order='F')+np.log(h**3)
