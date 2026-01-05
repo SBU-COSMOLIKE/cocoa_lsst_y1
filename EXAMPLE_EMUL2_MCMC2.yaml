@@ -81,10 +81,10 @@ params:
     proposal: 0.003
     latex: \tau_\mathrm{reio}
   As:
-    derived: 'lambda logA: 1e-10*np.exp(logA)'
+    value: 'lambda logA: 1e-10*np.exp(logA)'
     latex: A_\mathrm{s}
-  A:
-    derived: 'lambda As: 1e9*As'
+  As_1e9:
+    value: 'lambda As: 1e9*As'
     latex: 10^9 A_\mathrm{s}
   mnu:
     value: 0.06
@@ -109,6 +109,9 @@ params:
   omegam:
     derived: true
     latex: \Omega_\mathrm{m}
+  omegab:
+    derived: true
+    latex: \Omega_\mathrm{b}
   rdrag:
     derived: true
     latex: r_\mathrm{drag}
@@ -247,7 +250,7 @@ params:
 theory:
   emultheta:
     path: ./cobaya/cobaya/theories/
-    provides: ['H0', 'omegam']
+    provides: ['H0', 'omegam', 'omegab']
     extra_args:
       file: ['external_modules/data/emultrf/CMB_TRF/emul_lcdm_thetaH0_GP.joblib']
       extra: ['external_modules/data/emultrf/CMB_TRF/extra_lcdm_thetaH0.npy']
