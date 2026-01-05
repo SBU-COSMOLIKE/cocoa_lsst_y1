@@ -97,7 +97,7 @@ params:
   wa:
     value: 'lambda w0pwa, w: w0pwa - w'
     derived: false
-    latex: w_{a,\mathrm{DE}}
+    latex: 'w_{a,\mathrm{DE}}'
   H0:
     derived: true
     latex: H_0
