@@ -515,9 +515,10 @@ Details on the matter power spectrum emulator designs will be presented in the [
 
 # Running Fisher <a name="lsst_examples_fisher"></a>
 
-  The Jupyter notebook `projects/lsst_y1/EXAMPLE_EVALUATE1.ipynb` provides code to compute the Fisher Matrix (Cosmic Shear), as well as a preliminary study on how
-  the 5-stencil finite difference formula offers less precision than the polynomial fit implemented in the [derivkit](https://github.com/nikosarcevic/derivkit) package.
+  The Jupyter notebook `projects/lsst_y1/EXAMPLE_EVALUATE1.ipynb` provides code to compute the Fisher Matrix (Cosmic Shear). Hard priors are implemented in GetDist.
 
   <p align="center">
-  <img width="1156" height="858" alt="example_lssty1_profile2" src="https://github.com/user-attachments/assets/46b513c8-d853-4dac-9ef4-f7bde5b54544" />
+  <img width="1156" height="858" alt="example_lssty1_fisher" src="https://github.com/user-attachments/assets/4f4e5775-6522-4eca-af82-4d1a10f4b1c8" />
   </p>
+
+
