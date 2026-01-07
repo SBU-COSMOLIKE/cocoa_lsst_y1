@@ -16,6 +16,10 @@ likelihood:
   lsst_y1.cosmic_shear:
     path: ./external_modules/data/lsst_y1
     data_file: lsst_y1_M1_GGL0.05.dataset
+    accuracyboost: 1.0
+    integration_accuracy: 0
+    IA_model: 0
+    IA_redshift_evolution: 3
     use_emulator: 2
     non_linear_emul: 2
 params:
@@ -28,7 +32,7 @@ params:
       loc: 3.0448
       scale: 0.05
     proposal: 0.05
-    latex: \log(10^{10} A_\mathrm{s}
+    latex: \log(10^{10} A_\mathrm{s})
   ns:
     prior:
       min: 0.92
@@ -301,6 +305,7 @@ theory:
     path: ./cobaya/cobaya/theories/
     stop_at_error: True
     extra_args:
+      use_syren: True
       param_order: ["As_1e9", "ns", "H0", "omegab", "omegam", 'w', 'wa']
 sampler:
   mcmc:

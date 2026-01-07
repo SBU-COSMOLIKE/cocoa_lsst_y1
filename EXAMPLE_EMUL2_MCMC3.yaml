@@ -3,15 +3,18 @@ debug: False
 stop_at_error: True
 
 likelihood:
-  lsst_y1.cosmic_shear:
+  lsst_y1.combo_3x2pt:
     path: ./external_modules/data/lsst_y1
-    data_file: lsst_y1_M1_GGL0.05.dataset   # 705 non-masked elements  (EE2 delta chi^2 ~ 11.8)
+    data_file: lsst_y1_M1_GGL0.05.dataset
     accuracyboost: 1.0
     integration_accuracy: 0
+    lmax: 50000 # lmax computed for real space correlation function
+    kmax_boltzmann: 5.0
+    # 1 EE2, 2 Halofit
+    non_linear_emul: 2
     IA_model: 0
     IA_redshift_evolution: 3
     use_emulator: 2
-    non_linear_emul: 2
 params:
   As_1e9:
     prior:
@@ -224,6 +227,128 @@ params:
       scale: 0.005
     proposal: 0.005
     latex: m_\mathrm{LSST}^5
+  # Lensing photo-z errors
+  LSST_DZ_L1:
+    prior:
+      dist: norm
+      loc: 0.00457604
+      scale: 0.005
+    ref:
+      dist: norm
+      loc: 0.00457604
+      scale: 0.005
+    proposal: 0.005
+    latex: \Delta z_\mathrm{l,LSST}^1
+  LSST_DZ_L2:
+    prior:
+      dist: norm
+      loc: 0.000309875
+      scale: 0.005
+    ref:
+      dist: norm
+      loc: 0.000309875
+      scale: 0.005
+    proposal: 0.005
+    latex: \Delta z_\mathrm{l,LSST}^2
+  LSST_DZ_L3:
+    prior:
+      dist: norm
+      loc: 0.00855907
+      scale: 0.005
+    ref:
+      dist: norm
+      loc: 0.00855907
+      scale: 0.005
+    proposal: 0.005
+    latex: \Delta z_\mathrm{l,LSST}^3
+  LSST_DZ_L4:
+    prior:
+      dist: norm
+      loc: -0.00316269
+      scale: 0.005
+    ref:
+      dist: norm
+      loc: -0.00316269
+      scale: 0.005
+    proposal: 0.005
+    latex: \Delta z_\mathrm{l,LSST}^4
+  LSST_DZ_L5:
+    prior:
+      dist: norm
+      loc: -0.0146753
+      scale: 0.005
+    ref:
+      dist: norm
+      loc: -0.0146753
+      scale: 0.005
+    proposal: 0.005
+    latex: \Delta z_\mathrm{l,LSST}^5
+  # Bin bias parameters
+  LSST_B1_1:
+    prior:
+      min: 0.8
+      max: 3
+    ref:
+      dist: norm
+      loc: 1.24
+      scale: 0.15
+    proposal: 0.1
+    latex: b_\mathrm{1-LSST}^1
+  LSST_B1_2:
+    prior:
+      min: 0.8
+      max: 3
+    ref:
+      dist: norm
+      loc: 1.36
+      scale: 0.15
+    proposal: 0.1
+    latex: b_\mathrm{1-LSST}^2
+  LSST_B1_3:
+    prior:
+      min: 0.8
+      max: 3
+    ref:
+      dist: norm
+      loc: 1.47
+      scale: 0.15
+    proposal: 0.1
+    latex: b_\mathrm{1-LSST}^3
+  LSST_B1_4:
+    prior:
+      min: 0.8
+      max: 3
+    ref:
+      dist: norm
+      loc: 1.60
+      scale: 0.15
+    proposal: 0.1
+    latex: b_\mathrm{1-LSST}^4
+  LSST_B1_5:
+    prior:
+      min: 0.8
+      max: 3
+    ref:
+      dist: norm
+      loc: 1.76
+      scale: 0.1
+    proposal: 0.1
+    latex: b_\mathrm{1-LSST}^5
+  LSST_BMAG_1:
+    value: 0.0
+    latex: b_\mathrm{BMAG-LSST}^1
+  LSST_BMAG_2:
+    value: 0.0
+    latex: b_\mathrm{BMAG-LSST}^2
+  LSST_BMAG_3:
+    value: 0.0
+    latex: b_\mathrm{BMAG-LSST}^3
+  LSST_BMAG_4:
+    value: 0.0
+    latex: b_\mathrm{BMAG-LSST}^4
+  LSST_BMAG_5:
+    value: 0.0
+    latex: b_\mathrm{BMAG-LSST}^5
 theory:
   emulrdrag:
     path: ./cobaya/cobaya/theories/
@@ -304,4 +429,4 @@ sampler:
     # ---------------------------------------------------------------------
     # ---------------------------------------------------------------------
     Rminus1_single_split: 4
-output: ./projects/lsst_y1/chains/EXAMPLE_EMUL2_MCMC1
+output: ./projects/lsst_y1/chains/EXAMPLE_EMUL2_MCMC3

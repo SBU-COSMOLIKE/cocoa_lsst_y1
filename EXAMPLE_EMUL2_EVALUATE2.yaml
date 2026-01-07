@@ -3,14 +3,19 @@ debug: False
 stop_at_error: True
 
 likelihood:
-  lsst_y1.cosmic_shear:
+  lsst_y1.combo_3x2pt:
     path: ./external_modules/data/lsst_y1
-    data_file: lsst_y1_M1_GGL0.05.dataset   # 705 non-masked elements  (EE2 delta chi^2 ~ 11.8)
-    use_emulator: 2
+    data_file: lsst_y1_M1_GGL0.05.dataset
+    accuracyboost: 1.0
+    integration_accuracy: 0
+    lmax: 50000 # lmax computed for real space correlation function
+    kmax_boltzmann: 5.0
+    # 1 EE2, 2 Halofit
     non_linear_emul: 2
-    print_datavector: False
-    print_datavector_file: "./projects/lsst_y1/chains/example1_lsst_y1_theory_emul.modelvector"
-params: # EE2 PRIORS
+    IA_model: 0
+    IA_redshift_evolution: 3
+    use_emulator: 2
+params:
   As_1e9:
     prior:
       min: 0.5
@@ -18,8 +23,8 @@ params: # EE2 PRIORS
     ref:
       dist: norm
       loc: 2.1
-      scale: 0.25
-    proposal: 0.2
+      scale: 0.65
+    proposal: 0.4
     latex: 10^9 A_\mathrm{s}
     renames: A
   ns:
@@ -87,6 +92,44 @@ params: # EE2 PRIORS
     value: 'lambda w0pwa, w: w0pwa - w'
     derived: false
     latex: 'w_{a,\mathrm{DE}}'
+  LSST_A2_1:
+    prior:
+      min: -5
+      max:  5
+    ref:
+      dist: norm
+      loc: -1.36
+      scale: 0.5
+    proposal: 0.5
+    latex: A_\mathrm{2-IA,LSST}^1
+  LSST_A2_2:
+    prior:
+      min: -5
+      max:  5
+    ref:
+      dist: norm
+      loc: -2.5
+      scale: 0.5
+    proposal: 0.5
+    latex: A_\mathrm{2-IA,LSST}^2
+  LSST_BTA_1:
+    prior:
+      min: 0
+      max: 2
+    ref:
+      dist: norm
+      loc: 1
+      scale: 0.15
+    proposal: 0.1
+  # ---------------------------------------------------------------------------------------
+  # ------------------------------------- DERIVED PARAMETERS ------------------------------
+  # ---------------------------------------------------------------------------------------
+  # WARNING: DO NOT REMOVE omegabh2/omegach2/omegamh2/wa/As/ FROM DERIVED PARAMETERS
+  # SEE: github.com/CosmoLike/cocoa#warning-warning-warning-weak-lensing-yaml-files-in-cobaya-
+  # --------------------------------------------------------------------------------------- 
+  As:
+    value: 'lambda As_1e9: 1e-9 * As_1e9'
+    latex: A_\mathrm{s}
   mnu:
     value: 0.06
   omegabh2:
@@ -95,9 +138,27 @@ params: # EE2 PRIORS
   omegach2:
     value: 'lambda omegam, omegab, mnu, H0: (omegam-omegab)*(H0/100)**2-(mnu*(3.046/3)**0.75)/94.0708'
     latex: \Omega_\mathrm{c} h^2
-  As:
-    value: 'lambda As_1e9: 1e-9*As_1e9'
-    latex: 'A_\mathrm{s}'
+  omegamh2:
+    derived: 'lambda omegam, H0: omegam*(H0/100)**2'
+    latex: \Omega_\mathrm{m} h^2
+  rdrag:
+    latex: r_\mathrm{drag}
+# FIXED LSST PARAMETERS
+  LSST_BMAG_1:
+    value: 0.0
+    latex: b_\mathrm{BMAG-LSST}^1
+  LSST_BMAG_2:
+    value: 0.0
+    latex: b_\mathrm{BMAG-LSST}^2
+  LSST_BMAG_3:
+    value: 0.0
+    latex: b_\mathrm{BMAG-LSST}^3
+  LSST_BMAG_4:
+    value: 0.0
+    latex: b_\mathrm{BMAG-LSST}^4
+  LSST_BMAG_5:
+    value: 0.0
+    latex: b_\mathrm{BMAG-LSST}^5
 
 theory:
   emulrdrag:
@@ -129,7 +190,7 @@ theory:
 
 sampler:
   evaluate:
-    N: 2
+    N: 1
     override:
       As_1e9: 2.1
       ns: 0.96605
@@ -150,5 +211,21 @@ sampler:
       LSST_M5: -0.0158096
       LSST_A1_1: 0.606102
       LSST_A1_2: -1.51541
-
-output: ./projects/lsst_y1/chains/EXAMPLE_EMUL2_EVALUATE1
+      LSST_A2_1: 0.0
+      LSST_A2_2: -1.51541
+      LSST_BTA_1: 0.0
+      #LSST_A2_1: -0.852658
+      #LSST_A2_2: -2.63433
+      #LSST_BTA_1: 1.01257
+      LSST_DZ_L1: 0.00457604
+      LSST_DZ_L2: 0.000309875
+      LSST_DZ_L3: 0.00855907
+      LSST_DZ_L4: -0.00316269
+      LSST_DZ_L5: -0.0146753 
+      LSST_B1_1: 1.72716
+      LSST_B1_2: 1.65168
+      LSST_B1_3: 1.61423
+      LSST_B1_4: 1.92886
+      LSST_B1_5: 2.11633
+  
+output: ./projects/lsst_y1/chains/EXAMPLE_EMUL2_EVALUATE2

@@ -46,20 +46,20 @@ analysissettings2={'smooth_scale_1D':0.25,
                    'fine_bins_1D': 1024}
 
 root_chains = (
-  'EXAMPLE_EMUL_MCMC1',
-  'EXAMPLE_EMUL2_MCMC1',
+  'EXAMPLE_EMUL_MCMC2',
+  'EXAMPLE_EMUL2_MCMC2',
 )
 
 # --------------------------------------------------------------------------------
 samples=loadMCSamples(chaindir + root_chains[0],settings=analysissettings)
 p = samples.getParams()
 samples.addDerived(p.chi2+2*p.minuslogprior,name='chi2v2', label='{\\chi^2_{\\rm post}}')
-samples.saveAsText(chaindir + '/.VM_P3_TMP1')
+samples.saveAsText(chaindir + '/.VM_P4_TMP1')
 # --------------------------------------------------------------------------------
 samples=loadMCSamples(chaindir + root_chains[1],settings=analysissettings)
 p = samples.getParams()
 samples.addDerived(p.chi2+2*p.minuslogprior,name='chi2v2', label='{\\chi^2_{\\rm post}}')
-samples.saveAsText(chaindir + '/.VM_P3_TMP2')
+samples.saveAsText(chaindir + '/.VM_P4_TMP2')
 # --------------------------------------------------------------------------------
 
 #GET DIST PLOT SETUP
@@ -78,8 +78,8 @@ g.legend_labels=False
 
 g.triangle_plot(
   params=parameter,
-  roots=[chaindir + '/.VM_P3_TMP1',
-         chaindir + '/.VM_P3_TMP2'],
+  roots=[chaindir + '/.VM_P4_TMP1',
+         chaindir + '/.VM_P4_TMP2'],
   plot_3d_with_param=None,
   line_args=[ {'lw': 1.0,'ls': 'solid', 'color': 'cornflowerblue'},
               {'lw': 2.1,'ls': '--', 'color': 'maroon'},
@@ -93,10 +93,10 @@ g.triangle_plot(
   filled=[True,False,True,False,True],
   shaded=False,
   legend_labels=[
-    'Full cosmic shear data vector emul (Halofit), MH',
-    'Hybrid-emul (baseline analytical-syren w/o corrections), MH',
+    'CMB + SN + DESI + Full cosmic shear data vector emul (Halofit), MH',
+    'CMB + SN + DESI + Hybrid-emul (baseline analytical-syren w/o corrections), MH',
   ],
-  legend_loc=(0.32, 0.875))
+  legend_loc=(0.205, 0.89))
 
 # ----------------------------------------------------
 # ----------------------------------------------------
@@ -106,4 +106,4 @@ axarr[2,0].set_xlim([1.3,2.8])
 # ----------------------------------------------------
 # ----------------------------------------------------
 
-g.export(os.path.join(chaindir,"example_compare_chains_emul3.pdf"))
+g.export(os.path.join(chaindir,"example_compare_chains_emul4.pdf"))
