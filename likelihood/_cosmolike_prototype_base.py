@@ -263,7 +263,9 @@ class _cosmolike_prototype_base(DataSetLikelihood):
         lnbt[self.z_interp_2D < 10.0, :] = tmp
         # Use Halofit first that works on all redshifts
         lnPNL = self.provider.get_Pk_interpolator(("delta_tot", "delta_tot"),
-          nonlinear=True, extrap_kmax =2.5e2*self.accuracyboost).logP(self.z_interp_2D,
+          nonlinear=True, 
+          extrap_kmin=1e-6,
+          extrap_kmax =2.5e2*self.accuracyboost).logP(self.z_interp_2D,
           np.power(10.0,self.log10k_interp_2D)).flatten(order='F')+np.log(h**3) 
         # on z < 10.0, replace it with EE2
         lnPNL = np.where((self.z_interp_2D<10)[:,None], 
@@ -271,7 +273,9 @@ class _cosmolike_prototype_base(DataSetLikelihood):
           lnPNL.reshape(self.len_z_interp_2D,self.len_log10k_interp_2D,order='F')).ravel(order='F')
       elif self.non_linear_emul == 2:
         lnPNL = self.provider.get_Pk_interpolator(("delta_tot", "delta_tot"),
-          nonlinear=True, extrap_kmax =2.5e2*self.accuracyboost).logP(self.z_interp_2D,
+          nonlinear=True, 
+          extrap_kmin=1e-6, 
+          extrap_kmax=2.5e2*self.accuracyboost).logP(self.z_interp_2D,
           np.power(10.0,self.log10k_interp_2D)).flatten(order='F')+np.log(h**3)   
       else:
         raise LoggedError(self.log, "non_linear_emul = %d is an invalid option", non_linear_emul)
