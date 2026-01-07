@@ -3,6 +3,7 @@ from __future__ import absolute_import, division, print_function
 import os
 import numpy as np
 import scipy
+from scipy.interpolate import interp1d
 import sys
 import time
 
@@ -11,8 +12,6 @@ from cobaya.likelihoods.base_classes import DataSetLikelihood
 from cobaya.log import LoggedError
 from getdist import IniFile
 
-from scipy.interpolate import interp1d
-from scipy.interpolate import CubicSpline as _CubicSpline
 import euclidemu2 as ee2
 import math
 
@@ -23,30 +22,17 @@ survey = "LSST"
 class _cosmolike_prototype_base(DataSetLikelihood):
 
   def initialize(self, probe):
-
-    # ------------------------------------------------------------------------
     ini = IniFile(os.path.normpath(os.path.join(self.path, self.data_file)))
-
     self.probe = probe
-
     self.data_vector_file = ini.relativeFileName('data_file')
-
     self.cov_file = ini.relativeFileName('cov_file')
-
     self.mask_file = ini.relativeFileName('mask_file')
-
     self.lens_file = ini.relativeFileName('nz_lens_file')
-
     self.source_file = ini.relativeFileName('nz_source_file')
-
     self.lens_ntomo = ini.int("lens_ntomo") #5
-
     self.source_ntomo = ini.int("source_ntomo") #4
-
     self.ntheta = ini.int("n_theta")
-
     self.theta_min_arcmin = ini.float("theta_min_arcmin")
-    
     self.theta_max_arcmin = ini.float("theta_max_arcmin")
 
     # ------------------------------------------------------------------------   
@@ -68,6 +54,8 @@ class _cosmolike_prototype_base(DataSetLikelihood):
     ci.initial_setup()
     ci.init_probes(possible_probes=self.probe)
     ci.init_binning(int(self.ntheta), self.theta_min_arcmin, self.theta_max_arcmin)
+
+#    ci.init_ggl_exclude(np.array(self.ggl_exclude).flatten())
 
     if self.debug:
       ci.set_log_level_debug()
@@ -91,20 +79,20 @@ class _cosmolike_prototype_base(DataSetLikelihood):
 
       if self.external_nz_modeling: 
         (self.lens_nz, self.source_nz) = ci.read_redshift_distributions(
-            lens_multihisto_file=self.lens_file,
-            lens_ntomo=int(self.lens_ntomo), 
-            source_multihisto_file=self.source_file,
-            source_ntomo=int(self.source_ntomo)
+            lens_multihisto_file = self.lens_file,
+            lens_ntomo = int(self.lens_ntomo), 
+            source_multihisto_file = self.source_file,
+            source_ntomo = int(self.source_ntomo)
           ) 
         ci.init_lens_sample_size(int(self.lens_ntomo))
         ci.init_source_sample_size(int(self.source_ntomo))
         ci.init_ntomo_powerspectra() # must be called after set_source/lens_size  
       else:
         ci.init_redshift_distributions_from_files(
-          lens_multihisto_file=self.lens_file,
-          lens_ntomo=int(self.lens_ntomo), 
-          source_multihisto_file=self.source_file,
-          source_ntomo=int(self.source_ntomo))  
+          lens_multihisto_file = self.lens_file,
+          lens_ntomo = int(self.lens_ntomo), 
+          source_multihisto_file = self.source_file,
+          source_ntomo = int(self.source_ntomo))  
 
       ci.init_data_real(self.cov_file, self.mask_file, self.data_vector_file)
 
@@ -133,7 +121,6 @@ class _cosmolike_prototype_base(DataSetLikelihood):
       ci.set_baryon_pcs(eigenvectors = np.loadtxt(baryon_pca_file))
       self.log.info('use_baryon_pca = True')
       self.log.info('baryon_pca_file = %s loaded', baryon_pca_file)
-      self.use_baryon_pca = True
     else:
       self.log.info('use_baryon_pca = False')
 
@@ -221,6 +208,7 @@ class _cosmolike_prototype_base(DataSetLikelihood):
           'tt': 0
         }
       }
+
   # ------------------------------------------------------------------------
   # ------------------------------------------------------------------------
   # ------------------------------------------------------------------------
@@ -230,7 +218,7 @@ class _cosmolike_prototype_base(DataSetLikelihood):
     if not (self.use_emulator == 1):
       PKL  = self.provider.get_Pk_interpolator(("delta_tot", "delta_tot"), 
                                                nonlinear=False, 
-                                               extrap_kmin=5e-6,
+                                               extrap_kmin=1e-6,
                                                extrap_kmax=2.5e2*self.accuracyboost)
       lnPL = PKL.logP(self.z_interp_2D,
                       np.power(10.0,self.log10k_interp_2D)).flatten(order='F')+np.log(h**3)
@@ -384,6 +372,10 @@ class _cosmolike_prototype_base(DataSetLikelihood):
 
   def compute_logp(self, datavector):
     return -0.5 * ci.compute_chi2(datavector)
+
+  # ------------------------------------------------------------------------
+  # ------------------------------------------------------------------------
+  # ------------------------------------------------------------------------
 
   def logp(self, **params):
     return self.compute_logp(self.get_datavector(**params))
