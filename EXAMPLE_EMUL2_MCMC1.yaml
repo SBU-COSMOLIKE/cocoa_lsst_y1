@@ -92,6 +92,11 @@ params:
   LSST_BARYON_Q2:
     value: 0.0
     latex: Q2_\mathrm{LSST}^2
+  # ------------------------------------------------------------------------
+  # ------------------------------------------------------------------------
+  # Nuisance parameters below (it overwrites the default settings)
+  # ------------------------------------------------------------------------
+  # ------------------------------------------------------------------------
   # WL photo-z errors
   LSST_DZ_S1:
     prior:
@@ -148,27 +153,9 @@ params:
       scale: 0.002
     proposal: 0.002
     latex: \Delta z_\mathrm{s,LSST}^5
-  # Intrinsic alignment
-  LSST_A1_1:
-    prior:
-      min: -5
-      max:  5
-    ref:
-      dist: norm
-      loc: 0.7
-      scale: 0.5
-    proposal: 0.5
-    latex: A_\mathrm{1-IA,LSST}^1
-  LSST_A1_2:
-    prior:
-      min: -5
-      max:  5
-    ref:
-      dist: norm
-      loc: -1.7
-      scale: 0.5
-    proposal: 0.5
+  # ------------------------------------------------------------------------
   # Shear calibration parameters
+  # ------------------------------------------------------------------------
   LSST_M1:
     prior:
       dist: norm
@@ -224,6 +211,28 @@ params:
       scale: 0.005
     proposal: 0.005
     latex: m_\mathrm{LSST}^5
+  # ------------------------------------------------------------------------
+  # Intrinsic alignment
+  # ------------------------------------------------------------------------
+  LSST_A1_1:
+    prior:
+      min: -5
+      max:  5
+    ref:
+      dist: norm
+      loc: 0.7
+      scale: 0.5
+    proposal: 0.5
+    latex: A_\mathrm{1-IA,LSST}^1
+  LSST_A1_2:
+    prior:
+      min: -5
+      max:  5
+    ref:
+      dist: norm
+      loc: -1.7
+      scale: 0.5
+    proposal: 0.5
 theory:
   emulrdrag:
     path: ./cobaya/cobaya/theories/
