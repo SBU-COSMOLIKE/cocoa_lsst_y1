@@ -128,7 +128,7 @@ theory:
       param_order: ["As_1e9", "ns", "H0", "omegab", "omegam", 'w', 'wa']
 sampler:
   evaluate:
-    N: 1
+    N: 2
     override:
       As_1e9: 2.1
       ns: 0.96605
