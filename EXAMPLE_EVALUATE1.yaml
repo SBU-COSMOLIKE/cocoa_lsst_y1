@@ -191,7 +191,6 @@ params:
       scale: 0.15
     proposal: 0.1
     latex: A_\mathrm{BTA-IA,LSST}^1
-
 theory:
   camb:
     path: ./external_modules/code/CAMB
@@ -203,8 +202,7 @@ theory:
       dark_energy_model: ppf
       accurate_massive_neutrino_transfers: false
       k_per_logint: 10
-      kmax: 5.0
-
+      kmax: 5.0   
 sampler:
   evaluate:
     N: 1
@@ -235,5 +233,4 @@ sampler:
       #LSST_A2_1: -0.852658
       #LSST_A2_2: -2.63433
       #LSST_BTA_1: 1.01257
-
 output: ./projects/lsst_y1/chains/EXAMPLE_EVALUATE1

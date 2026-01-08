@@ -7,7 +7,7 @@ likelihood:
     path: ./external_modules/data/lsst_y1
     data_file: lsst_y1_M1_GGL0.05.dataset   # 705 non-masked elements  (EE2 delta chi^2 ~ 11.8)
     use_emulator: 2
-    non_linear_emul: 1
+    non_linear_emul: 2
     print_datavector: False
     print_datavector_file: "./projects/lsst_y1/chains/example1_lsst_y1_theory_emul.modelvector"
 params: # EE2 PRIORS
@@ -124,7 +124,7 @@ theory:
     path: ./cobaya/cobaya/theories/
     stop_at_error: True
     extra_args:
-      use_syren: False
+      use_syren: True
       param_order: ["As_1e9", "ns", "H0", "omegab", "omegam", 'w', 'wa']
 sampler:
   evaluate:
@@ -149,5 +149,4 @@ sampler:
       LSST_M5: -0.0158096
       LSST_A1_1: 0.606102
       LSST_A1_2: -1.51541
-
 output: ./projects/lsst_y1/chains/EXAMPLE_EMUL2_EVALUATE1
