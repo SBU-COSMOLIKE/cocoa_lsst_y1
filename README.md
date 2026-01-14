@@ -109,14 +109,24 @@ and
            --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} \
            cobaya-run ./projects/lsst_y1/EXAMPLE_EVALUATE1.yaml -f
 
-  - Linux
-    
+  -  macOS (arm)
+
+         mpirun -n 1 --oversubscribe cobaya-run ./projects/lsst_y1/EXAMPLE_EVALUATE1.yaml -f
+
+
 - **MCMC (Metropolis-Hastings Algorithm)**:
 
-      mpirun -n 4 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
-         --bind-to core:overload-allowed --mca mpi_yield_when_idle 1 --report-bindings  \
-         --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} \
-         cobaya-run ./projects/lsst_y1/EXAMPLE_MCMC1.yaml -f
+  - Linux
+
+        mpirun -n 4 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
+           --bind-to core:overload-allowed --mca mpi_yield_when_idle 1 --report-bindings  \
+           --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} \
+           cobaya-run ./projects/lsst_y1/EXAMPLE_MCMC1.yaml -f
+
+   -  macOS (arm)
+     
+          mpirun -n 4 --oversubscribe cobaya-run ./projects/lsst_y1/EXAMPLE_MCMC1.yaml -f
+
 
 # Running ML emulators <a name="cobaya_base_code_examples_emul"></a>
 
@@ -138,7 +148,7 @@ Cocoa contains a few transformer- and CNN-based neural network emulators capable
 > [!TIP]
 > What if users have not configured ML-related keys before sourcing `setup_cocoa.sh`?
 > 
-> Answer: comment the keys below before rerunning `setup_cocoa.sh`.
+> Answer: Comment the keys below before rerunning `setup_cocoa.sh`.
 > 
 >     [Adapted from Cocoa/set_installation_options.sh shell script]
 >     # These keys are only relevant if you run setup_cocoa multiple times
