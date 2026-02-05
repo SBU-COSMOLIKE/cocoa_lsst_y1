@@ -22,11 +22,13 @@ echo Number of task is $SLURM_NTASKS
 echo Number of cpus per task is $SLURM_CPUS_PER_TASK
 
 cd $SLURM_SUBMIT_DIR
+declare -i NY=100 # so from 0-99 is all about PROFILE1, 100-199 all about PROFILE2
 if [ -z "${ROOTDIR}" ]; then
-  sleep $(( 5 + SLURM_ARRAY_TASK_ID*25 )) # help avoid different scripts running start_cocoa.sh simultaneously
-                                          # clash can still happen when one script runs start_cocoa.sh, the other
-                                          # script is reading a file (start_cocoa.sh invokes stop_cocoa.sh)
-                                          # which delete links and ROOTDIR so the running script can find file/likelihood
+  declare -i tmp=$(( $SLURM_ARRAY_TASK_ID % NY ))
+  sleep $(( 5 + $tmp*15 )) # help avoid different scripts running start_cocoa.sh simultaneously
+                           # clash can still happen when one script runs start_cocoa.sh, the other
+                           # script is reading a file (start_cocoa.sh invokes stop_cocoa.sh)
+                           # which delete links and ROOTDIR so the running script can find file/likelihood
   conda activate cocoa
   source start_cocoa.sh
 fi
@@ -51,9 +53,7 @@ declare -a factor2=( "3" "3.0" "3.0" "3.0" "3"
                      "3" "3" )
 declare -a grid=( factor1 factor2 )
 declare -a nstws=( "400" "700" )
-
-declare -i NY=100 # so from 0-99 is all about PROFILE1, 100-199 all about PROFILE2
-declare -i i=$(( $SLURM_ARRAY_TASK_ID / NY + 1 ))
+declare -i i=$(( $SLURM_ARRAY_TASK_ID / NY ))
 declare -i j=$(( $SLURM_ARRAY_TASK_ID % NY ))
 (( i < ${#grid[@]} )) || exit 0 # padding: skip unused slots
 declare -n row="${grid[$i]}"
@@ -64,8 +64,8 @@ declare factor="${row[$j]}"
 "${CONDA_PREFIX}"/bin/mpirun -n ${SLURM_NTASKS} --oversubscribe --mca pml ^ucx \
   --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by slot \
   --map-by slot:pe=${OMP_NUM_THREADS} python \
-  ./projects/lsst_y1/EXAMPLE_EMUL_PROFILE1.py \
-    --root ./projects/lsst_y1/ --cov "chains/EXAMPLE_EMUL_MCMC${i}.covmat" \
-    --outroot "EXAMPLE_EMUL_PROFILE$i" --factor "$factor" \
+  ./projects/lsst_y1/EXAMPLE_EMUL_PROFILE$((i+1)).py \
+    --root ./projects/lsst_y1/ --cov "chains/EXAMPLE_EMUL_MCMC$((i+1)).covmat" \
+    --outroot "EXAMPLE_EMUL_PROFILE$((i+1))" --factor "$factor" \
     --nstw $nstw --numpts 15 --profile "${j}" \
     --minfile="./projects/lsst_y1/chains/EXAMPLE_EMUL_MIN${i}.txt"
