@@ -50,13 +50,14 @@ declare -a factor2=( "3" "3.0" "3.0" "3.0" "3"
                      "3" "3" "3" "3" "3" 
                      "3" "3" )
 declare -a grid=( factor1 factor2 )
-declare -a nstw=( "400" "700" )
+declare -a nstws=( "400" "700" )
 
 declare -i NY=100 # so from 0-99 is all about PROFILE1, 100-199 all about PROFILE2
 declare -i i=$(( $SLURM_ARRAY_TASK_ID / NY + 1 ))
 declare -i j=$(( $SLURM_ARRAY_TASK_ID % NY ))
 (( i < ${#grid[@]} )) || exit 0 # padding: skip unused slots
 declare -n row="${grid[$i]}"
+declare nstw="${nstws[$i]}"
 (( j < ${#row[@]} )) || exit 0  # padding: skip unused slots
 declare factor="${row[$j]}"
 
@@ -66,5 +67,5 @@ declare factor="${row[$j]}"
   ./projects/lsst_y1/EXAMPLE_EMUL_PROFILE1.py \
     --root ./projects/lsst_y1/ --cov "chains/EXAMPLE_EMUL_MCMC${i}.covmat" \
     --outroot "EXAMPLE_EMUL_PROFILE$i" --factor "$factor" \
-    --nstw "${nstw[$j]}" --numpts 15 --profile "${j}" \
+    --nstw $nstw --numpts 15 --profile "${j}" \
     --minfile="./projects/lsst_y1/chains/EXAMPLE_EMUL_MIN${i}.txt"
