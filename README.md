@@ -173,7 +173,7 @@ Now, users must follow all the steps below.
   - Linux
     
         mpirun -n 1 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --rank-by slot \
-            --bind-to core:overload-allowed --map-by slot --mca mpi_yield_when_idle 1 \
+            --bind-to core:overload-allowed --rank-by slot --map-by slot:pe=${OMP_NUM_THREADS} \
             cobaya-run ./projects/lsst_y1/EXAMPLE_EMUL_EVALUATE1.yaml -f
 
   - macOS (arm)
@@ -185,7 +185,7 @@ Now, users must follow all the steps below.
   - Linux
     
         mpirun -n 4 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --rank-by slot \
-            --bind-to core:overload-allowed --map-by slot --mca mpi_yield_when_idle 1 \
+            --bind-to core:overload-allowed --rank-by slot --map-by slot:pe=${OMP_NUM_THREADS} \
             cobaya-run ./projects/lsst_y1/EXAMPLE_EMUL_MCMC1.yaml -r
 
   - macOS (arm)
@@ -203,7 +203,7 @@ Now, users must follow all the steps below.
   - Linux
     
         mpirun -n 4 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --rank-by slot \
-            --bind-to core:overload-allowed --map-by slot --mca mpi_yield_when_idle 1 \
+            --bind-to core:overload-allowed --rank-by slot --map-by slot:pe=${OMP_NUM_THREADS} \
             cobaya-run ./projects/lsst_y1/EXAMPLE_EMUL_MCMC2.yaml -r
 
   - macOS (arm)
@@ -220,7 +220,7 @@ Now, users must follow all the steps below.
   - Linux
     
         mpirun -n 90 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --rank-by slot \
-            --bind-to core:overload-allowed --map-by slot --mca mpi_yield_when_idle 1 \
+            --bind-to core:overload-allowed --rank-by slot --map-by slot:pe=${OMP_NUM_THREADS} \
             cobaya-run ./projects/lsst_y1/EXAMPLE_EMUL_POLY1.yaml -r
 
   - macOS (arm)
@@ -232,7 +232,7 @@ Now, users must follow all the steps below.
   - Linux
     
         mpirun -n 90 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --rank-by slot \
-            --bind-to core:overload-allowed --map-by slot --mca mpi_yield_when_idle 1 \
+            --bind-to core:overload-allowed --rank-by slot --map-by slot:pe=${OMP_NUM_THREADS} \
             cobaya-run ./projects/lsst_y1/EXAMPLE_EMUL_POLY2.yaml -r
 
   - macOS (arm)
@@ -251,7 +251,7 @@ likelihoods, and the theory code, all following Cobaya Conventions.
   - Linux
     
         mpirun -n 90 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --rank-by slot \
-            --bind-to core:overload-allowed --map-by slot --mca mpi_yield_when_idle 1 \
+            --bind-to core:overload-allowed --rank-by slot --map-by slot:pe=${OMP_NUM_THREADS} \
             python -m mpi4py.futures ./projects/lsst_y1/EXAMPLE_EMUL_NAUTILUS1.py \
                 --root ./projects/lsst_y1/ --outroot "EXAMPLE_EMUL_NAUTILUS1"  \
                 --maxfeval 750000 --nlive 2048 --neff 15000 --flive 0.01 --nnetworks 5
@@ -269,7 +269,7 @@ likelihoods, and the theory code, all following Cobaya Conventions.
   - Linux
     
         mpirun -n 90 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --rank-by slot \
-            --bind-to core:overload-allowed --map-by slot --mca mpi_yield_when_idle 1 \
+            --bind-to core:overload-allowed --rank-by slot --map-by slot:pe=${OMP_NUM_THREADS} \
             python -m mpi4py.futures ./projects/lsst_y1/EXAMPLE_EMUL_NAUTILUS2.py \
                 --root ./projects/lsst_y1/ --outroot "EXAMPLE_EMUL_NAUTILUS2"  \
                 --maxfeval 850000 --nlive 3072 --neff 15000 --flive 0.01 --nnetworks 5
@@ -287,7 +287,7 @@ likelihoods, and the theory code, all following Cobaya Conventions.
   - Linux
     
         mpirun -n 51 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --rank-by slot \
-            --bind-to core:overload-allowed --map-by slot --mca mpi_yield_when_idle 1 \
+            --bind-to core:overload-allowed --rank-by slot --map-by slot:pe=${OMP_NUM_THREADS} \
             python ./projects/lsst_y1/EXAMPLE_EMUL_EMCEE1.py --root ./projects/lsst_y1/ \
                 --outroot "EXAMPLE_EMUL_EMCEE1" --maxfeval 1000000
 
@@ -301,7 +301,7 @@ likelihoods, and the theory code, all following Cobaya Conventions.
   - Linux
     
         mpirun -n 114 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --rank-by slot \
-          --bind-to core:overload-allowed --map-by slot --mca mpi_yield_when_idle 1 \
+          --bind-to core:overload-allowed --rank-by slot --map-by slot:pe=${OMP_NUM_THREADS} \
           python ./projects/lsst_y1/EXAMPLE_EMUL_EMCEE2.py --root ./projects/lsst_y1/ \
               --outroot "EXAMPLE_EMUL_EMCEE2" --maxfeval 2000000
 
@@ -349,7 +349,7 @@ likelihoods, and the theory code, all following Cobaya Conventions.
   - Linux
     
         mpirun -n 51 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --rank-by slot \
-            --bind-to core:overload-allowed --map-by slot --mca mpi_yield_when_idle 1 \
+            --bind-to core:overload-allowed --rank-by slot --map-by slot:pe=${OMP_NUM_THREADS} \
             python ./projects/lsst_y1/EXAMPLE_EMUL_MINIMIZE1.py --root ./projects/lsst_y1/ \
                 --outroot "EXAMPLE_EMUL_MIN1" --nstw 350
 
@@ -363,7 +363,7 @@ likelihoods, and the theory code, all following Cobaya Conventions.
   - Linux
     
         mpirun -n 114 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self --rank-by slot \
-            --bind-to core:overload-allowed --map-by slot --mca mpi_yield_when_idle 1 \
+            --bind-to core:overload-allowed --rank-by slot --map-by slot:pe=${OMP_NUM_THREADS} \
            python ./projects/lsst_y1/EXAMPLE_EMUL_MINIMIZE2.py --root ./projects/lsst_y1/ \
                --outroot "EXAMPLE_EMUL_MIN2" --nstw 750
 
@@ -396,8 +396,7 @@ likelihoods, and the theory code, all following Cobaya Conventions.
   - Linux
     
           mpirun -n 51 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
-            --bind-to core:overload-allowed --rank-by slot \
-            --map-by slot:pe=${OMP_NUM_THREADS} --mca mpi_yield_when_idle 1 \
+            --bind-to core:overload-allowed --rank-by slot --map-by slot:pe=${OMP_NUM_THREADS} \
             python ./projects/lsst_y1/EXAMPLE_EMUL_PROFILE1.py \
               --root ./projects/lsst_y1/ --cov 'chains/EXAMPLE_EMUL_MCMC1.covmat' \
               --outroot "EXAMPLE_EMUL_PROFILE1" --factor 3 --nstw 350 --numpts 10 \
@@ -417,8 +416,7 @@ likelihoods, and the theory code, all following Cobaya Conventions.
   - Linux
     
         mpirun -n 114 --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
-          --bind-to core:overload-allowed --rank-by slot \
-          --map-by slot:pe=${OMP_NUM_THREADS} --mca mpi_yield_when_idle 1 \
+          --bind-to core:overload-allowed --rank-by slot --map-by slot:pe=${OMP_NUM_THREADS} \
           python ./projects/lsst_y1/EXAMPLE_EMUL_PROFILE2.py \
             --root ./projects/lsst_y1/ --cov 'chains/EXAMPLE_EMUL_MCMC2.covmat' \
             --outroot "EXAMPLE_EMUL_PROFILE2" --factor 3 --nstw 750 --numpts 10 \
