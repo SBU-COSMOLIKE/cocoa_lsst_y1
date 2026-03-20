@@ -1,17 +1,16 @@
 #!/bin/bash
 
-#SBATCH --job-name=EMMCMC
-#SBATCH --output=EMMCMC-%A-%a.out
+#SBATCH --job-name=MC
+#SBATCH --output=MC-%A-%a.out
 #SBATCH --nodes=1
-#SBATCH --ntasks=4
-#SBATCH --ntasks-per-node=4
-#SBATCH --ntasks-per-socket=4   
+#SBATCH --ntasks=6
+#SBATCH --ntasks-per-node=6
+#SBATCH --ntasks-per-socket=6   
 #SBATCH --cpus-per-task=1      
-#SBATCH --time=12:00:00
+#SBATCH --time=15:00:00
 #SBATCH --partition=high_priority
 #SBATCH --qos=user_qos_timeifler
 #SBATCH --account=timeifler
-
 
 echo Running on host `hostname`
 echo Time is `date`
@@ -22,8 +21,6 @@ echo Number of task is $SLURM_NTASKS
 echo Number of cpus per task is $SLURM_CPUS_PER_TASK
 
 cd $SLURM_SUBMIT_DIR
-
-# conda and (.local) envs should be already loaded prior to submitting a slurm script
 if [ -z "${ROOTDIR}" ]; then
   sleep $(( 10 + SLURM_ARRAY_TASK_ID*20 )) # help avoid different scripts running start_cocoa.sh simultaneously
                                            # clash can still happen when one script runs start_cocoa.sh, the other
@@ -34,9 +31,10 @@ if [ -z "${ROOTDIR}" ]; then
   source start_cocoa.sh
 fi
 
+export OMP_PROC_BIND=close
 export OMP_NUM_THREADS=1
 
-mpirun -n ${SLURM_NTASKS} --oversubscribe --mca pml ^ucx --mca btl vader,tcp,self \
-  --bind-to core:overload-allowed --rank-by slot \
-  --map-by slot:pe=${OMP_NUM_THREADS} --mca mpi_yield_when_idle 1 \
+"${CONDA_PREFIX}"/bin/mpirun -n ${SLURM_NTASKS} --oversubscribe  --mca pml ^ucx \
+  --mca btl vader,tcp,self --bind-to core:overload-allowed --rank-by slot \
+  --map-by slot:pe=${OMP_NUM_THREADS} \
   cobaya-run ./projects/lsst_y1/EXAMPLE_EMUL_MCMC${SLURM_ARRAY_TASK_ID}.yaml -f
