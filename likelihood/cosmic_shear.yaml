@@ -16,7 +16,7 @@ IA_redshift_evolution: 3
 #           1 = TATT
 IA_model: 0
 external_nz_modeling: 0
-use_emulator: False
+use_emulator: 0
 
 add_baryons_on_dv: False
 which_bsims_add_on_dv: "antilles-2"
