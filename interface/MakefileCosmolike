@@ -48,7 +48,7 @@ LDFLAGS += -L$(CONDA_PREFIX)/lib -L$(ROOTDIR)/.local/lib
 LDFLAGS += -Wl,-rpath,$(CONDA_PREFIX)/lib -Wl,-rpath,$(ROOTDIR)/.local/lib
 
 ifdef COSMOLIKE_DEBUG_MODE
-	COMMON_FLAGS += -O0 -W -Wall -Wextra -Wcomment -pedantic -g  -Wno-unknown-pragmas 
+	COMMON_FLAGS += -O0  -DDEBUG -W -Wall -Wextra -Wcomment -pedantic -g -fmax-errors=1 -Wno-unknown-pragmas -fsignaling-nans
 	ifeq ($(PYOS),Darwin)
 		COMMON_FLAGS += -ferror-limit=1 -fsanitize=undefined,float-divide-by-zero -fno-sanitize-recover=all
 	else
@@ -57,9 +57,9 @@ ifdef COSMOLIKE_DEBUG_MODE
 else
 	COMMON_FLAGS += -O3 -march=native -fno-fast-math -fno-associative-math -frounding-math
 	ifeq ($(PYOS),Darwin)
-	  COMMON_FLAGS += -ferror-limit=1 -fopenmp -ftrapping-math
+	  COMMON_FLAGS += -fopenmp -ftrapping-math
 	else
-	  COMMON_FLAGS += -fmax-errors=1 -fopenmp -ftrapping-math -fsignaling-nans
+	  COMMON_FLAGS += -fopenmp -ftrapping-math -fsignaling-nans
 	endif
 endif
 
@@ -160,6 +160,7 @@ CSOURCES += \
 		${ROOTDIR}/external_modules/code/cosmolike/baryons.c \
 		${ROOTDIR}/external_modules/code/cosmolike/cosmo3D.c \
 		${ROOTDIR}/external_modules/code/cosmolike/cosmo2D.c \
+		${ROOTDIR}/external_modules/code/cosmolike/cosmo2D_scuts.c \
 		${ROOTDIR}/external_modules/code/cosmolike/halo.c \
 		${ROOTDIR}/external_modules/code/cosmolike/IA.c \
 		${ROOTDIR}/external_modules/code/cosmolike/radial_weights.c \
@@ -179,6 +180,7 @@ OBJECTC += \
 		./bias.o \
 		./cosmo3D.o \
 		./cosmo2D.o \
+		./cosmo2D_scuts.o \
 		./halo.o \
 		./IA.o \
 		./radial_weights.o \
@@ -188,11 +190,13 @@ OBJECTC += \
 
 CPPSOURCES += \
 		${ROOTDIR}/external_modules/code/cosmolike/generic_interface.cpp \
-		${ROOTDIR}/external_modules/code/cosmolike/cosmo2D_wrapper.cpp
+		${ROOTDIR}/external_modules/code/cosmolike/cosmo2D_wrapper.cpp \
+		${ROOTDIR}/external_modules/code/cosmolike/cosmo2D_scuts_wrapper.cpp
 
 OBJECTCPP += \
 		./generic_interface.o \
-		./cosmo2D_wrapper.o
+		./cosmo2D_wrapper.o \
+		./cosmo2D_scuts_wrapper.o
 
 $(OBJECTC): $(CSOURCES)
 	$(CC) $(CFLAGS) -fPIC -c $(CSOURCES)
@@ -203,7 +207,7 @@ $(OBJECTCPP): $(CPPSOURCES)
 cosmolike_lsst_y1_interface.so: $(OBJECTC) $(OBJECTCPP)
 	$(CXX) $(CXXFLAGS) -DCOBAYA_SAMPLER $(SOFLAG) -fPIC -o $@ \
 	      $(OBJECTC) $(OBJECTCPP) interface.cpp \
-	      $(LDFLAGS) $(INSTALL_NAME_FLAG) $(LDLIBS) 
+	      $(LDFLAGS) $(INSTALL_NAME_FLAG) $(LDLIBS)
 	@rm *.o
 
 test: $(OBJECTC) $(CSOURCES) $(OBJECTCPP) interface.cpp
