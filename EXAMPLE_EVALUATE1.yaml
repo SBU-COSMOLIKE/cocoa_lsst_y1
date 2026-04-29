@@ -244,8 +244,8 @@ sampler:
       LSST_A1_1: 0.606102
       LSST_A1_2: -1.51541
       LSST_A2_1: 0.0
-      LSST_A2_2: -1.51541
       LSST_BTA_1: 0.0
-      #LSST_A2_1:  0.125
+      #LSST_A2_1:  0.05
       #LSST_BTA_1: 0.05
+      LSST_A2_2: -1.51541
 output: ./projects/lsst_y1/chains/EXAMPLE_EVALUATE1
