@@ -9,7 +9,6 @@ likelihood:
     use_emulator: 1
     print_datavector: False
     print_datavector_file: "./projects/lsst_y1/chains/example1_lsst_y1_theory_emul.modelvector"
-
 params:
   As_1e9:
     prior:

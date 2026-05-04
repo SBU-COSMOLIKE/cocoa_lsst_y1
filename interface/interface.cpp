@@ -11,7 +11,6 @@
 #include <random>
 #include <map>
 
-#define SPDLOG_ACTIVE_LEVEL SPDLOG_LEVEL_INFO
 #include <spdlog/spdlog.h>
 #include <spdlog/sinks/basic_file_sink.h>
 #include <spdlog/cfg/env.h>
@@ -39,6 +38,7 @@ namespace py = pybind11;
 #include <armadillo>
 #include "cosmolike/generic_interface.hpp"
 #include "cosmolike/cosmo2D_wrapper.hpp"
+#include "cosmolike/cosmo2D_scuts_wrapper.hpp"
 
 PYBIND11_MODULE(cosmolike_lsst_y1_interface, m)
 {
@@ -52,16 +52,12 @@ PYBIND11_MODULE(cosmolike_lsst_y1_interface, m)
       "Init accuracy and sampling Boost (may slow down Cosmolike a lot)",
       (py::arg("lmax") = 50000).none(false)
     );
+  
   m.def("init_accuracy_boost",
-      [](const double accuracy_boost,
-         const int integration_accuracy) {
-        using namespace cosmolike_interface;
-        init_accuracy_boost(accuracy_boost, integration_accuracy);
-        spdlog::debug("\x1b[90m{}\x1b[0m: Ends", "set_cosmology");
-      },
+      &cosmolike_interface::init_accuracy_boost,
       "Init accuracy and sampling Boost (may slow down Cosmolike a lot)",
       (py::arg("accuracy_boost") = 1.0).none(false),
-      (py::arg("integration_accuracy") = 1).none(false)
+      (py::arg("integration_accuracy") = 0).none(false)
     );
 
   m.def("init_baryons_contamination",
@@ -105,10 +101,11 @@ PYBIND11_MODULE(cosmolike_lsst_y1_interface, m)
     );
 
   m.def("init_IA",
-      &cosmolike_interface::init_IA,
+      &cosmolike_interface::init_IA_fastpt,
       "Init IA related options",
       py::arg("ia_model").none(false).noconvert(),
-      py::arg("ia_redshift_evolution").none(false).noconvert()
+      py::arg("ia_redshift_evolution").none(false).noconvert(),
+      py::arg("ia_code").none(false).noconvert()
     );
 
   m.def("init_probes",
@@ -148,6 +145,27 @@ PYBIND11_MODULE(cosmolike_lsst_y1_interface, m)
     py::arg("source_ntomo").none(false).noconvert(),
     py::return_value_policy::move
   );
+  
+  m.def("set_IA_PS",
+      &cosmolike_interface::set_IA_PS,
+      "Set FPTIA if FASTPT is called",
+      py::arg("PS").none(false),
+      py::arg("kmin").none(false),
+      py::arg("kmax").none(false),
+      py::arg("cutoff").none(false),
+      py::arg("N").none(false)
+    );
+
+  m.def("set_bias_PS",
+      &cosmolike_interface::set_bias_PS,
+      "Set FPTbias if FASTPT is called",
+      py::arg("PS").none(false),
+      py::arg("kmin").none(false),
+      py::arg("kmax").none(false),
+      py::arg("cutoff").none(false),
+      py::arg("sigma4").none(false),
+      py::arg("N").none(false)
+    );
 
   m.def("init_lens_sample_size",
       &cosmolike_interface::set_lens_sample_size,
@@ -196,14 +214,12 @@ PYBIND11_MODULE(cosmolike_lsst_y1_interface, m)
          arma::Col<double> io_chi)
       {
         spdlog::debug("\x1b[90m{}\x1b[0m: Begins", "set_cosmology");
-
         using namespace cosmolike_interface;
         set_cosmological_parameters(omega_matter, hubble);
         set_linear_power_spectrum(io_log10k_2D,io_z_2D,io_lnP_linear);
         set_non_linear_power_spectrum(io_log10k_2D,io_z_2D,io_lnP_nonlinear);
         set_growth(io_z_2D,io_G);
         set_distances(io_z_1D,io_chi);
-
         spdlog::debug("\x1b[90m{}\x1b[0m: Ends", "set_cosmology");
       },
       "Set Cosmological Paramters, Distance, Matter Power Spectrum, Growth Factor",
@@ -239,12 +255,13 @@ PYBIND11_MODULE(cosmolike_lsst_y1_interface, m)
     );
 
   m.def("set_nuisance_bias",
-      &cosmolike_interface::set_nuisance_bias,
+      &cosmolike_interface::set_nuisance_bias_fastpt,
       "Set nuisance Bias Parameters",
       py::arg("B1").none(false),
       py::arg("B2").none(false),
       py::arg("B_MAG").none(false),
-      py::return_value_policy::move
+      py::arg("B3nl").none(false),
+      py::arg("BK").none(false)
     );
 
   m.def("set_nuisance_shear_calib",
@@ -310,7 +327,7 @@ PYBIND11_MODULE(cosmolike_lsst_y1_interface, m)
       &reset_bary_struct,
        "Set the Baryon Functions to not contaminate the MPS w/ Baryon effects"
     );
-  
+
   // --------------------------------------------------------------------
   // COMPUTE FUNCTIONS (relevant for emulators)
   // --------------------------------------------------------------------
@@ -419,8 +436,10 @@ PYBIND11_MODULE(cosmolike_lsst_y1_interface, m)
   // --------------------------------------------------------------------
   // Theoretical Cosmolike Functions
   // --------------------------------------------------------------------
-
   m.def("get_binning_real_space",
+      // Why return an STL vector?
+      // The conversion between STL vector and python np array is cleaner
+      // arma:Col is cast to 2D np array with 1 column (not as nice!)
       []()->std::vector<double> {
         arma::Col<double> res = cosmolike_interface::get_binning_real_space();
         return arma::conv_to<std::vector<double>>::from(res);
@@ -481,7 +500,7 @@ PYBIND11_MODULE(cosmolike_lsst_y1_interface, m)
       py::arg("a").none(false).noconvert(),
       py::arg("l").none(false).noconvert(),
       py::arg("ni").none(false).noconvert(),
-      py::arg("ni").none(false).noconvert()
+      py::arg("nj").none(false).noconvert()
     );
 
   m.def("int_for_C_ss_tomo_limber",
@@ -544,8 +563,7 @@ PYBIND11_MODULE(cosmolike_lsst_y1_interface, m)
     );
 
   m.def("C_gg_tomo",
-      py::overload_cast<arma::Col<double>>(
-        &cosmolike_interface::C_gg_tomo_cpp),
+      py::overload_cast<arma::Col<double>>(&cosmolike_interface::C_gg_tomo_cpp),
       "Compute position-position (fourier - non-limber/limber) data vector"
       " at all tomographic bins and many ell (vectorized)",
       py::arg("l").none(false),
@@ -553,9 +571,99 @@ PYBIND11_MODULE(cosmolike_lsst_y1_interface, m)
     );
 
   // --------------------------------------------------------------------
+  // Derivative
+  // --------------------------------------------------------------------
+
+  m.def("dlnC_ss_dlnk_tomo_limber",
+      py::overload_cast<const double, const double, const int, const int>(
+        &cosmolike_interface::dlnC_ss_dlnk_tomo_limber_cpp
+      ),
+      "Compute dlnC_ss_dlnk (fourier - limber) derivative of the data vector",
+      py::arg("k").none(false).noconvert(),
+      py::arg("l").none(false).noconvert(),
+      py::arg("ni").none(false).noconvert(),
+      py::arg("nj").none(false).noconvert(),
+      py::return_value_policy::move
+    );
+
+  m.def("dlnC_ss_dlnk_tomo_limber",
+      py::overload_cast<const arma::Col<double>, const arma::Col<double>>(
+        &cosmolike_interface::dlnC_ss_dlnk_tomo_limber_cpp
+      ),
+      "Compute dlnC_ss_dlnk (fourier - limber) derivative of the data vector",
+      py::arg("k").none(false),
+      py::arg("l").none(false),
+      py::return_value_policy::move
+    );
+
+  m.def("rf_C_ss_tomo_limber",
+      py::overload_cast<const double, const double, const int, const int>(
+        &cosmolike_interface::RF_C_ss_tomo_limber_cpp
+      ),
+      "Compute int from -infty to k of |dlnC_ss_dlnk| (fourier - limber)",
+      py::arg("k").none(false).noconvert(),
+      py::arg("l").none(false).noconvert(),
+      py::arg("ni").none(false).noconvert(),
+      py::arg("nj").none(false).noconvert(),
+      py::return_value_policy::move
+    );
+
+  m.def("rf_C_ss_tomo_limber",
+      py::overload_cast<const arma::Col<double>, const arma::Col<double>>(
+        &cosmolike_interface::RF_C_ss_tomo_limber_cpp
+      ),
+      "Compute int from -infty to k of |dlnC_ss_dlnk| (fourier - limber)",
+      py::arg("k").none(false),
+      py::arg("l").none(false),
+      py::return_value_policy::move
+    );
+
+  m.def("dlnxi_dlnk_pm_tomo_limber",
+      py::overload_cast<const double>(
+        &cosmolike_interface::dlnxi_dlnk_pm_tomo_limber_cpp
+      ),
+      "Compute dlnxi_dlnk (real - limber) derivative of the data vector",
+      py::arg("k").none(false),
+      py::return_value_policy::move
+    );
+
+  m.def("dlnxi_dlnk_pm_tomo_limber",
+      py::overload_cast<const arma::Col<double>>(
+        &cosmolike_interface::dlnxi_dlnk_pm_tomo_limber_cpp
+      ),
+      "Compute dlnxi_dlnk (real - limber) derivative of the data vector",
+      py::arg("k").none(false),
+      py::return_value_policy::move
+    );
+
+  m.def("rf_xi_tomo_limber",
+      py::overload_cast<const double, const int, const int, const int>(
+        &cosmolike_interface::RF_xi_tomo_limber_cpp
+      ),
+      "Compute int from -infty to k of |dlnxi_dlnk| (fourier - limber)",
+      py::arg("k").none(false),
+      py::arg("nt").none(false).noconvert(),
+      py::arg("ni").none(false).noconvert(),
+      py::arg("nj").none(false).noconvert(),
+      py::return_value_policy::move
+    );
+  
+  m.def("rf_xi_tomo_limber",
+      py::overload_cast<const arma::Col<double>>(
+        &cosmolike_interface::RF_xi_tomo_limber_cpp
+      ),
+      "Compute int from -infty to k of |dlnxi_dlnk| (fourier - limber)",
+      py::arg("k").none(false),
+      py::return_value_policy::move
+    );
+
+  // --------------------------------------------------------------------
   // Miscellaneous
   // --------------------------------------------------------------------
   m.def("get_mask",
+      // Why return an STL vector?
+      // The conversion between STL vector and python np array is cleaner
+      // arma:Col is cast to 2D np array with 1 column (not as nice!)
       []()->std::vector<int>{
         using namespace cosmolike_interface;
         arma::Col<int> res = IP::get_instance().get_mask();
@@ -566,6 +674,9 @@ PYBIND11_MODULE(cosmolike_lsst_y1_interface, m)
     );
 
   m.def("get_dv_masked",
+      // Why return an STL vector?
+      // The conversion between STL vector and python np array is cleaner
+      // arma:Col is cast to 2D np array with 1 column (not as nice!)
       []()->std::vector<double> {
         using namespace cosmolike_interface;
         arma::Col<double> res = IP::get_instance().get_dv_masked();
