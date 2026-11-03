@@ -351,7 +351,7 @@ class _cosmolike_prototype_base(DataSetLikelihood):
     # likelihood's choice.
     ci.init_lowrank_nonlimber_gg(
         flag=int(getattr(self, "nonlimber_lowrank_gg", 0)),
-        nrank=int(getattr(self, "nonlimber_lowrank_rank", 8)),
+        nrank=int(getattr(self, "nonlimber_lowrank_rank", 5)),
         lmax=int(getattr(self, "nonlimber_lowrank_lmax", 150)))
     # Cosmolike's halo statistics (mass variance, mass function) use the
     # linear spectrum of cold dark matter + baryons, P_cb. The hybrid

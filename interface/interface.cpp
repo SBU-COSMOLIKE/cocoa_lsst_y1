@@ -177,7 +177,7 @@ PYBIND11_MODULE(cosmolike_lsst_y1_interface, m)
       "1 = experimental low-rank DD (per-bin SVD of sqrt(P_g), nrank "
       "kept ranks, its own ell cap lmax; needs include_HOD_GX = 0)",
       (py::arg("flag") = 0).none(false),
-      (py::arg("nrank") = 8).none(false),
+      (py::arg("nrank") = 5).none(false),
       (py::arg("lmax") = 150).none(false)
     );
 
