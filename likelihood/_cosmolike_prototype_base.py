@@ -157,6 +157,14 @@ class _cosmolike_prototype_base(DataSetLikelihood):
                        its redshift dependence and the FAST-PT implementation
                        (C = 0, Python theory block = 1)
     bias_model       = redshift-evolution code of each galaxy-bias term
+    nonlimber_lowrank_gg = experimental low-rank non-Limber w(theta)
+                       clustering: 0 = the FKEM split (default,
+                       bit-identical), 1 = the density-density term keeps
+                       the full one-loop P_g through a per-bin SVD of
+                       sqrt(P_g) instead of a Limber hand-off
+    nonlimber_lowrank_rank = SVD ranks kept per lens bin (1-16)
+    nonlimber_lowrank_lmax = the low-rank path's own non-Limber ell cap
+                       (32 to lmax; the FKEM path keeps l = 150)
     use_emulator     = 0 CAMB, 1 data-vector emulators, 2 hybrid emulators
     external_nz_modeling = send the n(z) arrays from Python at every point
     use_baryon_pca, create_baryon_pca, add_baryons_on_dv,
@@ -334,6 +342,17 @@ class _cosmolike_prototype_base(DataSetLikelihood):
     # 0 = the init_IA model, 1 = halo-model IA (Fortuna et al. 2021)
     ci.init_include_halo_IA(
         include_halo_IA=int(getattr(self, "include_halo_IA", 0)))
+    # Experimental low-rank non-Limber galaxy clustering (w(theta) only):
+    # 0 = the FKEM split (bit-identical default), 1 = the density-density
+    # term carries the full one-loop P_g through a per-bin SVD of
+    # sqrt(P_g), with its own ell cap. Set at every initialize: the three
+    # values are cosmolike C globals shared by the whole process, so a
+    # likelihood that leaves them unset would inherit the previous
+    # likelihood's choice.
+    ci.init_lowrank_nonlimber_gg(
+        flag=int(getattr(self, "nonlimber_lowrank_gg", 0)),
+        nrank=int(getattr(self, "nonlimber_lowrank_rank", 8)),
+        lmax=int(getattr(self, "nonlimber_lowrank_lmax", 150)))
     # Cosmolike's halo statistics (mass variance, mass function) use the
     # linear spectrum of cold dark matter + baryons, P_cb. The hybrid
     # emulators provide no P_cb, so get_neutrino_inputs approximates it from

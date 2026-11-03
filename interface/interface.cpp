@@ -171,6 +171,16 @@ PYBIND11_MODULE(cosmolike_lsst_y1_interface, m)
       (py::arg("include_halo_IA") = 0).none(false)
     );
 
+  m.def("init_lowrank_nonlimber_gg",
+      &cosmolike_interface::init_lowrank_nonlimber_gg,
+      "Non-Limber w(theta) galaxy clustering: flag 0 = FKEM (default), "
+      "1 = experimental low-rank DD (per-bin SVD of sqrt(P_g), nrank "
+      "kept ranks, its own ell cap lmax; needs include_HOD_GX = 0)",
+      (py::arg("flag") = 0).none(false),
+      (py::arg("nrank") = 8).none(false),
+      (py::arg("lmax") = 150).none(false)
+    );
+
 
   m.def("init_baryons_contamination",
       py::overload_cast<std::string, std::string>(
