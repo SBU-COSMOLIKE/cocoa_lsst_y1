@@ -98,7 +98,17 @@ TestAccuracyAdvisory = u.accuracy_suite(
          True, "example2 (3x2pt, TATT)"),
     ),
     knob_scan="example2",
-    nmodels_example=("example2", "example2 (3x2pt, NLA)"))
+    nmodels_example=("example2", "example2 (3x2pt, NLA)"),
+    # The examples cap Omega_m at 0.5: above it the pushed settings
+    # move the 3x2pt chi2 by up to 10^3 against the fiducial covariance
+    # (tests/data_vector/README.md, the N-random-models check). The
+    # frozen configurations keep the earlier 0.1-0.9 box, so the draw
+    # narrows it here instead of refreezing.
+    nmodels_box={"omegam": (0.1, 0.5)},
+    # every odd model holds Omega_m, As and the lens biases at the
+    # fiducial (the clustering amplitude As b^2 with them), so its
+    # delta chi2 shows what the other parameters do to the accuracy
+    nmodels_hold=("omegam", "As_1e9", "LSST_B1_"))
 
 # __name__ is "__main__" only when this file runs directly as a
 # script; pytest imports the module instead, so this block stays

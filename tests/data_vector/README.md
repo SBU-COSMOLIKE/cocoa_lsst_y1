@@ -289,15 +289,73 @@ minutes):
 ### The N-random-models check (opt-in) <a name="nmodels_check"></a>
 
 [Mechanism](https://github.com/CosmoLike/cocoa-cosmolike-core/blob/main/README.md#dv_nmodels):
-seeded random points across the 3x2pt NLA prior, each scored
-high-accuracy against its own default-settings vector. Enable and run
-it with
+seeded random points across the 3x2pt NLA prior, each scored with every
+setting of the A-checks pushed at once against its own default-settings
+vector. Model $m$ draws its point with the seed $137 + m$, so every run
+repeats the same points and the same figure. Enable and run it with
 
     COCOA_ACCURACY_NMODELS=10 python -m pytest \
         ./projects/lsst_y1/tests/data_vector/test_accuracy.py -k nmodels
 
 Running the file as a script accepts `--nmodels N` in place of the
-environment variable.
+environment variable. Two more variables change a run:
+
+- `COCOA_ACCURACY_NMODELS_SEED` sets another seed base, for a second
+  reproducible set of points;
+- `COCOA_ACCURACY_NMODELS_FIGURES` names the folder of the figure
+  (unset: the system temporary folder, so the run changes no project
+  file).
+
+The check is advisory: each $\Delta\chi^2$ only has to be finite. Two
+settings in `test_accuracy.py` shape the draw:
+
+- `nmodels_box`: $\Omega_m$ is drawn in $[0.1, 0.5]$, the box of the
+  examples. The frozen configurations keep the earlier $[0.1, 0.9]$
+  box, and the override narrows it without a refreeze; it changes only
+  the $\Omega_m$ values of a seeded point.
+- `nmodels_hold`: every odd model (seed 138, 140, ...) resets
+  $\Omega_m$, $A_s$ and the lens biases to the fiducial after its draw,
+  so only the other parameters vary ($H_0$, $n_s$, $\Omega_b$,
+  $m_\nu$, $w_0$, $w_0 + w_a$ and the IA amplitudes). Those models
+  measure what the other parameters do to the accuracy.
+
+The check prints a summary of each half and draws the figure below:
+$\Delta\chi^2$ against $\Omega_m$ and against the clustering-amplitude
+ratio $A_s b_i^2/(A_s b_i^2)_{\rm fid}$ (the largest over the five lens
+bins), and the plane of the two. A numerical error that is a fixed
+fraction of the signal grows by that ratio, and its $\Delta\chi^2$
+against the fiducial covariance by the ratio squared. Circles are drawn
+across the prior; diamonds hold $\Omega_m$, $A_s$ and the biases at the
+fiducial, so they stack at $\Omega_m = 0.3$ and ratio 1. The color
+saturates above 100.
+
+Measured on 2026-11-05 (20 models, seed base 137):
+
+![The twenty random 3x2pt models, colored by the pushed-settings delta chi2](accuracy_nmodels_example2_seed137.png)
+
+| models | median $\Delta\chi^2$ | maximum | at or above 0.2 |
+|---|---:|---:|---:|
+| drawn across the prior | 0.12 | 20.4 | 4 of 10 |
+| $\Omega_m$, $A_s$, $b$ at the fiducial | 0.040 | 0.18 | 0 of 10 |
+
+- With $\Omega_m$ and the clustering amplitude at the fiducial, the
+  other parameters keep every model inside the 0.2 band, with the IA
+  amplitudes and $w_0 + w_a$ drawn across their full boxes.
+- The four drawn models above 0.2 all carry
+  $A_s b^2/(A_s b^2)_{\rm fid} \ge 3.5$:
+
+  | seed | $\Omega_m$ | $A_s b^2/(A_s b^2)_{\rm fid}$ | $\Delta\chi^2$ |
+  |---:|---:|---:|---:|
+  | 145 | 0.31 | 3.48 | 0.68 |
+  | 151 | 0.49 | 3.69 | 0.34 |
+  | 147 | 0.48 | 4.69 | 3.32 |
+  | 153 | 0.44 | 6.87 | 20.4 |
+
+  Every drawn model at a ratio of 3.2 or below passes.
+- Above $\Omega_m = 0.5$ the error grows steeply: a 50-point study of
+  the earlier $[0.1, 0.9]$ box found $\Delta\chi^2$ up to $1.9\times10^3$
+  there, almost all of it in cosmic shear, which is why the examples
+  cap $\Omega_m$ at 0.5.
 
 ### Baryonic feedback checks (`test_accuracy_baryons.py` BF0-BF7, `test_baryons.py` BD1-BD7) <a name="baryon_checks"></a>
 

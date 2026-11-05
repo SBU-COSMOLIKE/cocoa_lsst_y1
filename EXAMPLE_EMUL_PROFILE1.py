@@ -203,7 +203,7 @@ params:
   omegam:
     prior:
       min: 0.1
-      max: 0.9
+      max: 0.5
     ref:
       dist: norm
       loc: 0.316

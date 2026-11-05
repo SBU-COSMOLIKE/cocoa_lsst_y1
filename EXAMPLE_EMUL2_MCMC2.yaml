@@ -27,6 +27,12 @@ likelihood:
     IA_code: 0    # CFASTPT (0) or FASTPT (1) (only works if not NLA)
     IA_redshift_evolution: 3
     print_datavector: False 
+  # top hat on the derived Omega_m (sampled here through omegach2,
+  # omegabh2 and theta): log-likelihood 0 at omegam <= 0.5 and -inf
+  # above, the cap the omegam prior box sets in the other examples
+  omegam_cap:
+    external: "lambda _self: 0.0 if _self.provider.get_param('omegam') <= 0.5 else -np.inf"
+    requires: {omegam: null}
 params:
   logA:
     prior:
