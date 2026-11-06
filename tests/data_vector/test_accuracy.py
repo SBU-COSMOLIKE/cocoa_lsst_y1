@@ -99,16 +99,22 @@ TestAccuracyAdvisory = u.accuracy_suite(
     ),
     knob_scan="example2",
     nmodels_example=("example2", "example2 (3x2pt, NLA)"),
-    # The examples cap Omega_m at 0.5: above it the pushed settings
-    # move the 3x2pt chi2 by up to 10^3 against the fiducial covariance
-    # (tests/data_vector/README.md, the N-random-models check). The
-    # frozen configurations keep the earlier 0.1-0.9 box, so the draw
-    # narrows it here instead of refreezing.
-    nmodels_box={"omegam": (0.1, 0.5)},
-    # every odd model holds Omega_m, As and the lens biases at the
-    # fiducial (the clustering amplitude As b^2 with them), so its
+    # The examples keep Omega_m in [0.2, 0.5]: above 0.5 the pushed
+    # settings move the 3x2pt chi2 by up to 10^3 against the fiducial
+    # covariance (tests/data_vector/README.md, the N-random-models
+    # check). They also keep w0 + wa >= -3, below which the early
+    # phantom regime needs a costlier CAMB. The frozen configurations
+    # keep the earlier, wider boxes, so the draw narrows them here
+    # instead of refreezing.
+    nmodels_box={"omegam": (0.2, 0.5), "w0pwa": (-3.0, -0.01)},
+    # every odd model holds Omega_m, A_s (the primordial amplitude) and
+    # the lens biases at the fiducial (the clustering amplitude A_s b_i^2
+    # with them), so its
     # delta chi2 shows what the other parameters do to the accuracy
-    nmodels_hold=("omegam", "As_1e9", "LSST_B1_"))
+    nmodels_hold=("omegam", "As_1e9", "LSST_B1_"),
+    # every drawn lens bin keeps (A_s/A_s,fid)(b_i/b_i,fid)^2 <= 8, the
+    # amplitude cut of the examples' prior and of every project
+    nmodels_amplitude_cut=8.0)
 
 # __name__ is "__main__" only when this file runs directly as a
 # script; pytest imports the module instead, so this block stays

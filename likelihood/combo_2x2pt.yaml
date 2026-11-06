@@ -6,6 +6,16 @@ internal_accuracyboost: 1.0 # C-FAST-PT convolution grid / output grid
 # the non-Limber FFTLog chi grid, and the z nodes of the P(k) tables
 nonlimber_accuracyboost: 1.0
 pk_z_refinement: 1
+# Level 0 keeps the numerical error of the data vector (delta chi2
+# against the pushed accuracy settings) small near the fiducial.
+# WARNING: users who want delta chi2 < 0.2 over a larger fraction of the
+# prior should set 3, as an abundance of caution: at moderate clustering
+# amplitudes (A_s b_i^2 a few times its fiducial value, with A_s the
+# primordial amplitude and b_i a lens bin's linear galaxy bias) level 0
+# leaves chi2 errors of order 1, and level 3 removes them at nearly the
+# same evaluation time. Measured on the 3x2pt data vector; see more
+# details in tests/data_vector/README.md, subsection "The N-random-models
+# check (opt-in)".
 integration_accuracy: 0
 # n(z) interpolation: 0 = cubic spline, 1 = linear, 2+ = Steffen (monotone)
 # 0: original midpoint curve (default); 1: histogram + Akima.

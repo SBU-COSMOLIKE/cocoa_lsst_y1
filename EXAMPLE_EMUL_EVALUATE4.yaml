@@ -17,6 +17,22 @@ likelihood:
     path: ./external_modules/data/lsst_y1
     data_file: lsst_y1_M1_GGL0.05.dataset
     use_emulator: 1
+  # top hat on the derived Omega_m (sampled here through omegach2,
+  # omegabh2 and theta): log-likelihood 0 at 0.2 <= omegam <= 0.5 and
+  # -inf outside, the box the omegam prior sets in the other examples
+  omegam_cap:
+    external: "lambda _self: 0.0 if 0.2 <= _self.provider.get_param('omegam') <= 0.5 else -np.inf"
+    requires: {omegam: null}
+# The amplitude cut: every lens bin i keeps (A_s/A_s,fid)(b_i/b_i,fid)^2 <= 8,
+# with A_s the primordial amplitude (sampled as As_1e9 = 10^9 A_s) and b_i the
+# bin's linear galaxy bias (LSST_B1_i). The galaxy power of a bin scales as
+# A_s b_i^2, and a fixed relative numerical error of the data vector grows
+# with it against the fiducial covariance (the N-random-models check,
+# tests/data_vector/README.md). A point outside the cut has prior -inf, so
+# cobaya never evaluates its likelihood.
+prior:
+  amplitude_cut: "lambda As_1e9, LSST_B1_1, LSST_B1_2, LSST_B1_3, LSST_B1_4, LSST_B1_5: 0.0 if (As_1e9/2.1)*max((LSST_B1_1/1.72716)**2, (LSST_B1_2/1.65168)**2, (LSST_B1_3/1.61423)**2, (LSST_B1_4/1.92886)**2, (LSST_B1_5/2.11633)**2) <= 8 else -np.inf"
+
 params:
   logA:
     prior:

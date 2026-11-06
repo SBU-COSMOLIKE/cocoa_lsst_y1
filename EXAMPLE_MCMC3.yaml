@@ -9,7 +9,7 @@ likelihood:
     print_datavector: False
     print_datavector_file: "./projects/lsst_y1/chains/theory.modelvector"
     accuracyboost: 1.0
-    integration_accuracy: 0
+    integration_accuracy: 0 # 3 as an abundance of caution: see likelihood/combo_3x2pt.yaml
     lmax: 50000 # lmax computed for real space correlation function
     kmax_boltzmann: 7.5
     # 1 EE2, 2 Halofit (check below on the slow/fast decomposition)

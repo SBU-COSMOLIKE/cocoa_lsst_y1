@@ -173,7 +173,23 @@ _CONFIG = {
     "photoz_zmid_convention": 0,
     # C-FAST-PT internal (convolution) grid / output grid; 1.0 = equal
     "internal_accuracyboost": 1.0,
-
+    # the projection of galaxy-galaxy lensing (gs) and clustering (gg),
+    # mirroring the likelihood yaml keys: 0 = non-Limber below the FKEM
+    # multipole cap, as the likelihood computes them; 1 = Limber at every
+    # multipole
+    "adopt_limber_gs": 0,
+    "adopt_limber_gg": 0,
+    # the non-Limber FFTLog chi grid, refined on top of the accuracy boost
+    "nonlimber_accuracyboost": 1.0,
+    # 0 = perturbative galaxy bias, 1 = halo-model (HOD) galaxy power
+    "include_HOD_GX": 0,
+    # 0 = the init_IA model, 1 = halo-model intrinsic alignment
+    "include_halo_IA": 0,
+    # experimental low-rank non-Limber clustering: on/off, kept SVD
+    # ranks, and its multipole cap
+    "nonlimber_lowrank_gg": 0,
+    "nonlimber_lowrank_rank": 5,
+    "nonlimber_lowrank_lmax": 150,
 }
 
 # filled by init_cosmolike: the HDF5 file with every hydro simulation
@@ -215,8 +231,9 @@ def init_cosmolike(CLprobe=None, with_data=False, lmax=None):
     Reads the project's .dataset file (the small text file listing
     the n(z), covariance, mask, and data-vector files), then runs
     the interface init sequence every notebook shares: the excluded
-    ggl pairs, the angular binning, the n(z) tables, and the IA
-    model. The chi2 machinery (probes, covariance, mask, data
+    ggl pairs, the angular binning, the n(z) tables, the IA model,
+    and the projection choices (Limber or non-Limber for galaxy-galaxy
+    lensing and clustering) that the likelihood sets from its yaml. The chi2 machinery (probes, covariance, mask, data
     vector) only loads when asked, because the plotting-only
     notebooks never need it. The excluded ggl pairs apply only when
     _CONFIG["ggl_exclude"] is not empty; this project's compiled
@@ -285,6 +302,20 @@ def init_cosmolike(CLprobe=None, with_data=False, lmax=None):
     # initial_setup restores
     ci.init_fpt_internal_boost(
         float(_CONFIG["internal_accuracyboost"]))
+    # The projection options, set as the likelihood sets them: they are
+    # cosmolike C globals, so without these calls the notebook would use
+    # the interface defaults (Limber galaxy-galaxy lensing at every
+    # multipole) and its gamma_t would differ from the likelihood's.
+    ci.init_nonlimber_accuracy_boost(
+        nonlimber_boost=float(_CONFIG["nonlimber_accuracyboost"]))
+    ci.init_adopt_limber_gs(adopt_limber_gs=int(_CONFIG["adopt_limber_gs"]))
+    ci.init_adopt_limber_gg(adopt_limber_gg=int(_CONFIG["adopt_limber_gg"]))
+    ci.init_include_HOD_GX(include_HOD_GX=int(_CONFIG["include_HOD_GX"]))
+    ci.init_include_halo_IA(include_halo_IA=int(_CONFIG["include_halo_IA"]))
+    ci.init_lowrank_nonlimber_gg(
+        flag=int(_CONFIG["nonlimber_lowrank_gg"]),
+        nrank=int(_CONFIG["nonlimber_lowrank_rank"]),
+        lmax=int(_CONFIG["nonlimber_lowrank_lmax"]))
     # boost 1, integration level 1 for the start of the session; every
     # wrapper call sets both again (_set_state)
     ci.init_accuracy_boost(1.0, int(1))

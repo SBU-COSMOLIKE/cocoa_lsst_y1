@@ -18,7 +18,7 @@ likelihood:
     path: ./external_modules/data/lsst_y1
     data_file: lsst_y1_M1_GGL0.05.dataset
     accuracyboost: 1.0
-    integration_accuracy: 0
+    integration_accuracy: 0 # 3 as an abundance of caution: see likelihood/combo_3x2pt.yaml
     lmax: 50000
     kmax_boltzmann: 5.0
     # 1 EE2, 2 Halofit
@@ -28,10 +28,10 @@ likelihood:
     IA_redshift_evolution: 3
     print_datavector: False 
   # top hat on the derived Omega_m (sampled here through omegach2,
-  # omegabh2 and theta): log-likelihood 0 at omegam <= 0.5 and -inf
-  # above, the cap the omegam prior box sets in the other examples
+  # omegabh2 and theta): log-likelihood 0 at 0.2 <= omegam <= 0.5 and
+  # -inf outside, the box the omegam prior sets in the other examples
   omegam_cap:
-    external: "lambda _self: 0.0 if _self.provider.get_param('omegam') <= 0.5 else -np.inf"
+    external: "lambda _self: 0.0 if 0.2 <= _self.provider.get_param('omegam') <= 0.5 else -np.inf"
     requires: {omegam: null}
 params:
   logA:

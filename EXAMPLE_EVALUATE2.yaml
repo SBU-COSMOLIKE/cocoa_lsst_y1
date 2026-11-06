@@ -16,7 +16,7 @@ likelihood:
     print_datavector: False
     print_datavector_file: "./projects/lsst_y1/chains/theory.modelvector"
     accuracyboost: 1
-    integration_accuracy: 0
+    integration_accuracy: 0 # 3 as an abundance of caution: see likelihood/combo_3x2pt.yaml
     lmax: 65000 # lmax computed for real space correlation function
     kmax_boltzmann: 5.0
     # 1 EE2, 2 Halofit
@@ -29,6 +29,16 @@ likelihood:
     create_baryon_pca: false
     baryon_pca_select_sims: "antilles-2-99/antilles-101-378/antilles-380-400"
     filename_baryon_pca: "./projects/lsst_y1/chains/pca.txt"
+# The amplitude cut: every lens bin i keeps (A_s/A_s,fid)(b_i/b_i,fid)^2 <= 8,
+# with A_s the primordial amplitude (sampled as As_1e9 = 10^9 A_s) and b_i the
+# bin's linear galaxy bias (LSST_B1_i). The galaxy power of a bin scales as
+# A_s b_i^2, and a fixed relative numerical error of the data vector grows
+# with it against the fiducial covariance (the N-random-models check,
+# tests/data_vector/README.md). A point outside the cut has prior -inf, so
+# cobaya never evaluates its likelihood.
+prior:
+  amplitude_cut: "lambda As_1e9, LSST_B1_1, LSST_B1_2, LSST_B1_3, LSST_B1_4, LSST_B1_5: 0.0 if (As_1e9/2.1)*max((LSST_B1_1/1.72716)**2, (LSST_B1_2/1.65168)**2, (LSST_B1_3/1.61423)**2, (LSST_B1_4/1.92886)**2, (LSST_B1_5/2.11633)**2) <= 8 else -np.inf"
+
 params:
   As_1e9:
     prior:
@@ -75,7 +85,7 @@ params:
     drop: true
   omegam:
     prior:
-      min: 0.1
+      min: 0.2
       max: 0.5
     ref:
       dist: norm
@@ -96,7 +106,7 @@ params:
     latex: w_{0,\mathrm{DE}}
   w0pwa:
     prior:
-      min: -5 
+      min: -3 # w0 + wa > -3: below it the early phantom regime needs a costlier CAMB
       max: -0.01
     ref:
       dist: norm

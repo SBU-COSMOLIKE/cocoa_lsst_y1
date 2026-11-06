@@ -306,18 +306,22 @@ environment variable. Two more variables change a run:
   (unset: the system temporary folder, so the run changes no project
   file).
 
-The check is advisory: each $\Delta\chi^2$ only has to be finite. Two
+The check is advisory: each $\Delta\chi^2$ only has to be finite. Three
 settings in `test_accuracy.py` shape the draw:
 
-- `nmodels_box`: $\Omega_m$ is drawn in $[0.1, 0.5]$, the box of the
-  examples. The frozen configurations keep the earlier $[0.1, 0.9]$
-  box, and the override narrows it without a refreeze; it changes only
-  the $\Omega_m$ values of a seeded point.
-- `nmodels_hold`: every odd model (seed 138, 140, ...) resets
+- `nmodels_box`: $\Omega_m$ is drawn in $[0.2, 0.5]$ and $w_0 + w_a$
+  in $[-3, -0.01]$, the boxes of the examples. The frozen
+  configurations keep the earlier, wider boxes, and the override
+  narrows them without a refreeze; it changes only those values of a
+  seeded point.
+- `nmodels_hold`: every second model (seed 138, 140, ...) resets
   $\Omega_m$, $A_s$ and the lens biases to the fiducial after its draw,
   so only the other parameters vary ($H_0$, $n_s$, $\Omega_b$,
   $m_\nu$, $w_0$, $w_0 + w_a$ and the IA amplitudes). Those models
   measure what the other parameters do to the accuracy.
+- `nmodels_amplitude_cut`: every drawn lens bin keeps the amplitude
+  ratio $(A_s/A_s^{\rm fid})(b_i/b_i^{\rm fid})^2 \le 8$, the cut of
+  the examples' prior.
 
 The check prints a summary of each half and draws the figure below:
 $\Delta\chi^2$ against $\Omega_m$ and against the clustering-amplitude
@@ -329,29 +333,55 @@ across the prior; diamonds hold $\Omega_m$, $A_s$ and the biases at the
 fiducial, so they stack at $\Omega_m = 0.3$ and ratio 1. The color
 saturates above 100.
 
-Measured on 2026-11-05 (20 models, seed base 137):
+The check, like every test in this folder, runs `integration_accuracy:
+3`: the frozen references pin it through
+`FROZEN_LIKELIHOOD_OVERRIDES = {"integration_accuracy": 3}` in
+`tests/cocoa_test_utils.py`, while the examples ship level 0. **For
+MCMC with real data, `integration_accuracy: 3` is the more cautious
+option**; the FAQ
+[Which accuracy settings should I choose?](../../README.md#accuracy_choice)
+of the project README explains the choice.
 
-![The twenty random 3x2pt models, colored by the pushed-settings delta chi2](accuracy_nmodels_example2_seed137.png)
+Measured on 2026-11-05 (50 models, seed base 137,
+`COCOA_ACCURACY_NMODELS=50`):
+
+![The fifty random 3x2pt models, colored by the pushed-settings delta chi2](accuracy_nmodels_example2_seed137.png)
 
 | models | median $\Delta\chi^2$ | maximum | at or above 0.2 |
 |---|---:|---:|---:|
-| drawn across the prior | 0.12 | 20.4 | 4 of 10 |
-| $\Omega_m$, $A_s$, $b$ at the fiducial | 0.040 | 0.18 | 0 of 10 |
+| drawn across the prior | 0.028 | 3.06 | 4 of 25 |
+| $\Omega_m$, $A_s$, $b$ at the fiducial | 0.0048 | 0.056 | 0 of 25 |
 
 - With $\Omega_m$ and the clustering amplitude at the fiducial, the
   other parameters keep every model inside the 0.2 band, with the IA
-  amplitudes and $w_0 + w_a$ drawn across their full boxes.
-- The four drawn models above 0.2 all carry
-  $A_s b^2/(A_s b^2)_{\rm fid} \ge 3.5$:
+  amplitudes and $w_0 + w_a$ drawn across their full boxes. The worst
+  held models draw the NLA redshift power at $\eta = 4.65$ and
+  $\eta = 4.43$ (`LSST_A1_2`, flat in $[-5, 5]$), very far from
+  anything data-like; the README FAQ
+  [Which accuracy settings should I choose?](../../README.md#accuracy_choice)
+  works through the quadrature aliasing behind those points and the
+  node counts per level.
+- The four drawn models at or above 0.2 all carry a large
+  clustering-amplitude ratio:
 
-  | seed | $\Omega_m$ | $A_s b^2/(A_s b^2)_{\rm fid}$ | $\Delta\chi^2$ |
-  |---:|---:|---:|---:|
-  | 145 | 0.31 | 3.48 | 0.68 |
-  | 151 | 0.49 | 3.69 | 0.34 |
-  | 147 | 0.48 | 4.69 | 3.32 |
-  | 153 | 0.44 | 6.87 | 20.4 |
+  | $\Delta\chi^2$ | $\Omega_m$ | $A_s b^2/(A_s b^2)_{\rm fid}$ |
+  |---:|---:|---:|
+  | 3.06 | 0.45 | 6.9 |
+  | 1.28 | 0.49 | 4.7 |
+  | 1.06 | 0.38 | 6.0 |
+  | 0.215 | 0.46 | 4.2 |
 
-  Every drawn model at a ratio of 3.2 or below passes.
+  The other 21 drawn models sit at or below $\Delta\chi^2 = 0.17$.
+- For comparison, the same draw at the examples' level 0 (20 models)
+  reaches a held maximum of $\Delta\chi^2 = 0.17$ and drawn values of
+  27.6 ($\Omega_m = 0.45$, ratio 6.9), 3.5 ($\Omega_m = 0.49$, ratio
+  4.7), 2.0 ($\Omega_m = 0.26$, ratio 3.1) and 1.7 ($\Omega_m = 0.35$,
+  ratio 3.5).
+- At the ratio-4.7 point the level-3 residual of $\Delta\chi^2 = 1.28$
+  is mostly CAMB's own precision: raising CAMB's `AccuracyBoost` from
+  1.05 to 2 alone moves it by 1.15. The project accepts these extreme
+  corners (ratio $\ge 4.2$) as a documented judgment: the 3x2pt Fisher
+  contours do not reach them.
 - Above $\Omega_m = 0.5$ the error grows steeply: a 50-point study of
   the earlier $[0.1, 0.9]$ box found $\Delta\chi^2$ up to $1.9\times10^3$
   there, almost all of it in cosmic shear, which is why the examples

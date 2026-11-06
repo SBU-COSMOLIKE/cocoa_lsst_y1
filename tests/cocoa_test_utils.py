@@ -124,6 +124,12 @@ FASTPT_MASK_DATASETS = {
 #                         counterpart whose frozen layout the harness
 #                         copies, and "exact_reference" the reference
 #                         chi2 their accuracy is judged against.
+# The frozen references run integration_accuracy 3, the cautious level the
+# likelihood yamls recommend for chains on real data; the examples ship 0.
+# At level 3 the N-random-models check keeps delta chi2 below 0.2 over a
+# larger fraction of the prior (tests/data_vector/README.md).
+FROZEN_LIKELIHOOD_OVERRIDES = {"integration_accuracy": 3}
+
 EXAMPLES = {
     "example1": {
         "frozen_module": "frozen_config_example1.py",

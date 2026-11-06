@@ -10,6 +10,7 @@
 8. [Computing covariances](#computing_covariances)
 9. [Exploring notebooks](#notebooks)
 10. [Appendix: Which accuracy settings are available?](#accuracy)
+11. [Appendix: Which accuracy settings should I choose?](#accuracy_choice)
 
 # Reading path through the examples <a name="reading_path"></a>
 
@@ -988,6 +989,8 @@ supply the hosts and slots with the cluster's `--hostfile` or `--host` recipe.
   <img width="1156" height="858" alt="example_lssty1_fisher" src="https://github.com/user-attachments/assets/4f4e5775-6522-4eca-af82-4d1a10f4b1c8" />
   </p>
 
+  Section 18 of `projects/lsst_y1/EXAMPLE_EVALUATE2.ipynb` computes the 3×2pt Fisher matrix of 29 parameters (seven cosmological plus the NLA, photo-z, shear-calibration and lens-bias nuisances) at the example's own accuracy settings, and checks the prior cuts of the example yamls against the forecast; the [accuracy FAQ](#accuracy_choice) quotes its numbers.
+
 
 
 # Unit tests <a name="unit_tests"></a>
@@ -1104,3 +1107,210 @@ is not that check. The [data-vector test guide](tests/data_vector/README.md)
 and [covariance test guide](tests/covariance/README.md) state what each set of tests
 actually verifies. A passing regression or a larger boost is not a general
 claim of survey or Fisher convergence.
+
+## FAQ: Which accuracy settings should I choose? <a name="accuracy_choice"></a>
+
+**The defaults hold near the fiducial cosmology.** The likelihood
+configurations (`likelihood/*.yaml`) ship `accuracyboost: 1`,
+`integration_accuracy: 0` and matching defaults for the other settings of
+the [previous FAQ](#accuracy). These values keep the numerical error of
+the data vector small near the fiducial cosmology. The N-random-models
+check measures this: it compares the default settings with every accuracy
+setting pushed far beyond them, at random points of the prior. When
+$`\Omega_m`$, $`A_s`$ and the lens biases are held at the fiducial and
+only the other parameters move, the defaults keep almost every model
+below the 0.2 budget; the exceptions sit at the edge of the
+intrinsic-alignment prior, very far from anything data-like, and are
+explained below.
+The synthetic data vectors of the tests sit at the fiducial by
+construction, so this is the regime the tests certify.
+
+**Why the error grows away from the fiducial.** Let the finite accuracy
+settings leave a roughly fixed fractional error $`\varepsilon`$ on the
+theory vector $`m`$, so the data-vector error is
+$`\delta = \varepsilon\, m`$. An MCMC keeps the covariance $`C`$ fixed
+at the fiducial model, so
+
+```math
+\Delta\chi^2 = \delta^{\rm T} C^{-1} \delta
+             = \varepsilon^2\, m^{\rm T} C^{-1} m
+```
+
+grows with the signal while the "ruler" $`C`$ does not. At linear order
+the 3×2pt pieces scale with the primordial amplitude $`A_s`$ (sampled as
+`As_1e9` $`= 10^9 A_s`$) and the linear galaxy bias $`b_i`$ of lens bin
+$`i`$ (`LSST_B1_i`):
+
+| Piece | Signal scales as | Factor on $`\Delta\chi^2`$ |
+|---|---|---|
+| $`w(\theta)`$, galaxy clustering of lens bin $`i`$ | $`A_s b_i^2`$ | $`[(A_s/A_s^{\rm fid})(b_i/b_i^{\rm fid})^2]^2`$ |
+| $`\gamma_t(\theta)`$, galaxy–galaxy lensing of lens bin $`i`$ | $`A_s b_i`$ | $`[(A_s/A_s^{\rm fid})(b_i/b_i^{\rm fid})]^2`$ |
+| $`\xi_\pm(\theta)`$, cosmic shear | $`A_s`$ | about $`(A_s/A_s^{\rm fid})^2`$ |
+
+The shear factor is "about" because the nonlinear power grows faster than
+linearly in $`A_s`$, and $`\Omega_m`$ enters the lensing kernels as well.
+The real-space statistics $`w(\theta)`$ and $`\gamma_t(\theta)`$
+inherit these scalings from the Fourier-space power spectra they
+transform.
+
+These factors hold whatever the noise level, because only the numerator
+of $`\Delta\chi^2`$ changes; the noise sets how much each band weighs at
+the fiducial. For one Gaussian band of a power spectrum $`C_\ell`$
+measured with $`N_{\rm modes}`$ modes and noise $`N`$ (shot noise for
+clustering, shape noise for shear), the band error is
+
+```math
+\sigma(C_\ell) \propto \sqrt{2/N_{\rm modes}}\, (C_\ell + N).
+```
+
+- Signal-dominated bands ($`C_\ell \gg N`$):
+  $`\sigma_{\rm fid} \approx C_\ell^{\rm fid}\sqrt{2/N_{\rm modes}}`$,
+  so the band contributes about $`(N_{\rm modes}/2)\,\varepsilon^2`$
+  times the factor above.
+- Noise-dominated bands ($`C_\ell \ll N`$):
+  $`\sigma_{\rm fid} \approx N\sqrt{2/N_{\rm modes}}`$, so the
+  contribution is suppressed by $`(C_\ell^{\rm fid}/N)^2`$. It still
+  grows with the same factor.
+
+**Why real data call for more caution.** With simulated data the best fit
+sits at the fiducial by construction, so the defaults are enough. With
+real data you don't know beforehand how far the best fit and the
+posterior will be from the fiducial model the covariance was built at.
+Accuracy then has to hold over that wider region, where the amplitude
+factors above inflate the error.
+
+A second reason is the residual term. The tests measure
+$`\Delta\chi^2 = \delta^{\rm T} C^{-1} \delta`$ against noiseless
+synthetic data, where the residual $`r = m - d`$ between the theory
+$`m`$ and the data $`d`$ is zero. On real data the numerical error
+changes $`\chi^2`$ by
+
+```math
+\Delta\chi^2 = 2\, \delta^{\rm T} C^{-1} r
+             + \delta^{\rm T} C^{-1} \delta .
+```
+
+The first term is first order in $`\delta`$ and weighted by the
+residual. Real data can hold pieces that are a bit of an outlier; the
+Planck TT and EE spectra have several multipoles like that. Where $`r`$
+is large, the same numerical error moves $`\chi^2`$ much more than the
+tests show.
+
+The residual term is linear in the same error $`\delta`$, and by the
+Cauchy–Schwarz inequality
+
+```math
+\lvert 2\, \delta^{\rm T} C^{-1} r \rvert
+  \leq 2 \sqrt{\delta^{\rm T} C^{-1} \delta}\,
+          \sqrt{r^{\rm T} C^{-1} r} .
+```
+
+So keeping $`\delta^{\rm T} C^{-1} \delta`$ small over a wider range
+of $`\Omega_m`$ and $`A_s b_i^2`$, which is what the N-random-models
+check tests, also bounds the outlier-driven term. Even without a test on
+real residuals, the pipeline gains that robustness as a by-product.
+
+**For MCMC on real data, set `integration_accuracy: 3`.** Levels 3
+through 10 agree with each other to about $`\Delta\chi^2 = 0.01`$ at
+every point tested, so level 3 is converged.
+
+The table gives $`\Delta\chi^2`$ against the pushed accuracy settings,
+on the 3×2pt data vector, measured 2026-11-05. "Held" means $`\Omega_m`$,
+$`A_s`$ and the lens biases at the fiducial.
+
+| Point | $`\Delta\chi^2`$, level 0 | $`\Delta\chi^2`$, level 3 |
+|---|---:|---:|
+| $`\Omega_m = 0.26`$, amplitude ratio $`(A_s/A_s^{\rm fid})(b_i/b_i^{\rm fid})^2 = 3.1`$ | 1.99 | 0.08 |
+| $`\Omega_m = 0.35`$, ratio 3.5 | 1.67 | 0.008 |
+| held (ratio 1), $`H_0 = 89.5`$ km/s/Mpc, $`w_0 + w_a = -2.63`$ | 0.38 | 0.056 |
+| $`\Omega_m = 0.46`$, ratio 4.2 | 1.19 | 0.22 |
+
+At the fiducial, levels 0 and 3 differ by $`\Delta\chi^2 = 0.0013`$. A
+full evaluation takes about 2.7 s at level 3 against 2.6 s at level 0
+(laptop, one data vector), so the cost is nearly the same.
+
+**The defaults are not safe at the edge of the prior.** The
+intrinsic-alignment amplitude makes this concrete. NLA scales the
+alignment signal with the redshift power law
+
+```math
+A_{\rm IA}(z) = A_1 \left( \frac{1+z}{1.62} \right)^{\eta} ,
+```
+
+where $`A_1`$ (`LSST_A1_1`) and $`\eta`$ (`LSST_A1_2`) are each drawn
+flat in $`[-5, 5]`$ (`likelihood/params_source.yaml`), and the fiducial
+point is $`A_1 = 0.606`$, $`\eta = -1.515`$. The held model with the
+worst error at level 0 has $`\eta = 4.65`$ and $`A_1 = 3.59`$, with
+$`\Omega_m`$, $`A_s`$ and the biases at the fiducial; another bad point
+has $`\eta = 4.43`$. A redshift power $`\eta \approx 4`$ is very far
+from anything data-like. A chain that must be precise there needs
+`integration_accuracy: 3` or higher, for the following reason.
+
+**Aliasing of the n(z) bumps.** The intrinsic-alignment terms of the
+shear $`C_\ell`$ (GI, alignment times lensing, and II, alignment times
+alignment) integrate the source n(z) directly. That n(z) is a cubic
+spline through the 300 histogram cells of the source file, so it
+carries small bumps on the cell scale ($`\Delta z \approx 0.012`$) and
+sharp edges where each tomographic bin's shifted support ends. The
+Limber integral uses a fixed Gauss–Legendre rule whose node count
+follows `integration_accuracy`: 96, 128, 256 and 512 nodes at levels 0,
+1, 2 and 3.
+
+With too few nodes (the spacing at 96 nodes is about 0.036 in z, three
+cells), each node lands at an arbitrary phase of the bumps. The
+weighted sum does not cancel them, and a leftover remains whose size
+and sign depend only on where the nodes fall. That is aliasing: the
+same effect that makes a car wheel seem to spin backwards on video.
+The error therefore does not shrink steadily with the node count; it
+jumps around. Measured for the highest-redshift bin pair at the
+$`\eta = 4.65`$ point, the relative error of the II integral is
+$`-1.3\times10^{-3}`$ at 96 nodes, $`+5.2\times10^{-3}`$ at 128 nodes,
+$`+4.6\times10^{-4}`$ at 256 nodes and $`+4.1\times10^{-5}`$ at 512
+nodes. From 512 nodes on (level 3) the bumps are resolved, and levels 3
+to 10 agree.
+
+The leftover is tiny on its own. The factor $`((1+z)/1.62)^{\eta}`$
+with $`\eta`$ between about +4 and +5 multiplies the high-redshift end
+of the integrand, where n(z) is noisiest, by about $`10^4`$ to $`10^5`$
+relative to the fiducial. That turns the leftover into $`\Delta\chi^2`$
+of order 10 to 100. With the alignment amplitudes set to zero, every
+level agrees to $`\Delta\chi^2 = 7\times10^{-5}`$. Over 99.9% of the
+error sits in cosmic shear $`\xi_\pm`$.
+
+The example yamls also carry prior cuts that keep the sampler out of
+corners where no data set would place the posterior:
+
+- $`\Omega_m`$ in $`[0.2, 0.5]`$;
+- $`w_0 + w_a \geq -3`$;
+- the amplitude cut $`(A_s/A_s^{\rm fid})(b_i/b_i^{\rm fid})^2 \leq 8`$
+  on every lens bin, a cobaya `prior` block.
+
+Such corners are numerically costly because $`\Delta\chi^2`$ grows with
+the amplitude factors above.
+
+Section 18 of [EXAMPLE_EVALUATE2.ipynb](EXAMPLE_EVALUATE2.ipynb) checks
+these cuts against the 3×2pt Fisher forecast of the example, which gives
+$`\sigma(\Omega_m) = 0.024`$, $`\sigma(w_0) = 0.27`$,
+$`\sigma(w_a) = 0.83`$ and $`{\rm FoM}(w_0, w_a) = 17.3`$. The
+$`2\sigma`$ contours reach an amplitude ratio of only 1.29–1.32 in every
+lens bin, $`\Omega_m`$ spans $`[0.24, 0.36]`$ against the box
+$`[0.2, 0.5]`$, and $`w_0 + w_a`$ spans $`[-2.32, 0.52]`$, clear of
+$`-3`$: every numerical cut lies far outside what the data allow. Only
+the physical wall at $`w_0 + w_a < 0`$, which keeps dark energy
+subdominant at early times, crosses the $`2\sigma`$ region.
+
+A one-setting-at-a-time scan at the worst points found that the other
+settings did not matter: `accuracyboost: 2`, the non-Limber grid and
+CAMB's wavenumber range moved $`\Delta\chi^2`$ by at most 0.17. CAMB's
+`AccuracyBoost: 2` moved it by up to 1.15, and only at the extreme corner
+($`\Omega_m = 0.49`$, ratio 4.7), which the cuts and the posterior do
+not reach.
+
+The tests themselves run `integration_accuracy: 3`: the frozen references
+pin it through `FROZEN_LIKELIHOOD_OVERRIDES` in
+[tests/cocoa_test_utils.py](tests/cocoa_test_utils.py), while the example
+yamls ship level 0.
+
+See [tests/data_vector/README.md](tests/data_vector/README.md),
+subsection "The N-random-models check (opt-in)", for the full
+measurements and figures.

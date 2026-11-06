@@ -8,7 +8,7 @@ likelihood:
     path: ./external_modules/data/lsst_y1
     data_file: lsst_y1_M1_GGL0.05.dataset   # 705 non-masked elements  (EE2 delta chi^2 ~ 11.8)
     accuracyboost: 1.0
-    integration_accuracy: 0
+    integration_accuracy: 0 # 3 as an abundance of caution: see likelihood/combo_3x2pt.yaml
     lmax: 50000 
     kmax_boltzmann: 5.0
     # 1 EE2, 2 Halofit
@@ -62,7 +62,7 @@ params: # EE2 PRIORS
     latex: \Omega_\mathrm{b}
   omegam:
     prior:
-      min: 0.1
+      min: 0.2
       max: 0.5
     ref:
       dist: norm
@@ -72,7 +72,7 @@ params: # EE2 PRIORS
     latex: \Omega_\mathrm{m}
   w0pwa:
     prior:
-      min: -5 
+      min: -3 # w0 + wa > -3: below it the early phantom regime needs a costlier CAMB
       max: -0.01
     ref:
       dist: norm

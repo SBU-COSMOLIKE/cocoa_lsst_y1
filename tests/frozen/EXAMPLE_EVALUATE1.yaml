@@ -15,7 +15,7 @@ likelihood:
     print_datavector: False
     print_datavector_file: "./projects/lsst_y1/chains/theory.modelvector"
     accuracyboost: 1.0
-    integration_accuracy: 0
+    integration_accuracy: 0 # 3 as an abundance of caution: see likelihood/combo_3x2pt.yaml
     lmax: 50000 # lmax computed for real space correlation function
     kmax_boltzmann: 5.0
     # 1 EE2, 2 Halofit
@@ -75,8 +75,8 @@ params:
     drop: true
   omegam:
     prior:
-      min: 0.1
-      max: 0.9
+      min: 0.2
+      max: 0.5
     ref:
       dist: norm
       loc: 0.316
@@ -96,7 +96,7 @@ params:
     latex: w_{0,\mathrm{DE}}
   w0pwa:
     prior:
-      min: -5 
+      min: -3 # w0 + wa > -3: below it the early phantom regime needs a costlier CAMB
       max: -0.01
     ref:
       dist: norm

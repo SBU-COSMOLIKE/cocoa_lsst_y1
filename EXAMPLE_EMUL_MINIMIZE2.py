@@ -133,10 +133,10 @@ likelihood:
     data_file: lsst_y1_M1_GGL0.05.dataset
     use_emulator: 1
   # top hat on the derived Omega_m (sampled here through omegach2,
-  # omegabh2 and theta): log-likelihood 0 at omegam <= 0.5 and -inf
-  # above, the cap the omegam prior box sets in the other examples
+  # omegabh2 and theta): log-likelihood 0 at 0.2 <= omegam <= 0.5 and
+  # -inf outside, the box the omegam prior sets in the other examples
   omegam_cap:
-    external: "lambda _self: 0.0 if _self.provider.get_param('omegam') <= 0.5 else -np.inf"
+    external: "lambda _self: 0.0 if 0.2 <= _self.provider.get_param('omegam') <= 0.5 else -np.inf"
     requires: {omegam: null}
 params:
   logA:
