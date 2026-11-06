@@ -1312,5 +1312,5 @@ pin it through `FROZEN_LIKELIHOOD_OVERRIDES` in
 yamls ship level 0.
 
 See [tests/data_vector/README.md](tests/data_vector/README.md),
-subsection "The N-random-models check (opt-in)", for the full
+subsection "The N-random-models check", for the full
 measurements and figures.

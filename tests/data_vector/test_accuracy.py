@@ -31,22 +31,17 @@ accuracyboost 5 as a stress knob: in desy1xplanck that boost breaks
 the interface instead of refining it (a suspected fixed-size table),
 and the one-at-a-time delta is what tells such cases apart.
 
-One opt-in check extends the scan beyond the fiducial: the
-N-random-models check evaluates the same delta at N reproducible
-random points across the prior, each against a synthetic data vector
-generated at that point (see test_ax99_nmodels). It runs only when
-the COCOA_ACCURACY_NMODELS environment variable is a positive
-integer:
+One check extends the scan beyond the fiducial: the N-random-models
+check evaluates the same kind of delta at 50 fixed points across the
+prior (seed 137 + m for model m; the draw settings are NMODELS_BOX,
+NMODELS_HOLD and NMODELS_AMPLITUDE_CUT in cocoa_test_utils.py). The
+pushed-settings vectors of those points are stored in
+frozen/nmodels_example2.npz, so the check builds one model at the
+default settings and compares its 50 vectors with them (see
+test_ax99_nmodels). Another cosmology or prior means regenerating
+the stored vectors:
 
-    COCOA_ACCURACY_NMODELS=10 python -m pytest \\
-        ./projects/lsst_y1/tests/data_vector/test_accuracy.py -k nmodels
-
-When this file runs as a script, --nmodels N sets the same option:
-
-    python ./projects/lsst_y1/tests/data_vector/test_accuracy.py --nmodels 10
-
-With the variable unset (or 0) the check prints how to enable it and
-passes without evaluating anything.
+    python ./projects/lsst_y1/tests/generate_frozen_reference.py --nmodels
 
 A high-accuracy evaluation takes minutes, not seconds: the whole file
 is far slower than the rest of the suite. To run only this file (from
@@ -97,40 +92,10 @@ TestAccuracyAdvisory = u.accuracy_suite(
         ("test_a6_3x2pt_tatt", "A6", "example2",
          True, "example2 (3x2pt, TATT)"),
     ),
-    knob_scan="example2",
-    nmodels_example=("example2", "example2 (3x2pt, NLA)"),
-    # The examples keep Omega_m in [0.2, 0.5]: above 0.5 the pushed
-    # settings move the 3x2pt chi2 by up to 10^3 against the fiducial
-    # covariance (tests/data_vector/README.md, the N-random-models
-    # check). They also keep w0 + wa >= -3, below which the early
-    # phantom regime needs a costlier CAMB. The frozen configurations
-    # keep the earlier, wider boxes, so the draw narrows them here
-    # instead of refreezing.
-    nmodels_box={"omegam": (0.2, 0.5), "w0pwa": (-3.0, -0.01)},
-    # every odd model holds Omega_m, A_s (the primordial amplitude) and
-    # the lens biases at the fiducial (the clustering amplitude A_s b_i^2
-    # with them), so its
-    # delta chi2 shows what the other parameters do to the accuracy
-    nmodels_hold=("omegam", "As_1e9", "LSST_B1_"),
-    # every drawn lens bin keeps (A_s/A_s,fid)(b_i/b_i,fid)^2 <= 8, the
-    # amplitude cut of the examples' prior and of every project
-    nmodels_amplitude_cut=8.0)
+    knob_scan="example2")
 
 # __name__ is "__main__" only when this file runs directly as a
 # script; pytest imports the module instead, so this block stays
 # idle under pytest
 if __name__ == "__main__":
-    # --nmodels N is the script-run spelling of COCOA_ACCURACY_NMODELS;
-    # it must leave sys.argv before unittest.main parses the arguments.
-    # `in` scans the argument list for the flag, and .index returns
-    # the position of its first occurrence
-    if "--nmodels" in sys.argv:
-        flag_index = sys.argv.index("--nmodels")
-        if flag_index + 1 >= len(sys.argv):
-            sys.exit("--nmodels requires a value, for example "
-                     "--nmodels 10")
-        os.environ["COCOA_ACCURACY_NMODELS"] = sys.argv[flag_index + 1]
-        # del on the slice removes the flag and its value from the
-        # list in place, so unittest.main never sees them
-        del sys.argv[flag_index:flag_index + 2]
     unittest.main(verbosity=2)

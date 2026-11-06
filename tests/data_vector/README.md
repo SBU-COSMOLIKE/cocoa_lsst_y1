@@ -286,40 +286,45 @@ minutes):
     python -m pytest ./projects/lsst_y1/tests/data_vector/test_accuracy.py
     python -m pytest ./projects/lsst_y1/tests/data_vector --ignore ./projects/lsst_y1/tests/data_vector/test_accuracy.py
 
-### The N-random-models check (opt-in) <a name="nmodels_check"></a>
+### The N-random-models check <a name="nmodels_check"></a>
 
 [Mechanism](https://github.com/CosmoLike/cocoa-cosmolike-core/blob/main/README.md#dv_nmodels):
-seeded random points across the 3x2pt NLA prior, each scored with every
-setting of the A-checks pushed at once against its own default-settings
-vector. Model $m$ draws its point with the seed $137 + m$, so every run
-repeats the same points and the same figure. Enable and run it with
+50 seeded random points across the 3x2pt NLA prior, each scored with
+every setting of the A-checks pushed at once against its own
+default-settings vector. Model $m$ draws its point with the seed
+$137 + m$, so every run repeats the same points and the same figure.
+The pushed-settings vectors are stored in
+`tests/frozen/nmodels_example2.npz`, so a run builds one model at the
+default settings and evaluates the 50 points. The check runs with the
+rest of `test_accuracy.py`, or on its own with
 
-    COCOA_ACCURACY_NMODELS=10 python -m pytest \
-        ./projects/lsst_y1/tests/data_vector/test_accuracy.py -k nmodels
+    python -m pytest ./projects/lsst_y1/tests/data_vector/test_accuracy.py -k nmodels
 
-Running the file as a script accepts `--nmodels N` in place of the
-environment variable. Two more variables change a run:
+After a change to the prior, the draw settings, the fiducial, a pushed
+setting or a likelihood default, the check fails until the stored
+vectors are regenerated (without a stored file it is skipped with the
+same instruction):
 
-- `COCOA_ACCURACY_NMODELS_SEED` sets another seed base, for a second
-  reproducible set of points;
-- `COCOA_ACCURACY_NMODELS_FIGURES` names the folder of the figure
-  (unset: the system temporary folder, so the run changes no project
-  file).
+    python ./projects/lsst_y1/tests/generate_frozen_reference.py --nmodels
+
+`COCOA_ACCURACY_NMODELS_FIGURES` names the folder of the figure
+(unset: the system temporary folder, so the run changes no project
+file).
 
 The check is advisory: each $\Delta\chi^2$ only has to be finite. Three
-settings in `test_accuracy.py` shape the draw:
+settings in `tests/cocoa_test_utils.py` shape the draw:
 
-- `nmodels_box`: $\Omega_m$ is drawn in $[0.2, 0.5]$ and $w_0 + w_a$
+- `NMODELS_BOX`: $\Omega_m$ is drawn in $[0.2, 0.5]$ and $w_0 + w_a$
   in $[-3, -0.01]$, the boxes of the examples. The frozen
   configurations keep the earlier, wider boxes, and the override
   narrows them without a refreeze; it changes only those values of a
   seeded point.
-- `nmodels_hold`: every second model (seed 138, 140, ...) resets
+- `NMODELS_HOLD`: every second model (seed 138, 140, ...) resets
   $\Omega_m$, $A_s$ and the lens biases to the fiducial after its draw,
   so only the other parameters vary ($H_0$, $n_s$, $\Omega_b$,
   $m_\nu$, $w_0$, $w_0 + w_a$ and the IA amplitudes). Those models
   measure what the other parameters do to the accuracy.
-- `nmodels_amplitude_cut`: every drawn lens bin keeps the amplitude
+- `NMODELS_AMPLITUDE_CUT`: every drawn lens bin keeps the amplitude
   ratio $(A_s/A_s^{\rm fid})(b_i/b_i^{\rm fid})^2 \le 8$, the cut of
   the examples' prior.
 
@@ -342,8 +347,7 @@ option**; the FAQ
 [Which accuracy settings should I choose?](../../README.md#accuracy_choice)
 of the project README explains the choice.
 
-Measured on 2026-11-05 (50 models, seed base 137,
-`COCOA_ACCURACY_NMODELS=50`):
+Measured on 2026-11-05 (50 models, seed base 137):
 
 ![The fifty random 3x2pt models, colored by the pushed-settings delta chi2](accuracy_nmodels_example2_seed137.png)
 
@@ -502,7 +506,9 @@ the script `start_cocoa.sh`
 It deletes and rebuilds `frozen/` from the current project, prints one
 reference $\chi^2$ per configuration and variant (ten values), and
 rewrites the manifest. This step does not write the baryonic-feedback
-vectors of `test_baryons.py`.
+vectors of `test_baryons.py`, and it keeps the stored vectors of the
+[N-random-models check](#nmodels_check) (`frozen/nmodels_example2.npz`);
+regenerate those with `--nmodels` when that check asks for it.
 
 **Step :three:**: write the baryonic-feedback vectors
 

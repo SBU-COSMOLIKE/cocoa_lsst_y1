@@ -15,7 +15,7 @@ pk_z_refinement: 1
 # leaves chi2 errors of order 1, and level 3 removes them at nearly the
 # same evaluation time. Measured on the 3x2pt data vector; see more
 # details in tests/data_vector/README.md, subsection "The N-random-models
-# check (opt-in)".
+# check".
 integration_accuracy: 0
 # n(z) interpolation: 0 = cubic spline, 1 = linear, 2+ = Steffen (monotone)
 # 0: original midpoint curve (default); 1: histogram + Akima.

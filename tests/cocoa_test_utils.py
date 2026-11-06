@@ -130,6 +130,31 @@ FASTPT_MASK_DATASETS = {
 # larger fraction of the prior (tests/data_vector/README.md).
 FROZEN_LIKELIHOOD_OVERRIDES = {"integration_accuracy": 3}
 
+# The N-random-models check (test_accuracy.py, test_ax99_nmodels): the
+# default settings against the pushed accuracy settings at 50 fixed
+# points of the prior (seed 137 + m for model m).
+# generate_frozen_reference.py --nmodels stores the pushed vectors in
+# frozen/nmodels_<example>.npz and reads these same draw settings.
+NMODELS_EXAMPLES = (("example2", "example2 (3x2pt, NLA)"),)
+# None keeps the check advisory: it reports every delta and draws the
+# figure, and fails only on a non-finite delta
+NMODELS_LIMIT = None
+# The examples keep Omega_m in [0.2, 0.5]: above 0.5 the pushed
+# settings move the 3x2pt chi2 by up to 10^3 against the fiducial
+# covariance (tests/data_vector/README.md, the N-random-models check).
+# They also keep w0 + wa >= -3, below which the early phantom regime
+# needs a costlier CAMB. The frozen configurations keep the earlier,
+# wider boxes, so the draw narrows them instead of a refreeze.
+NMODELS_BOX = {"omegam": (0.2, 0.5), "w0pwa": (-3.0, -0.01)}
+# every odd model holds Omega_m, A_s (the primordial amplitude) and the
+# lens biases at the fiducial (the clustering amplitude A_s b_i^2 with
+# them), so its delta chi2 shows what the other parameters do to the
+# accuracy
+NMODELS_HOLD = ("omegam", "As_1e9", "LSST_B1_")
+# every drawn lens bin keeps (A_s/A_s,fid)(b_i/b_i,fid)^2 <= 8, the
+# amplitude cut of the examples' prior and of every project
+NMODELS_AMPLITUDE_CUT = 8.0
+
 EXAMPLES = {
     "example1": {
         "frozen_module": "frozen_config_example1.py",
@@ -338,7 +363,8 @@ ten_in_a_row_chi2 = _H.ten_in_a_row_chi2
 baryon_accuracy_delta = _H.baryon_accuracy_delta
 baryon_drift_chi2 = _H.baryon_drift_chi2
 draw_uniform_point = _H.draw_uniform_point
-random_model_accuracy = _H.random_model_accuracy
+nmodels_points = _H.nmodels_points
+nmodels_config_hash = _H.nmodels_config_hash
 ee2_original_vs_cocoa_dchi2s = _H.ee2_original_vs_cocoa_dchi2s
 _ee2_comparison_block = _H._ee2_comparison_block
 _worker = _H._worker
