@@ -368,6 +368,8 @@ nmodels_config_hash = _H.nmodels_config_hash
 ee2_original_vs_cocoa_dchi2s = _H.ee2_original_vs_cocoa_dchi2s
 _ee2_comparison_block = _H._ee2_comparison_block
 _worker = _H._worker
+# the setting-sequence worker (setting_sequence_suite spawns it)
+_sequence_worker = _H._sequence_worker
 _run_isolated = _H._run_isolated
 _fastpt_comparison_info = _H._fastpt_comparison_info
 _fastpt_comparison_block = _H._fastpt_comparison_block
@@ -387,6 +389,8 @@ photoz_conventions_suite = _cct_suites.photoz_conventions_suite
 nonlimber_suite = _cct_suites.nonlimber_suite
 lowrank_gg_suite = _cct_suites.lowrank_gg_suite
 cache_ladder_suite = _cct_suites.cache_ladder_suite
+setting_sequence_suite = _cct_suites.setting_sequence_suite
+common_sequences = _cct_suites.common_sequences
 baryon_accuracy_suite = _cct_suites.baryon_accuracy_suite
 baryon_drift_suite = _cct_suites.baryon_drift_suite
 freeze_main = _cct_freeze.freeze_main
