@@ -24,11 +24,19 @@ flowchart TB
 Every data-vector test reads only the pinned snapshot in `frozen/`.
 Asserted checks fail the run when a number moves: the $\Delta\chi^2$
 checks against `frozen/reference_chi2.json`, the race conditions (OpenMP
-threading), the cache ladder, the FAST-PT and EuclidEmulator2
-comparisons, the baryonic-feedback drift tests, the photo-z and
-non-Limber switches, and the scale-cut diagnostics. Advisory checks print
-measurements without a pass limit: the accuracy scans (with and without
-feedback), Halofit versus EuclidEmulator2, and the hybrid emulators.
+threading), the cache ladder, the setting sequences, the FAST-PT and
+EuclidEmulator2 comparisons, the baryonic-feedback drift tests, the
+photo-z and non-Limber switches, and the scale-cut diagnostics. Advisory
+checks print measurements without a pass limit: the accuracy scans (with
+and without feedback), Halofit versus EuclidEmulator2, and the hybrid
+emulators.
+
+The setting-sequence tests (`data_vector/test_setting_sequences.py`)
+change cosmolike settings in one process, as a notebook does between
+evaluations, and compare every result bit for bit with a separate
+process that saw only the final settings. A change the loaded data
+layout cannot follow must stop with a clear message instead of
+returning numbers computed from the earlier settings.
 
 The covariance sector does not read `frozen/`; it builds its own small
 inputs and needs the covariance build.
