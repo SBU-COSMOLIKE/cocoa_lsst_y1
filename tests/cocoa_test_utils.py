@@ -120,10 +120,11 @@ FASTPT_MASK_DATASETS = {
 #   "emulator"          = an EMUL2 configuration: machine-learning
 #                         emulators replace the Boltzmann code. These are
 #                         advisory (no pass/fail; see test_emul2.py);
-#                         "exact_example" names the exact-physics
+#                         "exact_example" names the non-emulated
 #                         counterpart whose frozen layout the harness
-#                         copies, and "exact_reference" the reference
-#                         chi2 their accuracy is judged against.
+#                         copies, and "exact_reference" the non-emulated
+#                         reference chi2 their agreement is judged
+#                         against.
 # The frozen references run integration_accuracy 3, the cautious level the
 # likelihood yamls recommend for chains on real data; the examples ship 0.
 # At level 3 the N-random-models check keeps delta chi2 below 0.2 over a

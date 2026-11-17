@@ -2,29 +2,30 @@
 
 The EXAMPLE_EMUL2 examples replace the Boltzmann code with trained
 machine-learning emulators (the emulrdrag, emulbaosn, and emulmps
-theory blocks) while the cosmolike likelihood stays exact. An
-emulator is an approximation of the exact physics, so these checks
-carry no pass/fail: they measure and report, and every method here
-ends green as long as the pipeline runs at all. What is reported:
+theory blocks) while the cosmolike likelihood is not emulated. An
+emulator approximates the full Boltzmann calculation, so these
+checks carry no pass/fail: they measure and report, and every method
+here ends green as long as the pipeline runs at all. What is reported:
 
   - the emulator chi2 against the frozen emulator reference (did the
     installed emulator stack change since the freeze);
-  - the emulator chi2 against the exact-physics reference at the same
-    cosmology (how accurate the emulator is), followed by the
-    printed recommendation: "RECOMMENDED for actual data analysis"
-    when |emulator - exact| chi2 < 0.2, "NOT recommended" otherwise;
+  - the emulator chi2 against the non-emulated reference at the same
+    cosmology (how closely the emulated pipeline tracks the frozen
+    pipeline without the emulator), followed by the printed verdict:
+    "agrees at this configuration" when |emulator - non-emulated|
+    chi2 < 0.2, "does not agree at this configuration" otherwise;
   - a race check identical in structure to tests 2/4/6/8, printed
     with a warning instead of a failure.
 
-  E1. emul2 example1 (cosmic shear): accuracy and recommendation.
+  E1. emul2 example1 (cosmic shear): accuracy and agreement verdict.
   E2. emul2 example1: race check, advisory.
-  E3. emul2 example2 (3x2pt): accuracy and recommendation.
+  E3. emul2 example2 (3x2pt): accuracy and agreement verdict.
   E4. emul2 example2: race check, advisory.
 
 Two caveats a reader should know before trusting the deltas. First,
-the emulated configurations sample fewer parameters than the exact
-ones (mnu is fixed inside the emulator training), so part of the
-difference is a modeling choice, not emulator error. Second, the
+the emulated configurations sample fewer parameters than the
+non-emulated ones (mnu is fixed inside the emulator training), so
+part of the difference is a modeling choice, not emulator error. Second, the
 trained-network files are read from external_modules/data/emultrf
 (pinned by the EMULTRF keys in set_installation_options.sh), not from
 the frozen state: retraining or updating the emulators changes these
@@ -55,11 +56,11 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(
     os.path.abspath(__file__))))
 import cocoa_test_utils as u
 
-# The recommendation threshold on |emulator - exact| chi2. It equals
-# CHI2_TOLERANCE on purpose: the reference tests allow the exact
-# pipeline a 0.2 chi2 band, and an emulator whose own error already
-# rivals that band would eat the whole error margin of a real
-# analysis.
+# The verdict threshold on |emulator - non-emulated| chi2. It equals
+# CHI2_TOLERANCE on purpose: the reference tests allow the
+# non-emulated pipeline a 0.2 chi2 band, and an emulator whose own
+# difference already rivals that band would eat the whole error
+# margin of a real analysis.
 RECOMMENDATION_LIMIT = u.CHI2_TOLERANCE
 
 
@@ -121,7 +122,7 @@ class TestEmul2Advisory(unittest.TestCase):
         u.report_emul2_race(f"{name}: {label}", fresh, tenth)
 
     def test_e1_emul2_example1_accuracy(self):
-        """emul2 example1: accuracy against the exact chi2, advisory."""
+        """emul2 example1: agreement with the non-emulated chi2, advisory."""
         self._accuracy_check("E1", "emul2_example1",
                              "example1 (cosmic shear, emulated)")
 
@@ -131,7 +132,7 @@ class TestEmul2Advisory(unittest.TestCase):
                          "example1 (cosmic shear, emulated) race check")
 
     def test_e3_emul2_example2_accuracy(self):
-        """emul2 example2: accuracy against the exact chi2, advisory."""
+        """emul2 example2: agreement with the non-emulated chi2, advisory."""
         self._accuracy_check("E3", "emul2_example2",
                              "example2 (3x2pt, emulated)")
 

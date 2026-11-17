@@ -904,12 +904,14 @@ def rf_C_ss_tomo_limber(k, ell, omegam=omegam, omegab=omegab, H0=H0,
                         CAMBAccuracyBoost=1.0, CLAccuracyBoost=1.0,
                         CLIntegrationAccuracy=0,
                         non_linear_emul=None, allsims=None):
-    """Compute the cumulative response R(k_max) of C_ss.
+    """Compute the cumulative response RF(k_max) of C_ss.
 
-    R(k_max) integrates |d ln C_ss/d ln k| over ln k up to k_max
-    (arXiv:2011.06469, eq. 17), a measure of how much of the spectrum
-    comes from wavenumbers below k_max. Shear state as in
-    C_ss_tomo_limber, then ci.rf_C_ss_tomo_limber.
+    RF(k_max) = S(k_max)/S(k_hi), where S(K) integrates
+    |d ln C_ss/d ln k| over ln k up to K on the tabulated k range,
+    whose upper end is k_hi (arXiv:2011.06469, eq. 17): the fraction
+    of the spectrum's response coming from wavenumbers below k_max,
+    rising from 0 to 1. Shear state as in C_ss_tomo_limber, then
+    ci.rf_C_ss_tomo_limber.
 
     Arguments:
       k = 1D array of cutoffs k_max [h/Mpc]; ell = 1D array of
@@ -942,7 +944,7 @@ def rf_xi_tomo_limber(k, ntheta=None, theta_min_arcmin=None,
                       k_per_logint=10, CAMBAccuracyBoost=1.0,
                       CLAccuracyBoost=1.0, CLIntegrationAccuracy=0,
                       non_linear_emul=None, allsims=None):
-    """Compute the cumulative response R(k_max) of xi_+-.
+    """Compute the cumulative response RF(k_max) of xi_+-.
 
     The real-space version of rf_C_ss_tomo_limber. Shear state plus a
     re-binning, then ci.rf_xi_tomo_limber.
