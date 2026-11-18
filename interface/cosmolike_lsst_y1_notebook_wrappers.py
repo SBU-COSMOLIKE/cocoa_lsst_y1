@@ -1036,6 +1036,19 @@ FISHER_GAUSSIAN_PRIORS = {
     11: (-8.67127e-05, 0.002),
 }
 
+# The dark-energy layout: the same 17 entries followed by w0 (index 17)
+# and wa (index 18), the parameters of the equation of state
+# w(a) = w0 + wa (1 - a). Appending them keeps every index above valid,
+# so FISHER_GAUSSIAN_PRIORS and FISHER_FLAT_PRIORS serve both layouts.
+# The fiducial is the cosmological constant, w0 = -1 and wa = 0, the
+# point at which the 17-entry layout holds them fixed; wa = 0 makes its
+# stencil step absolute (cnu.get_ddv uses h itself when |p0| <= 1e-12).
+FISHER_W0WA_PARAM_FID = np.append(FISHER_PARAM_FID, [-1.0, 0.0])
+
+FISHER_W0WA_PARAM_NAMES = FISHER_PARAM_NAMES + ["w0", "wa"]
+
+FISHER_W0WA_PARAM_LABELS = FISHER_PARAM_LABELS + [r"w_0", r"w_a"]
+
 # getdist samples for the Fisher contours come from this random
 # generator, seeded with 0 and created once, at import: repeated plot
 # calls draw successive samples from one reproducible stream, and
@@ -1043,15 +1056,23 @@ FISHER_GAUSSIAN_PRIORS = {
 _FISHER_RNG = np.random.default_rng(0)
 
 
-def fisher_fiducial_point():
+def fisher_fiducial_point(w0wa=False):
     """Return a fresh copy of the Fisher fiducial vector.
 
     Returns a copy so a notebook can shift entries for a forecast
     without editing the module's fiducial in place.
 
+    Arguments:
+      w0wa = False for the 17-entry layout (w0 = -1 and wa = 0 held
+             fixed), True for the 19-entry layout that also varies w0
+             and wa.
+
     Returns:
-      1D float64 array of 17 entries in the FISHER_PARAM_NAMES order.
+      1D float64 array: 17 entries in the FISHER_PARAM_NAMES order, or
+      19 in the FISHER_W0WA_PARAM_NAMES order.
     """
+    if w0wa:
+        return FISHER_W0WA_PARAM_FID.copy()
     return FISHER_PARAM_FID.copy()
 
 
@@ -1059,37 +1080,58 @@ def get_dv(param=None, AccuracyBoost=1.0):
     """Return the masked cosmic-shear data vector at a flat parameter vector.
 
     The Fisher derivatives evaluate this at shifted copies of the
-    fiducial vector; the layout is the one FISHER_PARAM_NAMES
-    documents. w0wa is pinned to the cosmological constant here: the
-    forecast of this notebook family does not open the dark-energy
-    parameters (the project fiducial w = -0.9 applies to the
-    likelihood evaluations, not this forecast). The probes in the
-    vector are the ones init_cosmolike selected; the clustering state
-    is not set here.
+    fiducial vector. Two layouts are accepted, told apart by their
+    length:
+      - 17 entries (FISHER_PARAM_NAMES): w0wa is pinned to the
+        cosmological constant, w0 = -1 and wa = 0; the forecasts of
+        this layout do not open the dark-energy parameters;
+      - 19 entries (FISHER_W0WA_PARAM_NAMES): the same 17 followed by
+        w0 and wa, handed to CAMB as w = w0 and w0pwa = w0 + wa.
+    At w0 = -1 and wa = 0 both layouts give the same vector, bit for
+    bit. The project fiducial w = -0.9 applies to the likelihood
+    evaluations, not to these forecasts. The probes in the vector are
+    the ones init_cosmolike selected; the clustering state is not set
+    here.
 
     Arguments:
-      param = 1D float array in the FISHER_PARAM_NAMES layout, or
-              None for the fiducial vector.
+      param = 1D float array in one of the two layouts, or None for
+              the 17-entry fiducial vector.
       AccuracyBoost = the overall boost, passed to _set_state both as
               AccuracyBoost and as CLAccuracyBoost, so the cosmolike
               boost there is AccuracyBoost squared.
 
     Returns:
       1D float64 array: the masked data vector (masked entries 0).
+
+    Raises:
+      ValueError when param has neither 17 nor 19 entries.
     """
     if param is None:
         param = FISHER_PARAM_FID
+    if len(param) == len(FISHER_PARAM_NAMES):
+        w0 = -1.0
+        wa = 0.0
+    elif len(param) == len(FISHER_W0WA_PARAM_NAMES):
+        w0 = param[17]
+        wa = param[18]
+    else:
+        raise ValueError(
+            f"get_dv: param has {len(param)} entries; pass the "
+            f"{len(FISHER_PARAM_NAMES)}-entry layout of FISHER_PARAM_NAMES "
+            f"or the {len(FISHER_W0WA_PARAM_NAMES)}-entry layout of "
+            "FISHER_W0WA_PARAM_NAMES")
     A1 = [param[5], param[6], 0, 0, 0]
     shear_photoz_bias = [param[7], param[8], param[9], param[10],
                          param[11]]
     M = [param[12], param[13], param[14], param[15], param[16]]
     # positional arguments of _set_state: omegam, omegab, H0, ns, As_1e9
-    # (param[4] down to param[0]), w = w0pwa = -1, AccuracyBoost,
-    # kmax = 5.0 [1/Mpc], k_per_logint = 10, CAMBAccuracyBoost = 1,
-    # CLAccuracyBoost = AccuracyBoost, CLIntegrationAccuracy = 0 and the
-    # configured non_linear_emul
+    # (param[4] down to param[0]), w = w0 and w0pwa = w0 + wa (-1 and -1
+    # in the 17-entry layout), AccuracyBoost, kmax = 5.0 [1/Mpc],
+    # k_per_logint = 10, CAMBAccuracyBoost = 1, CLAccuracyBoost =
+    # AccuracyBoost, CLIntegrationAccuracy = 0 and the configured
+    # non_linear_emul
     _set_state(param[4], param[3], param[2], param[1], param[0],
-               -1.0, -1.0,
+               w0, w0 + wa,
                AccuracyBoost, 5.0, 10, 1.0,
                AccuracyBoost, 0, _CONFIG["non_linear_emul"],
                M=M, shear_photoz_bias=shear_photoz_bias,
@@ -1104,9 +1146,11 @@ def get_ddv(index=0, h=0.02, CV=None, AccuracyBoost=1.0):
     relative steps +-h and +-2h around CV.
 
     Arguments:
-      index = position of the parameter in the FISHER_PARAM_NAMES order.
+      index = position of the parameter in the layout of CV
+              (FISHER_PARAM_NAMES or FISHER_W0WA_PARAM_NAMES).
       h     = relative step (0.02 = 2%; absolute when the fiducial is 0).
-      CV    = fiducial vector, or None for FISHER_PARAM_FID.
+      CV    = fiducial vector of either get_dv layout, or None for
+              FISHER_PARAM_FID.
       AccuracyBoost = forwarded to get_dv.
 
     Returns:
@@ -1129,19 +1173,22 @@ def get_Fisher(CV=None, h=0.02, AccuracyBoost=3.1, ddv=None,
     parameter, plus the Gaussian priors on the diagonal.
 
     Arguments:
-      CV    = fiducial vector, or None for FISHER_PARAM_FID.
+      CV    = fiducial vector of either get_dv layout, or None for
+              FISHER_PARAM_FID.
       h     = relative step of the derivatives.
       AccuracyBoost = forwarded to every data-vector evaluation (see
               get_dv: the cosmolike boost becomes its square).
       ddv   = derivative function, or None for get_ddv.
       priors = {index: (mean, sigma)}, or None for
-              FISHER_GAUSSIAN_PRIORS.
+              FISHER_GAUSSIAN_PRIORS (indices 7-16, valid in both
+              layouts).
       invcov = inverse covariance (n_data, n_data), or None for the
               masked one loaded by init_cosmolike.
 
     Returns:
-      2D array (len(CV), len(CV)): (17, 17), in the FISHER_PARAM_NAMES
-      order, for the default CV.
+      2D array (len(CV), len(CV)): (17, 17) in the FISHER_PARAM_NAMES
+      order for the default CV, (19, 19) in the FISHER_W0WA_PARAM_NAMES
+      order for fisher_fiducial_point(w0wa=True).
     """
     if CV is None:
         CV = FISHER_PARAM_FID
