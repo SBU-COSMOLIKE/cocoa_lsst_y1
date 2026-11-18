@@ -35,6 +35,7 @@ measured.
     9. [The photo-z convention checks](#photoz_conventions)
     10. [The non-Limber checks](#nonlimber_checks)
     11. [The sector-ladder cache check](#cache_ladder)
+    12. [The non-Limber early-exit tolerance checks](#nonlimber_tolerance)
 3. [Appendix](#appendix)
     1. [FAQ: What does this project's snapshot hold?](#frozen_copy)
     2. [FAQ: How can maintainers refresh the snapshot?](#refreeze)
@@ -456,6 +457,64 @@ described in
 [the shared checks](https://github.com/CosmoLike/cocoa-cosmolike-core/blob/main/README.md#dv_cache_ladder);
 this project runs it on its cosmic-shear configurations in both
 intrinsic-alignment models.
+
+### The non-Limber early-exit tolerance checks (`test_nonlimber_tolerance.py`) <a name="nonlimber_tolerance"></a>
+
+The non-Limber $C_\ell$ of $w(\theta)$ (and of $\gamma_t$ where
+`adopt_limber_gs: 0`) are computed in blocks of 16 multipoles, and a
+lens bin (clustering) or lens-source pair (lensing) whose $C_\ell$
+agrees with the Limber $C_\ell$ within a tolerance at the end of a
+block takes the Limber values from there: the early exit. The switch
+multipole is an integer that moves with the parameters, so a
+finite-difference derivative whose stencil straddles a switch sees a
+step in the model, which a Fisher matrix reads as information. The
+likelihood keys `nonlimber_tolerance_gg: 0.002` and
+`nonlimber_tolerance_gs: 0.01` set the tolerances; `0` removes the
+exit, the setting Fisher derivatives use, and `accuracyboost` $> 1$
+divides the tolerances in use by $1 + 2\,(\mathrm{boost} - 1)$. The
+Fourier data vectors (`C_gg_tomo_ells`, `C_gs_tomo_ells`) never take
+the exit.
+
+`test_nonlimber_tolerance.py` builds the `example2` (3x2pt, NLA) model
+once and runs the shared checks of `nonlimber_tolerance_suite`
+(`cosmolike_core/cocoa_testing_suites.py`): the frozen $\chi^2$, the
+documented defaults and a bit-for-bit tolerance round trip (tests 1-2);
+tolerance 0 moves only $\gamma_t$ and $w(\theta)$, and by a bounded
+$\delta^T C^{-1} \delta$ (test 3); the stencil noise of the $w_0$, $w_a$
+and `LSST_B1_5` derivative columns with and without the early exit (test
+4); the FKEM hand-off at the caps `lmax_nonlimber` = 150, 200 and 300
+(test 5: a step at the hand-off would raise the noise at the lower cap,
+where the FKEM-Limber difference is largest); the low-rank (SVD) engine
+next to FKEM at caps 150 and 300 (test 6); that a negative or nonfinite
+tolerance is refused (test 7); the accuracy-boost scaling of the
+tolerances in use (test 8); and that the production state returns bit
+for bit (test 9). The noise is $\sigma$ of `get_stencil_noise`
+(`cosmolike_notebook_utils/fisher.py`): the whitened fourth difference
+of five evaluations spaced $h = 0.025$ apart, in $\sqrt{\chi^2}$ units,
+the jitter one evaluation adds to a derivative column.
+
+Measured on 2026-11-18 (OMP 4), $\sigma$ in $\sqrt{\chi^2}$ units:
+
+| stencil noise $\sigma$ | $w_0$ | $w_a$ | `LSST_B1_5` |
+|---|---|---|---|
+| default tolerances, cap 150 | 7.26e-3 | 6.54e-3 | 6.47e-3 |
+| tolerance 0, cap 150 | 9.51e-4 | 3.76e-4 | 6e-13 |
+| tolerance 0, cap 200 | 9.51e-4 | 3.77e-4 | - |
+| tolerance 0, cap 300 | 9.47e-4 | 3.77e-4 | - |
+
+Both tolerances act here (`adopt_limber_gs: 0`). Turning the exit off
+moves the fiducial vector by $\delta^T C^{-1} \delta$ = 4.10e-2
+($\gamma_t$ 3.41e-2, $w(\theta)$ 5.4e-3; test 3 bound 0.1), and the
+vector moves by 8.7e-3 between the caps 150 and 300. The largest
+$|C_\ell^{\rm FKEM}/C_\ell^{\rm Limber} - 1|$ over the lens bins
+is 1.7e-3 / 6.5e-4 / 1.6e-4 at $\ell$ = 149 / 199 / 299. Test 4
+bounds every tolerance-0 column by 2e-3; test 5 allows cap 150 at
+most 1.1 times cap 300; the SVD/FKEM noise ratio is at most 1.012
+(margin 0.1).
+
+Run it alone with
+
+    python -m pytest ./projects/lsst_y1/tests/data_vector/test_nonlimber_tolerance.py -s
 
 ## Appendix <a name="appendix"></a>
 
