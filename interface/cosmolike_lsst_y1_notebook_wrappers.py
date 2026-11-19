@@ -72,6 +72,7 @@ sys.path.insert(0, os.environ["ROOTDIR"] + "/external_modules/code/cosmolike_cor
 # cnu = the shared notebook package (CAMB run, plots, Fisher helpers);
 # ci = this project's compiled cosmolike library
 import cosmolike_notebook_utils as cnu
+from cosmolike_notebook_utils.fisher import nonlimber_derivative_mode
 import cosmolike_lsst_y1_interface as ci
 
 
@@ -149,6 +150,11 @@ PM_FID = [LSST_PM_1, LSST_PM_2, LSST_PM_3, LSST_PM_4, LSST_PM_5]
 # module-global state: configure() changes it, and every later wrapper
 # call reads it.
 _CONFIG = {
+    # Base early-exit tolerances; Fisher reads temporarily use zero.
+    "nonlimber_tolerance_gg": 0.0,
+    "nonlimber_tolerance_gs": 0.0,
+    # FKEM multipole cap, separate from the low-rank engine cap.
+    "lmax_nonlimber": 200,
     # Upper redshift, independent of sampling; matches this project YAML.
     "nonlimber_zmax": 4.5,
     "lmax": 50000,              # base of the internal C_ell tables
@@ -191,7 +197,7 @@ _CONFIG = {
     # ranks, and its multipole cap
     "nonlimber_lowrank_gg": 0,
     "nonlimber_lowrank_rank": 5,
-    "nonlimber_lowrank_lmax": 150,
+    "nonlimber_lowrank_lmax": 200,
 }
 
 # filled by init_cosmolike: the HDF5 file with every hydro simulation
@@ -280,6 +286,10 @@ def init_cosmolike(CLprobe=None, with_data=False, lmax=None):
     allsims = ini.relativeFileName('all_sims_hdf5_file')
     ci.initial_setup()
     ci.init_nonlimber_zmax(zmax=float(_CONFIG["nonlimber_zmax"]))
+    ci.init_nonlimber_tolerance(
+        gg_tol=float(_CONFIG["nonlimber_tolerance_gg"]),
+        gs_tol=float(_CONFIG["nonlimber_tolerance_gs"]))
+    ci.init_lmax_nonlimber(lmax=int(_CONFIG["lmax_nonlimber"]))
     if _CONFIG["ggl_exclude"]:
         # flatten() turns the [[lens, source], ...] pair list into
         # the flat [l0, s0, l1, s1, ...] array the C layer expects
@@ -1154,7 +1164,13 @@ def get_dv(param=None, AccuracyBoost=1.0):
                AccuracyBoost, 0, _CONFIG["non_linear_emul"],
                M=M, shear_photoz_bias=shear_photoz_bias,
                A1=A1, A2=A2_FID, BTA=BTA_FID)
-    return np.array(ci.compute_data_vector_masked(), dtype=np.float64)
+    # A stencil must not change its stopping multipole between points.
+    # Restore configured bases, not the accuracy-scaled getter values.
+    with nonlimber_derivative_mode(
+            interface=ci,
+            production_gg=_CONFIG["nonlimber_tolerance_gg"],
+            production_gs=_CONFIG["nonlimber_tolerance_gs"]):
+        return np.array(ci.compute_data_vector_masked(), dtype=np.float64)
 
 
 def get_ddv(index=0, h=0.02, CV=None, AccuracyBoost=1.0):

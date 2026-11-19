@@ -1,10 +1,12 @@
 """The Akima reconstruction is fixed when only lookup accuracy is increased.
 
 Synthetic uniform and irregular histograms exercise source/lens tables and
-one/eight-thread preparation. The survey test covers the live mode round
-trip. Runtime values come from the compiled production readers, with no diagnostic C API.
+serial and parallel preparation (eight workers unless explicitly overridden).
+The survey test covers the live mode round trip. Runtime values come from the
+compiled production readers, with no diagnostic C API.
 """
 import ctypes
+import os
 from pathlib import Path
 
 import numpy as np
@@ -21,6 +23,7 @@ def test_histogram_reader_refinement(irregular, preparation_factor, tmp_path):
     library.omp_set_num_threads.argtypes = [ctypes.c_int]
     library.omp_get_max_threads.restype = ctypes.c_int
     previous_threads = library.omp_get_max_threads()
+    parallel_threads = int(os.environ.get("COCOA_TEST_OMP_THREADS", "8"))
     z = np.arange(9, dtype=float) * .1 + .05
     if irregular:
         z = np.array([.05, .11, .18, .24, .39, .42, .61, .76, .85])
@@ -31,7 +34,8 @@ def test_histogram_reader_refinement(irregular, preparation_factor, tmp_path):
     query = np.linspace(start=.025, stop=1.0, num=2001)
     results = {}
     try:
-        for boost, threads in ((1, 1), (2, 1), (3, 1), (4, 1), (1, 8)):
+        for boost, threads in ((1, 1), (2, 1), (3, 1), (4, 1),
+                               (1, parallel_threads)):
             ci.initial_setup()
             library.omp_set_num_threads(threads)
             ci.init_accuracy_boost(accuracy_boost=boost, integration_accuracy=0)
@@ -53,7 +57,7 @@ def test_histogram_reader_refinement(irregular, preparation_factor, tmp_path):
             np.testing.assert_allclose(actual=results[boost, 1],
                                        desired=results[1, 1],
                                        rtol=2.e-13, atol=2.e-13)
-        np.testing.assert_array_equal(results[1, 8], results[1, 1])
+        np.testing.assert_array_equal(results[1, parallel_threads], results[1, 1])
     finally:
         library.omp_set_num_threads(previous_threads)
         ci.initial_setup()
