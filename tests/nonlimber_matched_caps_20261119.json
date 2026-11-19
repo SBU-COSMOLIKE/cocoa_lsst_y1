@@ -1,0 +1,279 @@
+{
+  "date": "2026-11-19",
+  "scope": "Correct a shared test comparison; no native implementation, physical parameter, frozen reference or assertion margin changes.",
+  "shared_helper_core_commit": "2bc4500a9a55c1c4dcbe26952e0cfd658846fdc5",
+  "shared_helper_sha256": "6a8e26c462f825bcb0efa6255f4db1c3082c771f6e3853aa420d4e33fbbf39b0",
+  "previous_helper_core_commit": "0de919b",
+  "previous_helper_sha256": "2e52cd118a5075e950e6d2bd14bec9bd59f2e2b7b5d0f626f1cb74517b0581fc",
+  "cause": "The legacy SVD run left galaxy-shear at the production FKEM cap while the paired FKEM run changed that cap. The corrected helper sets both caps to the requested comparison value and retains its finally-based production restoration.",
+  "controlled_evidence_project": "roman_kl",
+  "controlled_evidence": {
+    "finding": "The old low-cap comparison changed gs projection settings as well as the gg engine. Matching the gs cap removes the failure without changing any margin or native implementation.",
+    "comparisons": [
+      {
+        "cap": 150,
+        "fkem_sigma": {
+          "w0": 0.004129304802344561,
+          "wa": 0.0004137010269278194,
+          "ROMAN_KL_B1_10": 4.1599699505149496e-13
+        },
+        "matched_svd_sigma": {
+          "w0": 0.004134682950091227,
+          "wa": 0.00041407540486666116,
+          "ROMAN_KL_B1_10": 4.1643150475102603e-13
+        },
+        "unchanged_10_percent_bounds_pass": {
+          "w0": true,
+          "wa": true,
+          "ROMAN_KL_B1_10": true
+        },
+        "all_15_ss_gs_stencils_bitwise_equal": true
+      },
+      {
+        "cap": 200,
+        "fkem_sigma": {
+          "w0": 0.005185671893661989,
+          "wa": 0.00040736329951387133,
+          "ROMAN_KL_B1_10": 4.1612666596754856e-13
+        },
+        "matched_svd_sigma": {
+          "w0": 0.005151415448078848,
+          "wa": 0.00040540490502293604,
+          "ROMAN_KL_B1_10": 4.1671879771367484e-13
+        },
+        "unchanged_10_percent_bounds_pass": {
+          "w0": true,
+          "wa": true,
+          "ROMAN_KL_B1_10": true
+        },
+        "all_15_ss_gs_stencils_bitwise_equal": true
+      }
+    ],
+    "old_to_matched_svd150_changed_stencil_values": {
+      "ss": 0,
+      "gs": 675,
+      "gg": 0
+    },
+    "fresh_processes": 5,
+    "each_process_restores_production_bitwise": true,
+    "statistic_limit": "The whitened fourth difference includes smooth fourth-order curvature as well as numerical artifacts; the controlled comparison does not establish purely stochastic noise.",
+    "input_and_binary_identity_across_cases": true,
+    "artifact_sha256": {
+      "matched_svd150.npz": "01b4d6f5f82ae8ef40598cd3a4548e2de9efec45d35ab605a6e33954e2f6ea6d",
+      "legacy_svd150.npz": "9d8cbd101679343e1724ac0e6a51640baa529c0dd0b4283d5d7fde9a376abfe2",
+      "legacy_fkem150.npz": "d156e78c536cfe7d04b20f38391a513649a4461b31fe462b73d53263e157d559",
+      "legacy_fkem200.npz": "f988d7f4ce241c19c2f77e8805b01a20c5eff75996bf677fc3993c9bdc1fffe3",
+      "matched_svd200.npz": "55bb324e41e2013856532dfdb63fe846643a6a745ce6e450a03f0e31b1e7defb"
+    },
+    "case_input_records": [
+      {
+        "variant": "legacy",
+        "engine": "FKEM",
+        "cap": 150,
+        "sigma": {
+          "w0": 0.004129304802344561,
+          "wa": 0.0004137010269278194,
+          "ROMAN_KL_B1_10": 4.1599699505149496e-13
+        },
+        "production": {
+          "gg_tol": 0.002,
+          "gs_tol": 0.01,
+          "lmax_nonlimber": 200,
+          "lowrank_flag": 0,
+          "lowrank_rank": 5,
+          "lowrank_lmax": 200,
+          "accuracy_boost": 1.0,
+          "integration_accuracy": 1
+        },
+        "block_sizes": [
+          1100,
+          900,
+          200
+        ],
+        "restoration_bitwise": true,
+        "omp_threads": 6,
+        "blas_threads": 1,
+        "helper_sha256": "2e52cd118a5075e950e6d2bd14bec9bd59f2e2b7b5d0f626f1cb74517b0581fc",
+        "library_sha256": "cf7fe79ab4d2def95ac578605794ff80923d4c2e1a588062207adfc9f751a492",
+        "frozen_manifest_sha256": "f31a078da11dd9827b5077705eb74e6c458d4e8fb22ab26894e0c5a63ef0ac6a"
+      },
+      {
+        "variant": "legacy",
+        "engine": "SVD",
+        "cap": 150,
+        "sigma": {
+          "w0": 0.004545113503941975,
+          "wa": 0.00041420254763831823,
+          "ROMAN_KL_B1_10": 4.1633619824221025e-13
+        },
+        "production": {
+          "gg_tol": 0.002,
+          "gs_tol": 0.01,
+          "lmax_nonlimber": 200,
+          "lowrank_flag": 0,
+          "lowrank_rank": 5,
+          "lowrank_lmax": 200,
+          "accuracy_boost": 1.0,
+          "integration_accuracy": 1
+        },
+        "block_sizes": [
+          1100,
+          900,
+          200
+        ],
+        "restoration_bitwise": true,
+        "omp_threads": 6,
+        "blas_threads": 1,
+        "helper_sha256": "2e52cd118a5075e950e6d2bd14bec9bd59f2e2b7b5d0f626f1cb74517b0581fc",
+        "library_sha256": "cf7fe79ab4d2def95ac578605794ff80923d4c2e1a588062207adfc9f751a492",
+        "frozen_manifest_sha256": "f31a078da11dd9827b5077705eb74e6c458d4e8fb22ab26894e0c5a63ef0ac6a"
+      },
+      {
+        "variant": "matched",
+        "engine": "SVD",
+        "cap": 150,
+        "sigma": {
+          "w0": 0.004134682950091227,
+          "wa": 0.00041407540486666116,
+          "ROMAN_KL_B1_10": 4.1643150475102603e-13
+        },
+        "production": {
+          "gg_tol": 0.002,
+          "gs_tol": 0.01,
+          "lmax_nonlimber": 200,
+          "lowrank_flag": 0,
+          "lowrank_rank": 5,
+          "lowrank_lmax": 200,
+          "accuracy_boost": 1.0,
+          "integration_accuracy": 1
+        },
+        "block_sizes": [
+          1100,
+          900,
+          200
+        ],
+        "restoration_bitwise": true,
+        "omp_threads": 6,
+        "blas_threads": 1,
+        "helper_sha256": "43fdaf8b4c9db9a92088e19f6f745f6d6d00fcaa69dff4ec3038ef2742cd94a6",
+        "library_sha256": "cf7fe79ab4d2def95ac578605794ff80923d4c2e1a588062207adfc9f751a492",
+        "frozen_manifest_sha256": "f31a078da11dd9827b5077705eb74e6c458d4e8fb22ab26894e0c5a63ef0ac6a"
+      },
+      {
+        "variant": "legacy",
+        "engine": "FKEM",
+        "cap": 200,
+        "sigma": {
+          "w0": 0.005185671893661989,
+          "wa": 0.00040736329951387133,
+          "ROMAN_KL_B1_10": 4.1612666596754856e-13
+        },
+        "production": {
+          "gg_tol": 0.002,
+          "gs_tol": 0.01,
+          "lmax_nonlimber": 200,
+          "lowrank_flag": 0,
+          "lowrank_rank": 5,
+          "lowrank_lmax": 200,
+          "accuracy_boost": 1.0,
+          "integration_accuracy": 1
+        },
+        "block_sizes": [
+          1100,
+          900,
+          200
+        ],
+        "restoration_bitwise": true,
+        "omp_threads": 6,
+        "blas_threads": 1,
+        "helper_sha256": "2e52cd118a5075e950e6d2bd14bec9bd59f2e2b7b5d0f626f1cb74517b0581fc",
+        "library_sha256": "cf7fe79ab4d2def95ac578605794ff80923d4c2e1a588062207adfc9f751a492",
+        "frozen_manifest_sha256": "f31a078da11dd9827b5077705eb74e6c458d4e8fb22ab26894e0c5a63ef0ac6a"
+      },
+      {
+        "variant": "matched",
+        "engine": "SVD",
+        "cap": 200,
+        "sigma": {
+          "w0": 0.005151415448078848,
+          "wa": 0.00040540490502293604,
+          "ROMAN_KL_B1_10": 4.1671879771367484e-13
+        },
+        "production": {
+          "gg_tol": 0.002,
+          "gs_tol": 0.01,
+          "lmax_nonlimber": 200,
+          "lowrank_flag": 0,
+          "lowrank_rank": 5,
+          "lowrank_lmax": 200,
+          "accuracy_boost": 1.0,
+          "integration_accuracy": 1
+        },
+        "block_sizes": [
+          1100,
+          900,
+          200
+        ],
+        "restoration_bitwise": true,
+        "omp_threads": 6,
+        "blas_threads": 1,
+        "helper_sha256": "43fdaf8b4c9db9a92088e19f6f745f6d6d00fcaa69dff4ec3038ef2742cd94a6",
+        "library_sha256": "cf7fe79ab4d2def95ac578605794ff80923d4c2e1a588062207adfc9f751a492",
+        "frozen_manifest_sha256": "f31a078da11dd9827b5077705eb74e6c458d4e8fb22ab26894e0c5a63ef0ac6a"
+      }
+    ]
+  },
+  "this_project_validation": {
+    "passed": 2,
+    "tests": [
+      "test_6_svd_noise",
+      "test_9_production_state_restored"
+    ],
+    "elapsed_seconds": 81.47239995002747,
+    "fingerprint": {
+      "interface/cosmolike_lsst_y1_interface.so": "ea61b2e35379d3b65d11784b8bb869f9386b0f269f2e84cf63866fdc7260a25d",
+      "tests/manifest_sha256.json": "5937611a0aa9a9972ae04574e347609f53cc6482099dfe568e9bb2c41df30ff3",
+      "tests/cocoa_test_utils.py": "ea5097cde3a9b3ed1241d1d412555d0fbc2b73961b9da8019fc6b5271f5a9299",
+      "likelihood/__init__.py": "fb3a82e10bccf30cbffa165d054363cd0f902debae758b8524b120e0ff375b0f",
+      "likelihood/_cosmolike_prototype_base.py": "4c4780624e880b42cc6832ce17429f84eaf47023cf6a296f3bcf60596b5ee872",
+      "likelihood/combo_2x2pt.py": "7a2c482f86c6c6f886cfff82767a047d18312f09af5807a8b49f2cb7ca4e0f37",
+      "likelihood/combo_3x2pt.py": "0beb4a4bc8a82caf5c85bc7b0689f6c626950b24d10e0542b410d5c0eaf9d5ab",
+      "likelihood/combo_xi_gg.py": "8034b2907a290d5656a609cd67b3e1eceaa06c787dc4fff25cb57c66d1c6a576",
+      "likelihood/combo_xi_ggl.py": "db07ae90adf183425a79615d9a44c63c85d690025f75692099a3611ff109309c",
+      "likelihood/cosmic_shear.py": "396461d4a5810e5fb18ba560d35d50e61985ef3423cddbfade08ed173fd4db18",
+      "likelihood/combo_2x2pt.yaml": "892b923f777fad2757ef843ee93b60da9f03ea6cf3ab8d04d305fa5ea4dcbb09",
+      "likelihood/combo_3x2pt.yaml": "7bbfcf075fb78cf029d82cf322565c601fe1b12dab406851102210952b74878b",
+      "likelihood/combo_xi_gg.yaml": "e5b87329a1ffe3900605297f0bddc9f39f4897d018dd78470f6c3aa2cea217b9",
+      "likelihood/combo_xi_ggl.yaml": "d3c0f867f3979b275ae41b1d0a32ecfa013e661e0272a886edd631deab3fd936",
+      "likelihood/cosmic_shear.yaml": "7a06f0e5a41f85151a397fc6262042f184c99fe12981169718aad29563047395",
+      "likelihood/params_lens.yaml": "7affe9ec9ced091ececd6a720ab6f800f11e681f19644c4cc268b24a71fc8ac8",
+      "likelihood/params_source.yaml": "b3be088d881118f266c5edf827f9e59e252e477e8f954aa6658fdb0496deab0d"
+    },
+    "helper_sha256": "6a8e26c462f825bcb0efa6255f4db1c3082c771f6e3853aa420d4e33fbbf39b0",
+    "log_sha256": "b78f193c5a6aae4683dbdcb854ba9adbfea4434152f17e47e4098fbfbb5e4bff",
+    "xml_sha256": "783490a824f455c43df1d55af7bd033737511271d7fb75dc37f58f27c1b70272",
+    "omp_threads": 6,
+    "blas_threads": 1
+  },
+  "caller_documentation": {
+    "path": "tests/data_vector/test_nonlimber_tolerance.py",
+    "before_sha256": "868e2e71033953fb1f15fbcd9d5d9ceea58994a5dc66cefa2cf89c66b649a77c",
+    "after_sha256": "66173f0a754c239903d3e11cad53fe35512fe88b93762f735344dd0adbe3c567",
+    "executable_ast_unchanged": true
+  },
+  "reproduction": {
+    "working_directory": "Cocoa checkout root with its normal build/runtime environment sourced.",
+    "environment": {
+      "OMP_NUM_THREADS": "6",
+      "OMP_THREAD_LIMIT": "6",
+      "COCOA_TEST_OMP_THREADS": "6",
+      "OPENBLAS_NUM_THREADS": "1",
+      "MKL_NUM_THREADS": "1",
+      "VECLIB_MAXIMUM_THREADS": "1"
+    },
+    "command": "python -B -m pytest projects/lsst_y1/tests/data_vector/test_nonlimber_tolerance.py -k \"test_6_svd_noise or test_9_production_state_restored\" -p no:cacheprovider",
+    "regression_reproducer": "The committed Roman KL test_6_svd_noise reproduces the original failure with helper commit 0de919b and passes with helper commit 2bc4500, holding the recorded frozen inputs and compiled library fixed. The original full-run failure is retained in the Roman KL refreeze record.",
+    "five_process_control": "Five fresh processes used immutable copies of cocoa_testing_suites.py: legacy commit 0de919b, or its single setter-placement correction (same executable change as commit 2bc4500). Engine/cap/variant, all input and helper hashes, and the production state are listed in case_input_records. The saved NPZ hashes identify all fifteen stencil vectors per case.",
+    "controlled_inputs_project_commit": "14281fd11564b446799422d86c9f8031d342fa46"
+  }
+}
