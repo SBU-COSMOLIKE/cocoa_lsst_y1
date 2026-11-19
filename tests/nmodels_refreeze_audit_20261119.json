@@ -1,0 +1,83 @@
+{
+  "project": "lsst_y1",
+  "numerical_evaluations": 0,
+  "generation_log_sha256": "abb1921ef96c2624b6c798c1e2a9ab37991cfa088b64fae5fcd85adb592d33fd",
+  "archives": [
+    {
+      "example": "example2",
+      "archive": "nmodels_example2.npz",
+      "exact_fields": {
+        "names": true,
+        "values": true,
+        "held": true,
+        "seed": true,
+        "draw": true
+      },
+      "sampled_values_byte_equal": true,
+      "shape": [
+        50,
+        1560
+      ],
+      "all_new_vectors_finite": true,
+      "old_config_hash": "3caa42ac409be1d919bc483243566709b54d9a12169f31845324d95e565b35cf",
+      "new_config_hash": "c7000ff365852f252026734cadd713adc29f3209a4a3c10fd5b9ea9b888309d8",
+      "old_sha256": "d40fc509d1a4b85ca033f58aad0f6f6cf379d72e9e03a1d39ebefa12b60a9441",
+      "new_sha256": "c312919eefc86d1604114ed48892ac59d12583d9af773143e7a0e1eec5d0b804",
+      "camb_warning_log_boundaries": [
+        {
+          "example": "example2",
+          "after_completed_row": 2,
+          "before_completed_row": 3,
+          "warning_lines": 640,
+          "after_archive_stored_message": false,
+          "physical_row_identified": false,
+          "next_progress_point": {
+            "As_1e9": 2.375431259161383,
+            "H0": 75.81056734909275,
+            "LSST_A1_1": -3.5815664878400435,
+            "LSST_A1_2": -4.259018510581276,
+            "LSST_A2_1": 4.497813966275064,
+            "LSST_A2_2": -4.127610412490698,
+            "LSST_B1_1": 2.494552763621654,
+            "LSST_B1_2": 1.306108720456528,
+            "LSST_B1_3": 2.7141270588479958,
+            "LSST_B1_4": 2.4694987815988605,
+            "LSST_B1_5": 0.9758315276883568,
+            "LSST_BTA_1": 0.2507545085096121,
+            "LSST_DZ_L1": 0.00457604,
+            "LSST_DZ_L2": 0.000309875,
+            "LSST_DZ_L3": 0.00855907,
+            "LSST_DZ_L4": -0.00316269,
+            "LSST_DZ_L5": -0.0146753,
+            "LSST_DZ_S1": 0.0414632,
+            "LSST_DZ_S2": 0.00147332,
+            "LSST_DZ_S3": 0.0237035,
+            "LSST_DZ_S4": -0.0773436,
+            "LSST_DZ_S5": -8.67127e-05,
+            "LSST_M1": 0.0191832,
+            "LSST_M2": -0.0431752,
+            "LSST_M3": -0.034961,
+            "LSST_M4": -0.0158096,
+            "LSST_M5": -0.0158096,
+            "mnu": 0.13229336466282243,
+            "ns": 1.067898169674259,
+            "omegab": 0.036855596078460805,
+            "omegam": 0.2833326260217262,
+            "w": -1.0436004648514206,
+            "w0pwa": -0.06598067378574735
+          }
+        },
+        {
+          "example": "example2",
+          "after_completed_row": 50,
+          "before_completed_row": null,
+          "warning_lines": 49,
+          "after_archive_stored_message": true,
+          "physical_row_identified": false
+        }
+      ]
+    }
+  ],
+  "warning_scope": "CAMB cmbmain.f90:1031-1032 warns when the final integration and transfer times differ by more than its threshold. The message does not print the actual discrepancy or bound its effect on the observables. Repeated lines are not independent failed models. Fortran output is buffered: some lines appear after the archive-stored message. The progress boundaries therefore do not identify the physical row that caused a warning. Finite stored vectors are necessary but do not prove convergence; the warning is retained without an error-budget claim.",
+  "likelihood_finiteness": "The generation path calls cocoa_testing.evaluate_chi2 for every point, which raises for non-finite likelihood chi2 before saving its vector. This offline check separately verifies every vector entry."
+}
