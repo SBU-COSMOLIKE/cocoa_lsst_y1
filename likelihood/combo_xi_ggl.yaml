@@ -5,18 +5,21 @@ internal_accuracyboost: 1.0 # C-FAST-PT convolution grid / output grid
 # refinements on top of accuracyboost (which multiplies them too):
 # the non-Limber FFTLog chi grid, and the z nodes of the P(k) tables
 nonlimber_accuracyboost: 1.0
-# Upper redshift of the non-Limber distance grid; finite and >= 4.
-# Independent of radial sampling; the core default is 4.0.
+# upper redshift of the non-Limber radial grid (core default and minimum 4.0);
+# 4.5 keeps the grid end above every kernel (4.0 -> 4.5 moves the fiducial
+# 3x2pt vector by delta chi2 = 5.7e-6)
 nonlimber_zmax: 4.5
 pk_z_refinement: 1
 # early-exit tolerances of the non-Limber real-space C_l (w(theta), gamma_t);
 # 0 = no early exit (Fisher derivatives); accuracyboost > 1 shrinks them
-# 0 here: the exit errs by up to delta chi2 = 20, mostly gamma_t (tests/data_vector/README.md)
+# no early exit in this project: across the example priors the exit errs by up
+# to delta chi2 = 20, almost all in gamma_t (tests/data_vector/README.md)
 nonlimber_tolerance_gg: 0.0
 nonlimber_tolerance_gs: 0.0
 # the FKEM non-Limber cap (limits.LMAX_NOLIMBER): C_gg and C_gs are
 # non-Limber below it and Limber above; 150 is the cosmolike default
-# 200 here: cap 150 errs by up to delta chi2 = 2.4 in the example box (tests/data_vector/README.md)
+# this project caps at 200: across the example priors cap 150 errs by up to
+# delta chi2 = 2.4, mostly in gamma_t (tests/data_vector/README.md)
 lmax_nonlimber: 200
 # Level 0 keeps the numerical error of the data vector (delta chi2
 # against the pushed accuracy settings) small near the fiducial.
@@ -39,7 +42,7 @@ photoz_histogram_akima_factor: 3
 photoz_interpolation_type: 0
 # n(z) file z column: 0 = Z_LOW (left bin edges), 1 = Z_MID (sample points)
 photoz_zmid_convention: 0
-# galaxy-galaxy lensing: 0 = non-Limber below l = 150, 1 = Limber at every multipole
+# galaxy-galaxy lensing: 0 = non-Limber below l = 200 (lmax_nonlimber), 1 = Limber at every multipole
 adopt_limber_gs: 0
 lmax: 60000 # lmax computed for real space correlation function
 kmax_boltzmann: 5.0
