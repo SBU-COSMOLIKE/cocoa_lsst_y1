@@ -368,8 +368,10 @@ For multi-node runs, see [MPI across nodes](#mpi_across_nodes).
 > up the CPU, but its detection can be fooled. Adding `--mca mpi_yield_when_idle 1` forces
 > that behavior; it is harmless otherwise.
 
-The `Nautilus`, `Minimizer`, `Profile`, and `Emcee` scripts below contain an internally defined `yaml_string` that specifies priors, 
-likelihoods, and the theory code, all following Cobaya Conventions.
+The `Minimizer`, `Profile`, and `Emcee` scripts below contain an internally defined `yaml_string` that specifies priors, 
+likelihoods, and the theory code, all following Cobaya Conventions. The `Nautilus` scripts read `EXAMPLE_EMUL_NAUTILUS[1-2].yaml` instead and run the shared
+driver `cosmolike_core/cocoa_hybrid_sampling.py`: Nautilus samples each parameter's own prior, and extra prior factors enter the likelihood once.
+Add `--check` to evaluate the yaml's fiducial point without sampling.
 
 - **Nautilus**:
 
@@ -382,7 +384,7 @@ likelihoods, and the theory code, all following Cobaya Conventions.
           -x CLIK_DATA --mca mpi_yield_when_idle 1 --rank-by slot --map-by slot \
           --mca pml ob1 --mca btl vader,tcp,self --bind-to core:overload-allowed \
           --mca btl_tcp_if_exclude lo,docker0,virbr0,ib0 --report-bindings \
-          python -m mpi4py.futures ./projects/lsst_y1/EXAMPLE_EMUL_NAUTILUS1.py \
+          python ./projects/lsst_y1/EXAMPLE_EMUL_NAUTILUS1.py \
             --root ./projects/lsst_y1/ --outroot "EXAMPLE_EMUL_NAUTILUS1"  \
             --maxfeval 750000 --nlive 2048 --neff 15000 \
             --flive 0.01 --nnetworks 5
@@ -390,7 +392,7 @@ likelihoods, and the theory code, all following Cobaya Conventions.
   - macOS (arm)
 
         mpirun -n 12 --oversubscribe \
-          python -m mpi4py.futures ./projects/lsst_y1/EXAMPLE_EMUL_NAUTILUS1.py \
+          python ./projects/lsst_y1/EXAMPLE_EMUL_NAUTILUS1.py \
             --root ./projects/lsst_y1/ \
             --outroot "EXAMPLE_EMUL_NAUTILUS1" \
             --maxfeval 750000 --nlive 2048 --neff 15000 \
@@ -409,7 +411,7 @@ likelihoods, and the theory code, all following Cobaya Conventions.
           -x CLIK_DATA --mca mpi_yield_when_idle 1 --rank-by slot --map-by slot \
           --mca pml ob1 --mca btl vader,tcp,self --bind-to core:overload-allowed \
           --mca btl_tcp_if_exclude lo,docker0,virbr0,ib0 --report-bindings \
-          python -m mpi4py.futures ./projects/lsst_y1/EXAMPLE_EMUL_NAUTILUS2.py \
+          python ./projects/lsst_y1/EXAMPLE_EMUL_NAUTILUS2.py \
             --root ./projects/lsst_y1/ \
             --outroot "EXAMPLE_EMUL_NAUTILUS2"  \
             --maxfeval 850000 --nlive 3072 --neff 15000 \
@@ -418,13 +420,14 @@ likelihoods, and the theory code, all following Cobaya Conventions.
   - macOS (arm)
 
         mpirun -n 12 --oversubscribe \
-          python -m mpi4py.futures ./projects/lsst_y1/EXAMPLE_EMUL_NAUTILUS2.py \
+          python ./projects/lsst_y1/EXAMPLE_EMUL_NAUTILUS2.py \
             --root ./projects/lsst_y1/ \
             --outroot "EXAMPLE_EMUL_NAUTILUS2"  \
             --maxfeval 850000 --nlive 3072 --neff 15000 \
             --flive 0.01 --nnetworks 5
     
   What if the user runs a `Nautilus` chain with `--maxfeval` insufficient for producing `neff` samples? `Nautilus` saves the chain checkpoint at `chains/outroot_checkpoint.hdf5`.
+  The chain `chains/outroot.1.txt` holds the weight, minus the log likelihood and the sampled parameters; `chains/outroot.yaml` records the log evidence. An existing result is never overwritten: choose a new `--outroot`.
 
 - **Emcee**:
 
