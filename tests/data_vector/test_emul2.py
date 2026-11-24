@@ -48,7 +48,9 @@ import os
 
 # OpenMP reads OMP_NUM_THREADS when the compiled libraries load, so
 # this must run before any cobaya/cosmolike import in the process.
-os.environ["OMP_NUM_THREADS"] = os.environ.get("COCOA_TEST_OMP_THREADS", "4")
+# E5 may use one thread; the race methods still check their required count.
+os.environ.setdefault(
+    "OMP_NUM_THREADS", os.environ.get("COCOA_TEST_OMP_THREADS", "4"))
 
 import sys
 import unittest
