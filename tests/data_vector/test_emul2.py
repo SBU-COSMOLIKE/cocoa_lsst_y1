@@ -22,8 +22,8 @@ here ends green as long as the pipeline runs at all. What is reported:
   E3. emul2 example2 (3x2pt): accuracy and agreement verdict.
   E4. emul2 example2: race check, advisory.
 
-E5 adds the current fifty-point hybrid matter comparison and its bounded
-Fisher/error plot. Its accuracy differences are advisory; numerical
+E5 uses EXAMPLE_EVALUATE1.yaml for 50 prior points, its bounded Fisher
+calculation and 25 focused comparison points in a combined error plot. Its accuracy differences are advisory; numerical
 pipeline failures are not. Outputs go in a new timestamped folder under
 chains/hybrid_emulator_tests/. This study does not refresh frozen data.
 
@@ -150,7 +150,7 @@ class TestEmul2Advisory(unittest.TestCase):
 
 
 class TestHybridEmulator(unittest.TestCase):
-    """E5: current hybrid matter emulator, including the Fisher/error figure.
+    """E5: EV1 cosmic shear, 50 prior points, Fisher and 25 focused points.
 
     This uses current example priors, not frozen E1--E4 reference vectors.
     It runs when the candidate code and networks are installed. Broad-prior
@@ -160,7 +160,7 @@ class TestHybridEmulator(unittest.TestCase):
     """
 
     def test_e5_hybrid_emulator_fisher(self):
-        """Compare fifty cosmologies and save the bounded Fisher overlay."""
+        """Use EV1 for 50 prior points, Fisher and 25 focused comparisons."""
         from datetime import datetime, timezone
         from pathlib import Path
         import subprocess
