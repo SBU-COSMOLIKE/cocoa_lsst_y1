@@ -32,7 +32,7 @@ params:
   logA:
     prior:
       min: 1.61
-      max: 3.91
+      max: 3.624340932976365
     ref:
       dist: norm
       loc: 3.0448
