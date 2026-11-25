@@ -157,7 +157,7 @@ class TestEmul2Advisory(unittest.TestCase):
 class TestHybridEmulator(unittest.TestCase):
     """E5: EV1 cosmic shear, 50 prior points, Fisher and 25 focused points.
 
-    This uses current example priors, not frozen E1--E4 reference vectors.
+    This uses saved benchmark priors, not frozen E1--E4 reference vectors.
     It runs when the candidate code and networks are installed. Broad-prior
     accuracy exceedances and individual nonfinite candidate predictions are
     advisory. Missing CAMB predictions or a comparison with no valid vectors
