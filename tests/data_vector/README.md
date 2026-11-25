@@ -591,16 +591,21 @@ the same 50 broad points (open symbols) and 25 focused points (filled symbols).
 The solid and dashed curves show the saved 68% and 95%
 nuisance-marginalized Fisher regions.
 
-CAMB uses `AccuracyBoost: 1.05`, `k_per_logint: 10` and `kmax: 5.0`. The saved
+CAMB uses `AccuracyBoost: 1.05` for both probes. Cosmic shear uses
+`k_per_logint: 10` and `kmax: 5.0`. Full 3×2pt uses `k_per_logint: 15`
+and `kmax: 7.5` from its numbered evaluate. The archived cosmic-shear
 Fisher diagnostic found a maximum FoM shift of 0.18%.
 
-![LSST Y1 hybrid-emulator error against CAMB](figures/emulator_precision.png)
+![LSST Y1 - Cosmic Shear](figures/emulator_precision.png)
+
+![LSST Y1 - 3×2pt](figures/emulator_precision_3x2pt.png)
 
 Counts use the thresholds 0.2, 0.5, 1 and 4 in that order.
 
 | Case | Broad below threshold (50) | Focused below threshold (25) | Nonfinite broad/focused |
 | --- | --- | --- | --- |
 | Cosmic shear | 19/25/29/35 | 23/23/23/23 | 0/0 |
+| Full 3×2pt | 11/23/27/35 | 23/24/24/24 | 0/0 |
 
 <!-- end hybrid-emulator figure -->
 
