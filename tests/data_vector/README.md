@@ -658,25 +658,35 @@ python projects/lsst_y1/tests/compare_emulator_camb.py --plot-only /path/to/run
 
 ## FoM convergence
 
-This test estimates how numerical settings affect the Fisher figure of merit
-(FoM), which is proportional to the inverse area of the marginalized
-parameter ellipse. The pair is $w_0,w_a$ for CPL and $10^9 A_s,\Omega_m$
-for ΛCDM. The test builds one full CAMB Fisher matrix at the benchmark
-settings. Fourth differences of its model vectors rank contributions from
-numerical noise.
-The higher-accuracy calculation reevaluates only the selected derivative
-columns. The estimate uses the same baseline Fisher weights at both settings.
+This CAMB test uses the ordinary accuracy and physical prescription of each
+benchmark to build one full local Fisher matrix. The figure of merit is
+$1/\sqrt{\det C_{w_0,w_a}}$, with nuisance parameters marginalized in the
+Gaussian approximation. The sampled pair $w_0,w_0+w_a$ has the same ellipse
+area. Gaussian prior curvature enters the Fisher matrix, and prior bounds
+limit the stencil positions.
 
-Each nonzero fiducial uses `h = 0.025 * abs(fiducial)`, capped as needed
-to keep both `±2h` stencil points within its prior. Zero-centered
-coordinates use their configured absolute step or one tenth of their proposal
-width. The output records the actual steps, numerical settings, measured and
-omitted columns, and the estimated FoM shift. Contributions from omitted
-columns remain unbounded, so the estimate measures sensitivity to the tested
-refinement.
+The five-point stencil uses a fixed 2.5% relative step, shortened near prior
+bounds. A zero-centered parameter uses its specified absolute step or one
+tenth of its proposal width. The fourth differences rank the numerical
+sensitivity of the columns. Both higher settings reevaluate the same selected
+columns and use the same full ordinary Fisher weights. The table scales the
+ordinary FoM by the estimated change at each setting. Contributions from
+omitted columns and correlated numerical errors remain unknown.
+
+| Case | Setting | CosmoLike boost / integration | CAMB boost / k_per_logint | Approx. FoM | Change from previous |
+| --- | --- | --- | --- | --- | --- |
+| Cosmic shear | Ordinary | 1.0 / 0 | 1.05 / 10 | 4.9468374 | — |
+| Cosmic shear | Refined | 2.0 / 1 | 2.0 / 50 | 4.9465898 | -0.00500578% |
+| Cosmic shear | Confirmation | 3.0 / 2 | 3.0 / 75 | 4.9465983 | +0.000171421% |
+
+**Selected columns in both higher settings**
+
+- Cosmic shear — `H0`, `omegam`, `w`, `w0pwa`.
 
 Run from activated Cocoa with two MPI ranks, four OpenMP threads per rank
 and one BLAS thread.
+
+The default is cosmic shear. Use `--probe 3x2pt` for the full selection.
 
 ```bash
 OMP_NUM_THREADS=4 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 \
@@ -684,8 +694,9 @@ OMP_NUM_THREADS=4 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 \
   projects/lsst_y1/tests/check_fom_convergence.py --mpi
 ```
 
-The earlier screen selected $H_0$, $\Omega_m$, $w_0$ and $w_0+w_a$
-and estimated a $-0.0050\%$ shift. The corrected run is pending.
+The run directory contains `fisher/fom_accuracy.tsv`, the effective
+settings for each tier, and the measured and omitted columns. The standalone
+screen applies its tolerance to the estimated refined-to-confirmation change.
 
 ## Appendix <a name="appendix"></a>
 
