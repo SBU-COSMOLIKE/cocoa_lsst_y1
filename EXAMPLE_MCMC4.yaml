@@ -29,6 +29,7 @@ likelihood:
 # tests/data_vector/README.md). A point outside the cut has prior -inf, so
 # cobaya never evaluates its likelihood.
 prior:
+  emulator_omegabh2_cap: "lambda omegab, H0: 0.0 if omegab*(H0/100)**2 < 0.035 else -np.inf"
   amplitude_cut: "lambda As_1e9, LSST_B1_1, LSST_B1_2, LSST_B1_3, LSST_B1_4, LSST_B1_5: 0.0 if (As_1e9/2.1)*max((LSST_B1_1/1.72716)**2, (LSST_B1_2/1.65168)**2, (LSST_B1_3/1.61423)**2, (LSST_B1_4/1.92886)**2, (LSST_B1_5/2.11633)**2) <= 8 else -np.inf"
 
 params:

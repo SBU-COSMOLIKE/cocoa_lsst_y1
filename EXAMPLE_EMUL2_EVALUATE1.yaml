@@ -18,10 +18,13 @@ likelihood:
     IA_redshift_evolution: 3
     print_datavector: False
     print_datavector_file: "./projects/lsst_y1/chains/example1_lsst_y1_theory_emul.modelvector"
+prior:
+  emulator_omegabh2_cap: "lambda omegab, H0: 0.0 if omegab*(H0/100)**2 < 0.035 else -np.inf"
+
 params: # EE2 PRIORS
   As_1e9:
     prior:
-      min: 0.5
+      min: 1.0000000000000002
       max: 3.5
     ref:
       dist: norm
@@ -43,7 +46,7 @@ params: # EE2 PRIORS
   H0:
     prior:
       min: 55
-      max: 91
+      max: 84.99999999999999
     ref:
       dist: norm
       loc: 67.32
@@ -62,8 +65,8 @@ params: # EE2 PRIORS
     latex: \Omega_\mathrm{b}
   omegam:
     prior:
-      min: 0.2
-      max: 0.5
+      min: 0.20000000000000004
+      max: 0.49999999999999994
     ref:
       dist: norm
       loc: 0.316
@@ -83,7 +86,7 @@ params: # EE2 PRIORS
     drop: true
   w:
     prior:
-      min: -3
+      min: -1.9999999999999998
       max: -0.01
     ref:
       dist: norm

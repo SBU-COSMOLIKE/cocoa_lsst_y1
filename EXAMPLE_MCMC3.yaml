@@ -23,6 +23,9 @@ likelihood:
     create_baryon_pca: false
     baryon_pca_select_sims: "antilles-2-99/antilles-101-378/antilles-380-400"
     filename_baryon_pca: "./projects/lsst_y1/chains/pca.txt"
+prior:
+  emulator_omegabh2_cap: "lambda omegab, H0: 0.0 if omegab*(H0/100)**2 < 0.035 else -np.inf"
+
 params:
   As_1e9:
     prior:
