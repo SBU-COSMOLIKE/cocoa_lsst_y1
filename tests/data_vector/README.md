@@ -645,13 +645,12 @@ OMP_NUM_THREADS=4 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 \
 Add `--probe 3x2pt` to this command or to `check_fom_convergence.py` to
 select the full probe combination.
 
-Saved Fisher contours show the bounded 68% and 95% regions of a centered
-CAMB forecast with nuisance parameters marginalized. The saved reference
-records the matrix, priors, fiducial, selection and numerical diagnostics.
-The accuracy run uses the available saved contour for display. Prediction
-errors remain valid when the saved contour is absent or marked unreliable. `--fisher-reference` selects a saved directory, and
-`--no-fisher` omits the display. Candidate networks can be changed using
-`EMULATOR_CODE_DIR` and `EMULATOR_DATA_DIR`.
+The shared plot uses saved 68% and 95% bounded Fisher contours with
+nuisance parameters marginalized. The reference records the matrix, priors,
+fiducial and data selection. Use `--fisher-reference` to select a saved
+reference directory or `--no-fisher` to show only the comparison points.
+Use `EMULATOR_CODE_DIR` and `EMULATOR_DATA_DIR` to select the candidate
+network installation.
 
 ```bash
 python projects/lsst_y1/tests/compare_emulator_camb.py --plot-only /path/to/run
