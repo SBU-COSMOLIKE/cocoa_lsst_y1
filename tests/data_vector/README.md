@@ -575,9 +575,6 @@ that posterior importance weights have adequate effective sample size;
 that must be checked on the chain used for reweighting.
 
 <!-- hybrid-emulator figure -->
-The figures below show the earlier benchmark. Runs with $w_0+w_a<-0.4$
-are pending.
-
 **Emulator training range**
 
 | Parameter | Range |
@@ -586,7 +583,12 @@ are pending.
 | Primordial amplitude | $1<10^9 A_s\le 3.5$ |
 | Hubble constant | $H_0<85$ km/s/Mpc |
 | Present dark-energy equation of state in CPL | $w_0>-2$ |
+| Early-time dark-energy equation of state | $w_0+w_a<-0.4$ |
 | Physical baryon density | $\Omega_b(H_0/100)^2<0.035$ |
+
+The revised tables retain cosmologies that already satisfy the cap and
+replace the excluded rows deterministically. The focused replacements
+use the saved Fisher matrix integrated over the capped priors.
 
 The fixed tables intersect this range with the benchmark priors. CAMB uses
 one massive species with $\sum m_\nu=0.06$ eV. Both model routes evaluate
@@ -606,8 +608,8 @@ Counts use the thresholds 0.2, 0.5, 1 and 4 in that order.
 
 | Case | Broad below threshold (50) | Focused below threshold (25) | Nonfinite broad/focused |
 | --- | --- | --- | --- |
-| Cosmic shear | 19/25/29/35 | 23/23/23/23 | 0/0 |
-| Full 3×2pt | 11/23/27/35 | 23/24/24/24 | 0/0 |
+| Cosmic shear | 20/27/31/37 | 25/25/25/25 | 0/0 |
+| Full 3×2pt | 13/25/28/37 | 24/25/25/25 | 0/0 |
 
 <!-- end hybrid-emulator figure -->
 
