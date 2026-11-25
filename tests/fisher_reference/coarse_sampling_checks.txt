@@ -1,4 +1,4 @@
 coarse_sampling_valid=True; minimum_effective=200
-maximum_relative_seed_width_spread=0.003071311
-maximum_seed_mean_spread_in_sigma=0.0038853197
-relative_seed_normalization_spread=0.0013002493
+maximum_relative_seed_width_spread=0.0036917761
+maximum_seed_mean_spread_in_sigma=0.0041741427
+relative_seed_normalization_spread=0.001932119
