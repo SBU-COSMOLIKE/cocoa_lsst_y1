@@ -678,10 +678,14 @@ omitted columns and correlated numerical errors remain unknown.
 | Cosmic shear | Ordinary | 1.0 / 0 | 1.05 / 10 | 4.9468374 | — |
 | Cosmic shear | Refined | 2.0 / 1 | 2.0 / 50 | 4.9465898 | -0.00500578% |
 | Cosmic shear | Confirmation | 3.0 / 2 | 3.0 / 75 | 4.9465983 | +0.000171421% |
+| 3×2pt | Ordinary | 1 / 0 | 1.05 / 15 | 15.746348 | — |
+| 3×2pt | Refined | 2.0 / 1 | 2.0 / 50 | 15.744411 | -0.0123034% |
+| 3×2pt | Confirmation | 3.0 / 2 | 3.0 / 75 | 15.743923 | -0.00309557% |
 
 **Selected columns in both higher settings**
 
 - Cosmic shear — `H0`, `omegam`, `w`, `w0pwa`.
+- 3×2pt — `w`, `w0pwa`, `omegam`.
 
 Run from activated Cocoa with two MPI ranks, four OpenMP threads per rank
 and one BLAS thread.
@@ -696,7 +700,7 @@ OMP_NUM_THREADS=4 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 \
 
 The run directory contains `fisher/fom_accuracy.tsv`, the effective
 settings for each tier, and the measured and omitted columns. The standalone
-screen applies its tolerance to the estimated refined-to-confirmation change.
+screen applies its 1% tolerance to the estimated refined-to-confirmation change.
 
 ## Appendix <a name="appendix"></a>
 
