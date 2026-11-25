@@ -1,0 +1,5 @@
+pair=('w', 'w0pwa'); full default Fisher with nuisance priors.
+h: dlnFoM=1.1916269825267973e-06; ratio=1.000001191625274
+h/2: dlnFoM=5.7535849818204462e-06; ratio=1.000005753511318
+Analytic columns: LSST_M1, LSST_M2, LSST_M3, LSST_M4, LSST_M5
+Smooth curvature and correlated errors can invalidate the noise interpretation.
