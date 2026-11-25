@@ -519,3 +519,102 @@ def test_input_validation():
     assert result["dlnFoM"] == 0.0
     assert result["ratio"] == 1.0
     assert get_FoM(0, 1, TOY_F) == pytest.approx(np.sqrt(6.0), rel=1e-13)
+
+
+@pytest.mark.parametrize("real_space", [False, True])
+def test_exact_shear_calibration_matches_five_point(real_space):
+    """Auto/cross pairs and masked rows agree with independent stencils."""
+    from cosmolike_notebook_utils.fisher import shear_calibration_derivatives
+
+    calibration = np.array([0.03, -0.02])
+    nrows = 12 if real_space else 6
+    baseline = np.arange(1.0, nrows + 1.0)
+    baseline[1] = 0.0  # One masked angular entry must stay zero.
+
+    def prediction(values):
+        # Two angular entries for each of (0,0), (0,1), (1,1).
+        factors = np.repeat([(1 + values[0])**2,
+                             (1 + values[0])*(1 + values[1]),
+                             (1 + values[1])**2], 2)
+        if real_space:
+            factors = np.tile(factors, 2)  # Separate xi+ and xi- blocks.
+        return np.r_[baseline*factors, np.zeros(3)]
+
+    exact = shear_calibration_derivatives(
+        vector=prediction(calibration), calibration=calibration,
+        nangular=2, real_space=real_space)
+    for index in range(2):
+        for step in (0.01, 0.005):
+            direction = np.eye(2)[index]*step
+            numerical = (-prediction(calibration + 2*direction)
+                         + 8*prediction(calibration + direction)
+                         - 8*prediction(calibration - direction)
+                         + prediction(calibration - 2*direction))/(12*step)
+            np.testing.assert_allclose(exact[:, index], numerical,
+                                       rtol=1.e-12, atol=1.e-12)
+
+
+def test_exact_shear_calibration_refuses_other_active_probes():
+    """A calibration formula for shear alone must not zero a ggl derivative."""
+    from cosmolike_notebook_utils.fisher import shear_calibration_derivatives
+
+    with pytest.raises(ValueError, match="shear-only"):
+        shear_calibration_derivatives(
+            vector=np.ones(4), calibration=[0.0], nangular=1)
+    with pytest.raises(ValueError, match="nonzero 1.m"):
+        shear_calibration_derivatives(
+            vector=np.zeros(2), calibration=[-1.0], nangular=1)
+
+
+def test_bounded_fisher_gaussian_proposal_matches_truncated_normal(tmp_path):
+    """All bounds apply to a joint Gaussian, including nuisance bounds."""
+    from scipy.stats import norm
+    from cocoa_testing import sample_matter_emulator_fisher
+
+    np.savez(tmp_path / "fisher.npz", names=["As_1e9", "nuisance"],
+             center=[2.0, 0.0], lower=[1.9, -1.5], upper=[2.1, 1.5],
+             fisher_fine=np.diag([100.0, 4.0]),
+             fisher_coarse=np.diag([100.0, 4.0]))
+    result = sample_matter_emulator_fisher(tmp_path, sample_power=14)
+    # For a standard Gaussian truncated symmetrically at +/-a,
+    # Var = 1 - 2*a*phi(a)/(2*Phi(a)-1), from integrating x^2 phi(x).
+    limits = np.array([1.0, 3.0])
+    expected = np.array([0.01, 0.25]) * (
+        1 - 2*limits*norm.pdf(limits)/(2*norm.cdf(limits)-1))
+    np.testing.assert_allclose(np.diag(result["covariance"]), expected,
+                               rtol=0.004)
+    with np.load(tmp_path / "bounded_samples.npz") as saved:
+        assert str(saved["proposal"]) == "joint Gaussian"
+        values = saved["values"][saved["weights"] > 0]
+        assert np.all((values >= saved["lower"]) & (values <= saved["upper"]))
+
+
+def test_bounded_fisher_keeps_uniform_null_direction(tmp_path):
+    """A proper flat prior remains available when no full Gaussian exists."""
+    from cocoa_testing import sample_matter_emulator_fisher
+
+    np.savez(tmp_path / "fisher.npz", names=["As_1e9", "nuisance"],
+             center=[2.0, 0.0], lower=[1.0, -2.0], upper=[3.0, 2.0],
+             fisher_fine=np.diag([100.0, 0.0]),
+             fisher_coarse=np.diag([100.0, 0.0]))
+    result = sample_matter_emulator_fisher(tmp_path, sample_power=14)
+    np.testing.assert_allclose(result["covariance"][1, 1], 4.0/3.0,
+                               rtol=0.005)
+    with np.load(tmp_path / "bounded_samples.npz") as saved:
+        assert str(saved["proposal"]) == "uniform and conditional Gaussian"
+
+
+def test_bounded_fisher_gaussian_keeps_coupled_amplitude_cut(tmp_path):
+    """The Gaussian proposal must retain a coupled amplitude/bias prior."""
+    from cocoa_testing import sample_matter_emulator_fisher
+
+    np.savez(tmp_path / "fisher.npz", names=["As_1e9", "bias"],
+             center=[2.0, 1.0], lower=[1.0, 0.5], upper=[3.0, 1.5],
+             fisher_fine=np.diag([100.0, 100.0]),
+             fisher_coarse=np.diag([100.0, 100.0]),
+             amplitude_bias_cut_parameters=[["As_1e9", "bias"]],
+             amplitude_bias_cut_scales=[[2.0, 1.0, 1.0]])
+    result = sample_matter_emulator_fisher(tmp_path, sample_power=13)
+    values = result["values"][result["weights"] > 0]
+    assert np.all((values[:, 0]/2.0)*values[:, 1]**2 <= 1.0)
+    assert len(values) > 1000
