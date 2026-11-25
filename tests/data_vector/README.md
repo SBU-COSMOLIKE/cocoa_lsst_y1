@@ -554,10 +554,11 @@ thread before importing numerical libraries.
 export OMP_NUM_THREADS=4
 ```
 
-**Step :three:**: run the comparison.
+**Step :three:**: run cosmic shear or full 3×2pt.
 
 ```bash
 python projects/lsst_y1/tests/compare_emulator_camb.py
+python projects/lsst_y1/tests/compare_emulator_camb.py --probe 3x2pt
 ```
 
 The script uses the existing shared `cocoa_testing.py` machinery. It saves
@@ -599,13 +600,22 @@ Counts use the thresholds 0.2, 0.5, 1 and 4 in that order.
 
 | Case | Broad below threshold (50) | Focused below threshold (25) | Nonfinite broad/focused |
 | --- | --- | --- | --- |
-| LSST Y1 | 19/25/29/35 | 23/23/23/23 | 0/0 |
+| Cosmic shear | 19/25/29/35 | 23/23/23/23 | 0/0 |
 
 <!-- end hybrid-emulator figure -->
 
-E5 reads the saved `benchmark.yaml` in [fisher_reference/](../fisher_reference/).
+E5 reads the saved `benchmark.yaml` for [cosmic shear](../fisher_reference/)
+or [full 3×2pt](../fisher_reference/3x2pt/).
 The benchmark fixes the likelihood, data selection, sampled parameters,
 fiducial and normal numerical controls.
+
+The full 3×2pt benchmark uses `EXAMPLE_EVALUATE2.yaml` and its own
+959-row mask, covariance and fixed nuisance point. Its saved Fisher uses
+the matching 29-coordinate notebook derivative archive. The likelihood
+Fisher term agrees when rebuilt using the shipped masked covariance. The
+frozen reference transforms the archive's `(w0, wa)` derivatives to
+`(w, w0pwa)`, applies the benchmark priors and retains the galaxy-bias,
+photo-redshift, intrinsic-alignment and shear-calibration nuisance columns.
 
 The accuracy test evaluates CAMB and the candidate at the fixed
 [50 broad and 25 focused points](../fisher_reference/) and stores both
@@ -627,6 +637,9 @@ OMP_NUM_THREADS=4 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 \
   VECLIB_MAXIMUM_THREADS=1 mpirun -n 2 --bind-to none python -m mpi4py \
   projects/lsst_y1/tests/compare_emulator_camb.py --mpi --advisory
 ```
+
+Add `--probe 3x2pt` to this command or to `check_fom_convergence.py` to
+select the full probe combination.
 
 Saved Fisher contours show the bounded 68% and 95% regions of a centered
 CAMB forecast with nuisance parameters marginalized. The saved reference

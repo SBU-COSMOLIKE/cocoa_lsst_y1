@@ -1,4 +1,4 @@
-"""Compare the candidate matter emulator with CAMB at random lsst_y1 cosmologies.
+"""Compare the candidate matter emulator with CAMB at fixed LSST Y1 cosmologies.
 
 Run from activated Cocoa (one project at a time):
     python projects/lsst_y1/tests/compare_emulator_camb.py
@@ -81,10 +81,15 @@ def fisher_calibration_columns(model, likelihood, center, steps, mpi_comm=None):
             for i, name in enumerate(names) if name in steps}
 
 
+BENCHMARK_PROBES = ("shear", "3x2pt")
+
+
 def main(*, fisher=False):
     description = "Screen the CAMB Fisher FoM with one fixed stencil spacing." if fisher else __doc__
     parser = argparse.ArgumentParser(description=description)
     parser.add_argument("--configuration", default=None)
+    parser.add_argument("--probe", choices=BENCHMARK_PROBES, default="shear",
+                        help="Select the saved cosmic shear or full 3×2pt benchmark")
     parser.add_argument("--models", type=int, default=50)
     parser.add_argument("--seed", type=int, default=137)
     parser.add_argument("--limit", type=float, default=1.0)
@@ -117,6 +122,8 @@ def main(*, fisher=False):
                         help="Distribute points and Fisher columns across MPI ranks")
     args = parser.parse_args()
     benchmark = project / "tests/fisher_reference"
+    if args.probe != "shear":
+        benchmark /= args.probe
     benchmark_yaml = benchmark / "benchmark.yaml"
     if args.configuration is None:
         args.configuration = str(benchmark_yaml)
@@ -164,6 +171,14 @@ def main(*, fisher=False):
                 parser.error(f"Required benchmark table is missing: {required_table}")
     if standard_configuration and fisher_reference is None:
         fisher_reference = benchmark
+    cuts = {}
+    if fisher and standard_configuration and args.probe == "3x2pt":
+        # The frozen YAML splits the original maximum into these five
+        # equivalent hard cuts for integration of the bounded Fisher.
+        for lens_bin, bias0 in enumerate(
+                (1.72716, 1.65168, 1.61423, 1.92886, 2.11633), 1):
+            bias = f"LSST_B1_{lens_bin}"
+            cuts[f"amplitude_cut_{bias}"] = ("As_1e9", bias, 2.1, bias0, 8.0)
     os.chdir(root)
     failed = run_matter_emulator_prior_check(
         project=project,
@@ -184,6 +199,7 @@ def main(*, fisher=False):
         advisory=args.advisory,
         local_points_file=local_points,
         derivative_provider=fisher_calibration_columns,
+        amplitude_bias_cuts=cuts,
     )
     sys.exit(1 if failed else 0)
 

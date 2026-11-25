@@ -22,8 +22,8 @@ Repeatability still fails on changed numerical results. The report includes:
   E3. emul2 example2 (3x2pt): accuracy and agreement verdict.
   E4. emul2 example2: race check, required repeatability.
 
-E5 compares 50 frozen broad points and 25 frozen focused points. It
-reports the prediction errors and optionally overlays saved Fisher contours.
+E5 compares 50 frozen broad points and 25 frozen focused points for each
+of cosmic shear and full 3×2pt, using each probe's saved Fisher contours.
 Outputs go under chains/hybrid_emulator_tests/.
 
 Two caveats a reader should know before trusting the deltas. First,
@@ -155,7 +155,7 @@ class TestEmul2Advisory(unittest.TestCase):
 
 
 class TestHybridEmulator(unittest.TestCase):
-    """E5: EV1 cosmic shear, 50 prior points, Fisher and 25 focused points.
+    """E5: cosmic shear and full 3×2pt, each with a separate saved Fisher.
 
     This uses saved benchmark priors, not frozen E1--E4 reference vectors.
     It runs when the candidate code and networks are installed. Broad-prior
@@ -203,26 +203,29 @@ class TestHybridEmulator(unittest.TestCase):
         environment["OPENBLAS_NUM_THREADS"] = "1"
         environment["MKL_NUM_THREADS"] = "1"
         environment["VECLIB_MAXIMUM_THREADS"] = "1"
-        print("E5 hybrid emulator vector accuracy:", output, flush=True)
         frozen = project / "tests/fisher_reference"
-        prior = frozen / "prior_50.txt"
-        focused = frozen / "focused_25.txt"
-        # A missing row changes the denominator even when CAMB itself succeeds.
-        for path, count in ((prior, 50), (focused, 25)):
-            rows = [s for s in path.read_text().splitlines() if s.strip() and not s.startswith("#")]
-            self.assertEqual(len(rows), count, str(path))
-        result = subprocess.run(
-            [sys.executable, str(project / "tests/compare_emulator_camb.py"),
-             "--points", str(prior), "--local-points", str(focused),
-             "--advisory", "--output", str(output)],
-            cwd=root,
-            env=environment,
-            check=False,
-        )
-        self.assertEqual(
-            result.returncode, 0,
-            "Emulator vector comparison failed; inspect " + str(output),
-        )
+        for probe, benchmark in (("shear", frozen), ("3x2pt", frozen / "3x2pt")):
+            with self.subTest(probe=probe):
+                prior = benchmark / "prior_50.txt"
+                focused = benchmark / "focused_25.txt"
+                # A missing row changes the denominator even when CAMB succeeds.
+                for path, count in ((prior, 50), (focused, 25)):
+                    rows = [s for s in path.read_text().splitlines()
+                            if s.strip() and not s.startswith("#")]
+                    self.assertEqual(len(rows), count, str(path))
+                destination = output.with_name(f"{output.name}-{probe}")
+                print("E5 hybrid emulator vector accuracy:", destination, flush=True)
+                result = subprocess.run(
+                    [sys.executable, str(project / "tests/compare_emulator_camb.py"),
+                     "--probe", probe, "--advisory", "--output", str(destination)],
+                    cwd=root,
+                    env=environment,
+                    check=False,
+                )
+                self.assertEqual(
+                    result.returncode, 0,
+                    "Emulator vector comparison failed; inspect " + str(destination),
+                )
 
 # __name__ is "__main__" only when this file runs directly as a
 # script; pytest imports the module instead, so this block stays
