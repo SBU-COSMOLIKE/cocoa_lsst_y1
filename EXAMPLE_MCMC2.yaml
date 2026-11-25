@@ -92,7 +92,8 @@ params:
   w:
     prior:
       min: -1.9999999999999998
-      max: -0.01
+      # Exclusive w0 + wa < -0.4 in Cobaya's float64 prior.
+      max: -0.4000000000000001
     ref:
       dist: norm
       loc: -0.99
