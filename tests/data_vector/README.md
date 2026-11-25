@@ -593,8 +593,7 @@ nuisance-marginalized Fisher regions.
 
 CAMB uses `AccuracyBoost: 1.05` for both probes. Cosmic shear uses
 `k_per_logint: 10` and `kmax: 5.0`. Full 3×2pt uses `k_per_logint: 15`
-and `kmax: 7.5` from its numbered evaluate. The archived cosmic-shear
-Fisher diagnostic found a maximum FoM shift of 0.18%.
+and `kmax: 7.5` from its numbered evaluate.
 
 ![LSST Y1 - Cosmic Shear](figures/emulator_precision.png)
 
