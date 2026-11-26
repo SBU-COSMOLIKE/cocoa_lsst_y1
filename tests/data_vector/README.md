@@ -313,17 +313,25 @@ default-settings vector. Model $m$ draws its point with the seed
 $137 + m$, so every run repeats the same points and the same figure.
 The pushed-settings vectors are stored in
 `tests/frozen/nmodels_example2.npz`, so a run builds one model at the
-default settings and evaluates the 50 points. The check runs with the
-rest of `test_accuracy.py`, or on its own with
+default settings and evaluates the 50 points.
 
-    python -m pytest ./projects/lsst_y1/tests/data_vector/test_accuracy.py -k nmodels
+Use the activated `Cocoa/` directory and the thread settings in
+[Running the tests](#run_tests).
 
-After a change to the prior, the draw settings, the fiducial, a pushed
-setting or a likelihood default, the check fails until the stored
-vectors are regenerated (without a stored file it is skipped with the
-same instruction):
+**Step :one:** Compare the ordinary predictions with the saved vectors.
 
-    python ./projects/lsst_y1/tests/generate_frozen_reference.py --nmodels
+```bash
+python -m pytest -s projects/lsst_y1/tests/data_vector/test_accuracy.py -k nmodels
+```
+
+If the prior, draw rules, fiducial or pushed settings change, refresh
+the reference from the same environment.
+
+**Step :one:** Recompute and save the pushed predictions.
+
+```bash
+python projects/lsst_y1/tests/generate_frozen_reference.py --nmodels
+```
 
 `COCOA_ACCURACY_NMODELS_FIGURES` names the folder of the figure
 (unset: the system temporary folder, so the run changes no project
@@ -354,7 +362,15 @@ fraction of the signal grows by that ratio, and its $\Delta\chi^2$
 against the fiducial covariance by the ratio squared. Circles are drawn
 across the prior; diamonds hold $\Omega_m$, $A_s$ and the biases at the
 fiducial, so they stack at $\Omega_m = 0.3$ and ratio 1. The color
-saturates above 100.
+scale saturates at Δχ² = 1.
+
+![LSST Y1 3×2pt prediction distances with saved Fisher contours](accuracy_nmodels_example2_seed137.png)
+
+The upper-right panel shows the same points in Ωm–10⁹Aₛ with the
+approximate 68% and 95% contours from the 3×2pt NLA Fisher reference.
+The plot uses the recorded distances from a replay of the saved points.
+[Saved contours](../fisher_reference/3x2pt/contours.json)
+[Recorded distances](accuracy_nmodels_example2_seed137.txt)
 
 The check, like every test in this folder, runs `integration_accuracy:
 3`: the frozen references pin it through
