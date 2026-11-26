@@ -44,33 +44,41 @@ measured.
 
 ## Running the tests <a name="run_tests"></a>
 
-We assume users are in the Conda cocoa environment from a previous
-`conda activate cocoa` command, that the shell is bash, and that the
-current folder is the cocoa main folder `cocoa/Cocoa`. Every command
-below assumes `start_cocoa.sh` has been sourced once:
+Use Bash in the main `cocoa/Cocoa/` directory with the Cocoa Conda
+environment activated.
 
-    source start_cocoa.sh
+**Step :one:** Load Cocoa.
 
-Run the full suite with
+```bash
+source start_cocoa.sh
+```
 
-    python -m pytest ./projects/lsst_y1/tests/data_vector
+**Step :two:** Set four OpenMP threads and one BLAS thread.
 
-or, without pytest,
+- Linux
 
-    python -m unittest discover -s ./projects/lsst_y1/tests/data_vector -v
+      export OMP_NUM_THREADS=4 COCOA_TEST_OMP_THREADS=4 OMP_DYNAMIC=FALSE \
+        OMP_PROC_BIND=close OMP_PLACES=cores OPENBLAS_NUM_THREADS=1 \
+        OPENBLAS_DEFAULT_NUM_THREADS=1 MKL_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1
 
-The tests change no project files. Each test prints a progress line per
-model build and per evaluation, then a report with the computed $\chi^2$,
-the stored reference, the difference, and the pass limit. A full run
-performs about 207 likelihood evaluations and takes a few minutes. The test
-files set their OpenMP worker count before imports.
+- macOS (arm)
 
-The shared likelihood tests default to four OpenMP workers. For six workers,
-set `COCOA_TEST_OMP_THREADS=6` and `OMP_THREAD_LIMIT=6` before
-starting Python. The entry points copy the test setting to
-`OMP_NUM_THREADS` before importing native libraries. Keep BLAS at
-one worker. A smaller OpenMP thread limit can reduce the actual team
-below the requested count.
+      export OMP_NUM_THREADS=4 COCOA_TEST_OMP_THREADS=4 OMP_DYNAMIC=FALSE \
+        OMP_PROC_BIND=disabled OMP_PLACES=cores OPENBLAS_NUM_THREADS=1 \
+        OPENBLAS_DEFAULT_NUM_THREADS=1 MKL_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1
+
+**Step :three:** Run the data-vector tests.
+
+```bash
+python -m pytest -s projects/lsst_y1/tests/data_vector
+```
+
+For unittest discovery, use this alternative.
+
+```bash
+python -m unittest discover -s projects/lsst_y1/tests/data_vector -v
+```
+
 
 ## The tests <a name="the_tests"></a>
 
@@ -84,7 +92,7 @@ The TATT variants set
     LSST_BTA_1: 0.05
     LSST_A2_2: -1.51541
 
-The suite follows the shared
+The tests follow the shared
 [test-file naming convention](https://github.com/CosmoLike/cocoa-cosmolike-core/blob/main/README.md#dv_naming): a file name
 means the same thing in every project. This project's
 configurations and test numbers:
@@ -134,7 +142,7 @@ This is a decision record, built from this check's own sweeps.
 
 Table measured on 2026-09-22 (cosmic shear, test 15):
 
-| output table (points) | internal grid (points) | max $\Delta\chi^2$ | Runtime / first row |
+| output table (points) | internal grid (points) | max Δχ² | Runtime / first row |
 |---|---|---|---|
 | 1,100 | 1,100 (shared) | 21.40 | 1.00 |
 | 16,900 | 1,100 | 0.125 | 1.00 |
@@ -227,10 +235,10 @@ check prints four quantities:
 
 | printed quantity | meaning |
 |---|---|
-| emulator $\chi^2$ | the emulated pipeline evaluated at the fiducial point |
-| drift | change against the stored emulator reference; nonzero means the installed emulator no longer reproduces its stored $\chi^2$ |
-| $\lvert\chi^2_\text{emulator} - \chi^2_\text{non-emulated}\rvert$ | the difference against the non-emulated $\chi^2$ at the same cosmology |
-| verdict | agrees at this configuration when $\lvert\chi^2_\text{emulator} - \chi^2_\text{non-emulated}\rvert < 0.2$, does not agree otherwise |
+| emulator χ² | the emulated pipeline evaluated at the fiducial point |
+| drift | change against the stored emulator reference; nonzero means the installed emulator no longer reproduces its stored χ² |
+| Absolute χ² score difference | the difference against the non-emulated χ² at the same cosmology |
+| verdict | agrees at this configuration when the absolute χ² score difference is below 0.2, does not agree otherwise |
 
 A race-condition check (OpenMP threading) runs as well, warning
 instead of failing.
@@ -361,10 +369,10 @@ Measured on 2026-11-18, at the production non-Limber settings (no
 early exit, cap `lmax_nonlimber: 200`), on the 50 stored models (seed
 base 137):
 
-| models | median $\Delta\chi^2$ | maximum | at or above 0.2 |
+| models | median Δχ² | maximum | at or above 0.2 |
 |---|---:|---:|---:|
 | drawn across the prior | 0.0177 | 1.33 | 4 of 25 |
-| $\Omega_m$, $A_s$, $b$ at the fiducial | 0.00441 | 0.0591 | 0 of 25 |
+| Ωm, Aₛ, b at the fiducial | 0.00441 | 0.0591 | 0 of 25 |
 
 - With $\Omega_m$ and the clustering amplitude at the fiducial, the
   other parameters keep every model inside the 0.2 band, with the IA
@@ -510,7 +518,7 @@ the jitter one evaluation adds to a derivative column.
 
 Measured on 2026-11-18 (OMP 4), $\sigma$ in $\sqrt{\chi^2}$ units:
 
-| stencil noise $\sigma$ | $w_0$ | $w_a$ | `LSST_B1_5` |
+| stencil noise σ | w₀ | wₐ | `LSST_B1_5` |
 |---|---|---|---|
 | core default tolerances, cap 150 | 7.26e-3 | 6.54e-3 | 6.47e-3 |
 | tolerance 0, cap 150 | 9.51e-4 | 3.76e-4 | 6e-13 |
@@ -531,6 +539,10 @@ Run it alone with
     python -m pytest ./projects/lsst_y1/tests/data_vector/test_nonlimber_tolerance.py -s
 
 ## Hybrid-emulator accuracy test
+
+**Mechanism.** Compare the candidate emulator's predictions with CAMB at
+the same saved cosmologies and nuisance values. Score the prediction
+differences using the benchmark mask and covariance.
 
 [compare_emulator_camb.py](../compare_emulator_camb.py) compares the candidate
 matter-spectrum emulator with fresh CAMB predictions at the saved 50
@@ -579,12 +591,12 @@ that must be checked on the chain used for reweighting.
 
 | Parameter | Range |
 | --- | --- |
-| Total matter density | $0.2<\Omega_m<0.5$ |
-| Primordial amplitude | $1<10^9 A_s\le 3.5$ |
-| Hubble constant | $H_0<85$ km/s/Mpc |
-| Present dark-energy equation of state in CPL | $w_0>-2$ |
-| Early-time dark-energy equation of state | $w_0+w_a<-0.4$ |
-| Physical baryon density | $\Omega_b(H_0/100)^2<0.035$ |
+| Total matter density | 0.2 < Ωm < 0.5 |
+| Primordial amplitude | 1 < 10⁹ Aₛ ≤ 3.5 |
+| Hubble constant | H₀ < 85 km/s/Mpc |
+| Present dark-energy equation of state in CPL | w₀ > −2 |
+| Early-time dark-energy equation of state | w₀ + wₐ < −0.4 |
+| Physical baryon density | Ωb (H₀ / 100)² < 0.035 |
 
 The revised tables retain cosmologies that already satisfy the cap and
 replace the excluded rows deterministically. The focused replacements
@@ -640,15 +652,36 @@ as advisory. The strict standalone command also checks the error threshold.
 python -m pytest projects/lsst_y1/tests/data_vector/test_emul2.py -k e5
 ```
 
-To distribute the numerical comparisons across two MPI ranks with four
-OpenMP threads each, use the same driver directly from activated Cocoa.
-Keep BLAS at one thread and pass `--mpi` so the ranks own different points.
+For MPI, run from the main `Cocoa/` directory with the environment activated.
 
-```bash
-OMP_NUM_THREADS=4 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 \
-  VECLIB_MAXIMUM_THREADS=1 mpirun -n 2 --bind-to none python -m mpi4py \
-  projects/lsst_y1/tests/compare_emulator_camb.py --mpi --advisory
-```
+**Step :one:** Set four OpenMP threads and one BLAS thread per rank.
+
+- Linux
+
+      export OMP_NUM_THREADS=4 OMP_DYNAMIC=FALSE \
+        OMP_PROC_BIND=close OMP_PLACES=cores OPENBLAS_NUM_THREADS=1 \
+        OPENBLAS_DEFAULT_NUM_THREADS=1 MKL_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1
+
+- macOS (arm)
+
+      export OMP_NUM_THREADS=4 OMP_DYNAMIC=FALSE \
+        OMP_PROC_BIND=disabled OMP_PLACES=cores OPENBLAS_NUM_THREADS=1 \
+        OPENBLAS_DEFAULT_NUM_THREADS=1 MKL_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1
+
+**Step :two:** Run the comparison with two MPI ranks.
+
+- Linux
+
+      "${CONDA_PREFIX}"/bin/mpirun -n 2 --oversubscribe \
+        --mca pml ob1 --mca btl vader,tcp,self \
+        --bind-to core:overload-allowed --map-by numa:pe="${OMP_NUM_THREADS}" \
+        python -m mpi4py \
+        projects/lsst_y1/tests/compare_emulator_camb.py --mpi --advisory
+
+- macOS (arm)
+
+      mpirun -n 2 --bind-to none python -m mpi4py \
+        projects/lsst_y1/tests/compare_emulator_camb.py --mpi --advisory
 
 Add `--probe 3x2pt` to this command or to `check_fom_convergence.py` to
 select the full probe combination.
@@ -664,51 +697,95 @@ network installation.
 python projects/lsst_y1/tests/compare_emulator_camb.py --plot-only /path/to/run
 ```
 
-## FoM convergence
+## FoM convergence <a name="fom-convergence"></a>
 
 This CAMB test uses the ordinary accuracy and physical prescription of each
 benchmark to build one full local Fisher matrix. The figure of merit is
-$1/\sqrt{\det C_{w_0,w_a}}$, with nuisance parameters marginalized in the
-Gaussian approximation. The sampled pair $w_0,w_0+w_a$ has the same ellipse
+$`1/\sqrt{\det C_{w_0,w_a}}`$, with nuisance parameters marginalized in the
+Gaussian approximation. The sampled pair $`w_0,w_0+w_a`$ has the same ellipse
 area. Gaussian prior curvature enters the Fisher matrix, and prior bounds
 limit the stencil positions.
 
-The five-point stencil uses a fixed 2.5% relative step, shortened near prior
-bounds. A zero-centered parameter uses its specified absolute step or one
-tenth of its proposal width. The fourth differences rank the numerical
-sensitivity of the columns. Both higher settings reevaluate the same selected
-columns and use the same full ordinary Fisher weights. The table scales the
-ordinary FoM by the estimated change at each setting. Contributions from
-omitted columns and correlated numerical errors remain unknown.
+**Mechanism.** The test computes every derivative at the default
+settings. To estimate numerical noise it takes fourth differences of the
+five predictions used for each derivative. The step is 2.5% for nonzero
+parameter values, shortened at prior boundaries. For a zero-centered
+parameter it uses the specified absolute step or one tenth of its
+proposal width.
 
-| Case | Setting | CosmoLike boost / integration | CAMB boost / k_per_logint | Approx. FoM | Change from previous |
-| --- | --- | --- | --- | --- | --- |
-| Cosmic shear | Ordinary | 1.0 / 0 | 1.05 / 10 | 4.9468374 | — |
-| Cosmic shear | Refined | 2.0 / 1 | 2.0 / 50 | 4.9465898 | -0.00500578% |
-| Cosmic shear | Confirmation | 3.0 / 2 | 3.0 / 75 | 4.9465983 | +0.000171421% |
-| 3×2pt | Ordinary | 1 / 0 | 1.05 / 15 | 15.746348 | — |
-| 3×2pt | Refined | 2.0 / 1 | 2.0 / 50 | 15.744411 | -0.0123034% |
-| 3×2pt | Confirmation | 3.0 / 2 | 3.0 / 75 | 15.743923 | -0.00309557% |
+The estimate treats the derivative errors as centered and uncorrelated.
+
+```math
+F_q \simeq F_0 + \operatorname{diag}(a_q), \qquad S_q = F_q^{-1}.
+```
+
+Here $`F_0`$ is the full default Fisher matrix, and each entry in
+$`a_q`$ is a fourth-difference estimate of the noise for one selected
+derivative at setting $`q`$, weighted by the inverse data covariance. The FoM
+uses the dark-energy block of $`S_q`$. Both refinements reevaluate the
+same selected derivatives. Their noise estimates use the same selection
+at the default and higher settings. Noise in the other derivatives and
+smooth shifts of any derivative remain unmeasured.
+
+| Setting | Default | Higher | Highest |
+| --- | ---: | ---: | ---: |
+| CosmoLike `accuracyboost` | 1 | 2 | 3 |
+| CosmoLike `integration_accuracy` | 0 | 1 | 2 |
+| CAMB `AccuracyBoost` | 1.05 | 2 | 3 |
+| CAMB `k_per_logint` (Cosmic shear) | 10 | 50 | 75 |
+| CAMB `k_per_logint` (3×2pt) | 15 | 50 | 75 |
+
+The entries are estimated FoM changes between successive settings.
+
+| Likelihood | Default → higher | Higher → highest |
+| --- | ---: | ---: |
+| Cosmic shear | −5.0×10⁻³% | +1.7×10⁻⁴% |
+| 3×2pt | −0.012% | −3.1×10⁻³% |
+
+The default settings meet the 1% check for every likelihood shown.
+Both successive estimated changes are below 1%.
 
 **Selected columns in both higher settings**
 
 - Cosmic shear — `H0`, `omegam`, `w`, `w0pwa`.
 - 3×2pt — `w`, `w0pwa`, `omegam`.
 
-Run from activated Cocoa with two MPI ranks, four OpenMP threads per rank
-and one BLAS thread.
-
 The default is cosmic shear. Use `--probe 3x2pt` for the full selection.
 
-```bash
-OMP_NUM_THREADS=4 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 \
-  VECLIB_MAXIMUM_THREADS=1 mpirun -n 2 --bind-to none python -m mpi4py \
-  projects/lsst_y1/tests/check_fom_convergence.py --mpi
-```
+Run from the main `Cocoa/` directory with the Cocoa environment activated.
+
+**Step :one:** Set four OpenMP threads and one BLAS thread per rank.
+
+- Linux
+
+      export OMP_NUM_THREADS=4 OMP_DYNAMIC=FALSE \
+        OMP_PROC_BIND=close OMP_PLACES=cores \
+        OPENBLAS_NUM_THREADS=1 \
+          OPENBLAS_DEFAULT_NUM_THREADS=1 MKL_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1
+
+- macOS (arm)
+
+      export OMP_NUM_THREADS=4 OMP_DYNAMIC=FALSE \
+        OMP_PROC_BIND=disabled OMP_PLACES=cores \
+        OPENBLAS_NUM_THREADS=1 \
+          OPENBLAS_DEFAULT_NUM_THREADS=1 MKL_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1
+
+**Step :two:** Run the check with two MPI ranks.
+
+- Linux
+
+      "${CONDA_PREFIX}"/bin/mpirun -n 2 --oversubscribe \
+        --mca pml ob1 --mca btl vader,tcp,self \
+        --bind-to core:overload-allowed --map-by numa:pe="${OMP_NUM_THREADS}" \
+        python -m mpi4py projects/lsst_y1/tests/check_fom_convergence.py --mpi
+
+- macOS (arm)
+
+      mpirun -n 2 --bind-to none python -m mpi4py \
+        projects/lsst_y1/tests/check_fom_convergence.py --mpi
 
 The run directory contains `fisher/fom_accuracy.tsv`, the effective
-settings for each tier, and the measured and omitted columns. The standalone
-screen applies its 1% tolerance to the estimated refined-to-confirmation change.
+settings, and the measured and omitted columns.
 
 ## Appendix <a name="appendix"></a>
 
@@ -726,7 +803,7 @@ This project's `frozen/` holds:
 | `frozen_config_emul2_example1.py` | cosmic shear with the hybrid emulators: the complete cobaya configuration as a yaml string, plus the exact evaluation point |
 | `frozen_config_emul2_example2.py` | 3x2pt with the hybrid emulators: the complete cobaya configuration as a yaml string, plus the exact evaluation point |
 | `data/` | the tests' own copy of the data vectors, covariance, n(z), and masks, plus the TATT and baryonic-feedback vectors the generator writes |
-| `reference_chi2.json` | the reference $\chi^2$ values, one per configuration and variant |
+| `reference_chi2.json` | the reference χ² values, one per configuration and variant |
 | `EXAMPLE_EVALUATE1.yaml` | snapshot of the cosmic-shear example, kept only so a human can diff how the live example drifted since the freeze |
 | `EXAMPLE_EVALUATE2.yaml` | snapshot of the 3x2pt example, kept only so a human can diff how the live example drifted since the freeze |
 | `EXAMPLE_EMUL2_EVALUATE1.yaml` | snapshot of the hybrid cosmic-shear example, kept only so a human can diff how the live example drifted since the freeze |
