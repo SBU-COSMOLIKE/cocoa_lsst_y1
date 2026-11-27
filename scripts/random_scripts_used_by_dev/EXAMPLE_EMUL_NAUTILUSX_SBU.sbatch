@@ -49,7 +49,6 @@ export MKL_NUM_THREADS=1
     ./projects/lsst_y1/EXAMPLE_EMUL_NAUTILUS${SLURM_ARRAY_TASK_ID}.py \
     --root ./projects/lsst_y1/ \
     --outroot "EXAMPLE_EMUL_NAUTILUS${SLURM_ARRAY_TASK_ID}" \
-    --maxfeval 750000 \
     --nlive 2048 \
     --neff 15000 \
     --flive 0.01 \

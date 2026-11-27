@@ -386,7 +386,7 @@ Add `--check` to evaluate the yaml's fiducial point without sampling.
           --mca btl_tcp_if_exclude lo,docker0,virbr0,ib0,eno1,enp1s0f0np0 --report-bindings \
           python ./projects/lsst_y1/EXAMPLE_EMUL_NAUTILUS1.py \
             --root ./projects/lsst_y1/ --outroot "EXAMPLE_EMUL_NAUTILUS1"  \
-            --maxfeval 750000 --nlive 2048 --neff 15000 \
+            --nlive 2048 --neff 15000 \
             --flive 0.01 --nnetworks 5
 
   - macOS (arm)
@@ -395,7 +395,7 @@ Add `--check` to evaluate the yaml's fiducial point without sampling.
           python ./projects/lsst_y1/EXAMPLE_EMUL_NAUTILUS1.py \
             --root ./projects/lsst_y1/ \
             --outroot "EXAMPLE_EMUL_NAUTILUS1" \
-            --maxfeval 750000 --nlive 2048 --neff 15000 \
+            --nlive 2048 --neff 15000 \
             --flive 0.01 --nnetworks 5
 
   The Colab example [Test Nautilus](https://github.com/CosmoLike/CoCoAGoogleColabExamples/blob/main/Cocoa_Example_(LSSTY1)_Test_Nautilus.ipynb) illustrates how stable Nautilus results are as a function of `nlive` 
@@ -414,7 +414,7 @@ Add `--check` to evaluate the yaml's fiducial point without sampling.
           python ./projects/lsst_y1/EXAMPLE_EMUL_NAUTILUS2.py \
             --root ./projects/lsst_y1/ \
             --outroot "EXAMPLE_EMUL_NAUTILUS2"  \
-            --maxfeval 850000 --nlive 3072 --neff 15000 \
+            --nlive 3072 --neff 15000 \
             --flive 0.01 --nnetworks 5
 
   - macOS (arm)
@@ -423,11 +423,14 @@ Add `--check` to evaluate the yaml's fiducial point without sampling.
           python ./projects/lsst_y1/EXAMPLE_EMUL_NAUTILUS2.py \
             --root ./projects/lsst_y1/ \
             --outroot "EXAMPLE_EMUL_NAUTILUS2"  \
-            --maxfeval 850000 --nlive 3072 --neff 15000 \
+            --nlive 3072 --neff 15000 \
             --flive 0.01 --nnetworks 5
     
-  What if the user runs a `Nautilus` chain with `--maxfeval` insufficient for producing `neff` samples? `Nautilus` saves the chain checkpoint at `chains/outroot_checkpoint.hdf5`.
-  The chain `chains/outroot.1.txt` holds the weight, minus the log likelihood and the sampled parameters; `chains/outroot.yaml` records the log evidence. An existing result is never overwritten: choose a new `--outroot`.
+  Set `--maxfeval` to limit likelihood evaluations in a bounded run.
+  Nautilus saves the checkpoint at `chains/outroot_checkpoint.hdf5`.
+  The chain `chains/outroot.1.txt` holds the weight, minus the log likelihood
+  and the sampled parameters. `chains/outroot.yaml` records the log evidence.
+  Use `--resume` at the same prefix to continue a matching unfinished run.
 
 - **Emcee**:
 
@@ -754,7 +757,8 @@ The minimization, profile and Nautilus scripts read the corresponding
 YAML. They require `cocoa_hybrid_sampling.py` from the matching shared core
 revision. They do not maintain separate embedded cosmologies. `--check` evaluates
 the specified fiducial and prints the sampled parameter order without sampling.
-Use a new `--outroot` for each run; these scripts refuse to overwrite results.
+Use an unused `--outroot` for a new run. Nautilus can continue a matching
+unfinished checkpoint at the same prefix with `--resume`.
 
 ### Cobaya MCMC
 
@@ -886,12 +890,12 @@ python ./projects/lsst_y1/EXAMPLE_EMUL2_MINIMIZE1.py --check
         --mca btl_tcp_if_exclude lo,docker0,virbr0,ib0,eno1,enp1s0f0np0 \
         --bind-to core:overload-allowed --report-bindings \
         --rank-by slot --map-by numa:pe=${OMP_NUM_THREADS} \
-        python ./projects/lsst_y1/EXAMPLE_EMUL2_NAUTILUS1.py --nlive 1000 --neff 10000 --maxfeval 100000 --outroot hybrid_nautilus1
+        python ./projects/lsst_y1/EXAMPLE_EMUL2_NAUTILUS1.py --nlive 1000 --neff 15000 --outroot hybrid_nautilus1
 
 - macOS (arm)
 
       mpirun -n 12 --oversubscribe \
-        python ./projects/lsst_y1/EXAMPLE_EMUL2_NAUTILUS1.py --nlive 1000 --neff 10000 --maxfeval 100000 --outroot hybrid_nautilus1
+        python ./projects/lsst_y1/EXAMPLE_EMUL2_NAUTILUS1.py --nlive 1000 --neff 15000 --outroot hybrid_nautilus1
 
 
 The annealed Emcee search follows the DES × Planck template. Its objective
